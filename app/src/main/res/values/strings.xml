@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">Start Recording</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="settings_title">Recorder Settings</string>
+    
+    <string name="resolution_label">Resolution</string>
+    <string name="bitrate_label">Bitrate</string>
+    <string name="fps_label">Frame Rate</string>
+    <string name="audio_source_label">Audio Source</string>
+    <string name="video_codec_label">Video Codec</string>
+    
+    <string-array name="resolution_options">
+        <item>Original (Native)</item>
+        <item>1080p (FHD)</item>
+        <item>720p (HD)</item>
+        <item>480p (SD)</item>
+    </string-array>
+    
+    <string-array name="bitrate_options">
+        <item>2 Mbps</item>
+        <item>4 Mbps</item>
+        <item>8 Mbps</item>
+        <item>12 Mbps</item>
+        <item>20 Mbps</item>
+        <item>40 Mbps</item>
+    </string-array>
+    
+    <string-array name="fps_options">
+        <item>24 FPS</item>
+        <item>30 FPS</item>
+        <item>60 FPS</item>
+        <item>90 FPS</item>
+        <item>120 FPS</item>
+    </string-array>
+    
+    <string-array name="audio_options">
+        <item>No Audio</item>
+        <item>Microphone</item>
+        <item>Internal Audio</item>
+    </string-array>
+
+    <string-array name="codec_options">
+        <item>H.264 (AVC)</item>
+        <item>H.265 (HEVC)</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">This app is open source and works entirely offline. No internet connection is used.</string>
+    <string name="view_source">View Source</string>
+</resources>

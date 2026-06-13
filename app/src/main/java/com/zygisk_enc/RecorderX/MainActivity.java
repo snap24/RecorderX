@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -15,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import com.google.android.material.slider.Slider;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SCREEN_CAPTURE_REQUEST_CODE = 1000;
@@ -36,30 +41,79 @@ public class MainActivity extends AppCompatActivity {
         btnRecord = findViewById(R.id.btnRecord);
         btnRecord.setOnClickListener(v -> toggleRecording());
 
+        findViewById(R.id.btnGuide).setOnClickListener(v -> {
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+            builder.setTitle("RECORDER GUIDE");
+            builder.setMessage(
+                "• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n" +
+                "• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n" +
+                "• RESOLUTION: NAT uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n" +
+                "• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n" +
+                "• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n" +
+                "• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n" +
+                "• AUDIO SOURCE: Record Silence, Microphone, or System Internal sound.\n\n" +
+                "• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity."
+            );
+            builder.setPositiveButton("UNDERSTOOD", null);
+            builder.show();
+        });
+            
         findViewById(R.id.btnViewSource).setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/zygisk-enc/RecorderX"));
             startActivity(intent);
         });
 
-        setupSpinner(R.id.codecSpinner, R.array.codec_options, settingsManager.getCodec(), 
+        // Video Settings
+        setupSlider(R.id.codecSlider, R.array.codec_options, settingsManager.getCodec(), 
             index -> settingsManager.setCodec(index));
-        setupSpinner(R.id.resolutionSpinner, R.array.resolution_options, settingsManager.getResolution(), 
+        setupSlider(R.id.orientationSlider, R.array.orientation_options, settingsManager.getOrientation(), 
+            index -> settingsManager.setOrientation(index));
+        setupSlider(R.id.bitrateModeSlider, R.array.bitrate_mode_options, settingsManager.getBitrateMode(), 
+            index -> settingsManager.setBitrateMode(index));
+
+        setupSlider(R.id.resolutionSlider, R.array.resolution_options, settingsManager.getResolution(), 
             index -> settingsManager.setResolution(index));
-        setupSpinner(R.id.bitrateSpinner, R.array.bitrate_options, settingsManager.getBitrate(), 
-            index -> settingsManager.setBitrate(index));
-        setupSpinner(R.id.fpsSpinner, R.array.fps_options, settingsManager.getFps(), 
+        setupSlider(R.id.fpsSlider, R.array.fps_options, settingsManager.getFps(), 
             index -> settingsManager.setFps(index));
-        setupSpinner(R.id.audioSpinner, R.array.audio_options, settingsManager.getAudioSource(), 
+        setupSlider(R.id.bitrateSlider, R.array.bitrate_options, settingsManager.getBitrate(), 
+            index -> settingsManager.setBitrate(index));
+
+        // Audio Settings
+        setupSlider(R.id.audioSlider, R.array.audio_options, settingsManager.getAudioSource(), 
             index -> settingsManager.setAudioSource(index));
+        setupSlider(R.id.audioQualitySlider, R.array.audio_quality_options, settingsManager.getAudioQuality(), 
+            index -> settingsManager.setAudioQuality(index));
+
+        // Output Settings
+        TextInputEditText namingInput = findViewById(R.id.namingTemplateEditText);
+        namingInput.setText(settingsManager.getRawNamingTemplate());
+        namingInput.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+                if (s != null) settingsManager.setNamingTemplate(s.toString());
+            }
+        });
     }
 
-    private void setupSpinner(int viewId, int arrayId, int initialSelection, OnSelectionChanged listener) {
-        AutoCompleteTextView spinner = findViewById(viewId);
+    private void setupSlider(int viewId, int arrayId, int initialSelection, OnSelectionChanged listener) {
+        Slider slider = findViewById(viewId);
         String[] options = getResources().getStringArray(arrayId);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, options);
-        spinner.setAdapter(adapter);
-        spinner.setText(options[initialSelection], false);
-        spinner.setOnItemClickListener((parent, view, position, id) -> listener.onChanged(position));
+        
+        slider.setValue(initialSelection);
+        slider.setLabelFormatter(value -> {
+            int index = (int) value;
+            if (index >= 0 && index < options.length) {
+                return options[index];
+            }
+            return String.valueOf(value);
+        });
+        
+        slider.addOnChangeListener((slider1, value, fromUser) -> {
+            if (fromUser) {
+                listener.onChanged((int) value);
+            }
+        });
     }
 
     private void toggleRecording() {
@@ -75,14 +129,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkPermissions() {
-        if (settingsManager.getAudioSource() == 1) {
-            return ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+        boolean granted = true;
+        
+        // Audio Permission
+        int audioSource = settingsManager.getAudioSource();
+        if (audioSource == 1) { // Mic
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                granted = false;
+            }
         }
-        return true;
+        
+        // Notification Permission (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                granted = false;
+            }
+        }
+        
+        return granted;
     }
 
     private void requestPermissions() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSION_REQUEST_CODE);
+        java.util.ArrayList<String> permissions = new java.util.ArrayList<>();
+        
+        if (settingsManager.getAudioSource() == 1) {
+            permissions.add(Manifest.permission.RECORD_AUDIO);
+        }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+        
+        if (!permissions.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+        }
     }
 
     @Override
@@ -92,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startProjectionRequest();
             } else {
-                Toast.makeText(this, "Audio permission required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Audio permission required for Mic", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -119,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
     private void startRecording(int resultCode, Intent data) {
         android.util.Log.d("RecorderX_Main", "startRecording: ResultCode=" + resultCode + ", Data=" + data);
         
-        // Use static backup as the Intent extras can be stripped on some devices
         RecorderService.setProjectionData(resultCode, data);
 
         Intent intent = new Intent(this, RecorderService.class);
@@ -148,9 +227,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         btnRecord.setText(RecorderService.isRecording() ? R.string.stop_recording : R.string.start_recording);
         
-        // Handle auto-start request from Quick Settings Tile
         if (getIntent() != null && getIntent().getBooleanExtra("AUTO_START", false)) {
-            getIntent().removeExtra("AUTO_START"); // Clear so it doesn't trigger again
+            getIntent().removeExtra("AUTO_START");
             if (!RecorderService.isRecording()) {
                 toggleRecording();
             }

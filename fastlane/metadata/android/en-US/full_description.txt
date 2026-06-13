@@ -1,10 +1,12 @@
-A modern, high-performance screen recording application for Android with a focus on privacy and high-quality output.
+RecorderX is a high-performance, privacy-focused screen recorder for Android.
 
-Features:
-* High-Resolution Recording: Supports Native, 1080p, 720p, and 480p.
-* High FPS: Up to 120 FPS recording (device dependent).
-* Internal Audio: Capture system sound directly (Android 10+).
-* Modern Codecs: Support for H.264 (AVC) and H.265 (HEVC).
-* Privacy Focused: Works entirely offline. No internet permissions, no tracking.
-* Material 3 Design: Clean, modern UI with glassmorphic elements.
-* Quick Settings Integration: Start/Stop recording directly from your notification shade.
+Key Features:
+- Record up to 4K (UHD) and 2K (QHD) for crystal clear video.
+- High-speed recording at 60fps, 90fps, and 120fps.
+- Custom bitrates up to 40 Mbps for professional quality.
+- Modern AMOLED Black and Lavender Purple theme with precision slider controls.
+- Automatic file naming with custom templates.
+- Self-healing audio system that recovers if the system blocks capture.
+- Post-recording notifications with live video thumbnails.
+- Works entirely offline with no internet access or ads.
+- Open Source and built for performance.

@@ -59,6 +59,18 @@ public class RecordingSession {
     private String outputFilePath;
     private Uri outputUri;
 
+    public interface SessionListener {
+        void onSystemStop();
+    }
+    private SessionListener listener;
+
+    public void setListener(SessionListener listener) {
+        this.listener = listener;
+    }
+
+    public String getOutputFilePath() { return outputFilePath; }
+    public Uri getOutputUri() { return outputUri; }
+
     public RecordingSession(Context context, MediaProjection mediaProjection, SettingsManager settings) {
         this.context = context;
         this.mediaProjection = mediaProjection;
@@ -121,14 +133,20 @@ public class RecordingSession {
                 @Override
                 public void onStop() {
                     Log.i(TAG, "MediaProjection onStop() triggered by system");
-                    stop();
+                    if (listener != null) {
+                        listener.onSystemStop();
+                    } else {
+                        stop();
+                    }
                 }
             }, new Handler(Looper.getMainLooper()));
 
             Log.d(TAG, "Creating VirtualDisplay (" + settings.getResolutionWidth() + "x" + settings.getResolutionHeight() + ")...");
             virtualDisplay = mediaProjection.createVirtualDisplay("RecorderX",
                     settings.getResolutionWidth(), settings.getResolutionHeight(), density,
-                    DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                    DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR | 
+                    DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC | 
+                    DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION,
                     inputSurface, null, null);
             
             if (virtualDisplay == null) {
@@ -152,18 +170,45 @@ public class RecordingSession {
         MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
         format.setInteger(MediaFormat.KEY_BIT_RATE, settings.getBitrateValue());
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, settings.getFpsValue());
-        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
-        format.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
         
-        Log.i(TAG, "Configuring Video Encoder: Codec=" + mime + 
-                ", Res=" + width + "x" + height + 
-                ", Bitrate=" + (settings.getBitrateValue() / 1000000) + "Mbps" + 
-                ", FPS=" + settings.getFpsValue());
+        int fps = settings.getFpsValue();
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, fps);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            format.setFloat(MediaFormat.KEY_MAX_FPS_TO_ENCODER, (float) fps);
+        }
+        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
+        
+        int bitrateMode = settings.getBitrateMode() == 0 ? 
+                MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR : 
+                MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR;
+        format.setInteger(MediaFormat.KEY_BITRATE_MODE, bitrateMode);
 
-        videoEncoder = MediaCodec.createEncoderByType(mime);
-        videoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-        inputSurface = videoEncoder.createInputSurface();
+        if (MediaFormat.MIMETYPE_VIDEO_AVC.equals(mime)) {
+            format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+            // Removed AVCLevel41 constraint. Level 4.1 restricts macroblock processing (maxing out at 1080p30).
+            // Removing this allows the encoder to dynamically select Level 5.1/5.2 for 4K/60fps+.
+        }
+
+        try {
+            videoEncoder = MediaCodec.createEncoderByType(mime);
+            videoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            inputSurface = videoEncoder.createInputSurface();
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "Hardware encoder rejected High Quality/AV1 configuration. Falling back to safe defaults.", e);
+            if (videoEncoder != null) videoEncoder.release();
+            
+            mime = MediaFormat.MIMETYPE_VIDEO_AVC;
+            format = MediaFormat.createVideoFormat(mime, width, height);
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, settings.getBitrateValue());
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, 60);
+            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
+            format.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR);
+
+            videoEncoder = MediaCodec.createEncoderByType(mime);
+            videoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            inputSurface = videoEncoder.createInputSurface();
+        }
     }
 
     private void setupAudioEncoder() throws IOException {

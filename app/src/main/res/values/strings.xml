@@ -1,51 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RecorderX</string>
-    <string name="start_recording">Start Recording</string>
-    <string name="stop_recording">Stop Recording</string>
-    <string name="settings_title">Recorder Settings</string>
+    <string name="app_name">RecorderX V2</string>
+    <string name="start_recording">START RECORDING</string>
+    <string name="stop_recording">STOP RECORDING</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
     
-    <string name="resolution_label">Resolution</string>
-    <string name="bitrate_label">Bitrate</string>
-    <string name="fps_label">Frame Rate</string>
-    <string name="audio_source_label">Audio Source</string>
-    <string name="video_codec_label">Video Codec</string>
+    <string name="resolution_label">RESOLUTION</string>
+    <string name="bitrate_label">BITRATE</string>
+    <string name="fps_label">FRAME RATE</string>
+    <string name="video_codec_label">VIDEO CODEC</string>
+    <string name="bitrate_mode_label">BITRATE MODE</string>
+    <string name="orientation_label">ORIENTATION</string>
+
+    <string name="audio_source_label">AUDIO SOURCE</string>
+    <string name="audio_quality_label">AUDIO QUALITY</string>
+    
+    <string name="naming_template_label">OUTPUT TEMPLATE</string>
     
     <string-array name="resolution_options">
-        <item>Original (Native)</item>
-        <item>1080p (FHD)</item>
-        <item>720p (HD)</item>
-        <item>480p (SD)</item>
+        <item>NAT</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>SD</item>
     </string-array>
     
     <string-array name="bitrate_options">
-        <item>2 Mbps</item>
-        <item>4 Mbps</item>
-        <item>8 Mbps</item>
-        <item>12 Mbps</item>
-        <item>20 Mbps</item>
-        <item>40 Mbps</item>
+        <item>2M</item>
+        <item>4M</item>
+        <item>8M</item>
+        <item>12M</item>
+        <item>20M</item>
+        <item>40M</item>
     </string-array>
     
     <string-array name="fps_options">
-        <item>24 FPS</item>
-        <item>30 FPS</item>
-        <item>60 FPS</item>
-        <item>90 FPS</item>
-        <item>120 FPS</item>
-    </string-array>
-    
-    <string-array name="audio_options">
-        <item>No Audio</item>
-        <item>Microphone</item>
-        <item>Internal Audio</item>
+        <item>24</item>
+        <item>30</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
     </string-array>
 
     <string-array name="codec_options">
-        <item>H.264 (AVC)</item>
-        <item>H.265 (HEVC)</item>
+        <item>H.264</item>
+        <item>H.265</item>
+        <item>AV1</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>AUTO</item>
+        <item>PORT</item>
+        <item>LAND</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>OFF</item>
+        <item>MIC</item>
+        <item>SYS</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>LOW</item>
+        <item>HIGH</item>
+        <item>EX</item>
     </string-array>
 
     <string name="qs_label">RecorderX</string>
-    <string name="info_text">This app is open source and works entirely offline. No internet connection is used.</string>
-    <string name="view_source">View Source</string>
+    <string name="info_text">Advanced settings are automatically saved.</string>
 </resources>

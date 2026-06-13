@@ -1,0 +1,6 @@
+- 4K (UHD) and 2K (QHD) high-resolution recording.
+- Ultra-smooth 90fps and 120fps frame rates.
+- Modern AMOLED Black & Deep Lavender UI with Pill Sliders.
+- Self-healing audio capture with auto-recovery.
+- Instant video thumbnail notifications.
+- Fixed landscape recording quality and sharpness.

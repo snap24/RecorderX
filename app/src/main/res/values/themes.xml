@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
+    <!-- Forced AMOLED Theme (Ignores System Light/Dark) -->
     <style name="Theme.RecorderX" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/neon_pink</item>
-        <item name="colorSecondary">@color/neon_cyan</item>
-        <item name="colorTertiary">@color/neon_purple</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu</item>
+        <item name="colorPrimary">@color/accent_lavender</item>
+        <item name="android:windowBackground">@color/bg_amoled</item>
+        <item name="android:statusBarColor">@color/bg_amoled</item>
+        <item name="android:navigationBarColor">@color/bg_amoled</item>
+        <item name="colorSecondary">@color/accent_lavender_dim</item>
+        <item name="colorTertiary">@color/text_secondary</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
     </style>
 </resources>

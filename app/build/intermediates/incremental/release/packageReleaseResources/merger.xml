@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/zygisk/Music/RecorderX_V2/app/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="/home/zygisk/Music/RecorderX_V2/app/src/main/res"><file name="activity_main" path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/layout/activity_main.xml" qualifiers="" type="layout"/><file name="file_paths" path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/xml/file_paths.xml" qualifiers="" type="xml"/><file name="ic_launcher_foreground" path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/drawable/ic_launcher_foreground.xml" qualifiers="" type="drawable"/><file name="ic_record" path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/drawable/ic_record.xml" qualifiers="" type="drawable"/><file path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/values/strings.xml" qualifiers=""><string name="app_name">RecorderX V2</string><string name="start_recording">START RECORDING</string><string name="stop_recording">STOP RECORDING</string><string name="settings_title">SYSTEM CONFIGURATION</string><string name="resolution_label">RESOLUTION</string><string name="bitrate_label">BITRATE</string><string name="fps_label">FRAME RATE</string><string name="video_codec_label">VIDEO CODEC</string><string name="bitrate_mode_label">BITRATE MODE</string><string name="orientation_label">ORIENTATION</string><string name="audio_source_label">AUDIO SOURCE</string><string name="audio_quality_label">AUDIO QUALITY</string><string name="naming_template_label">OUTPUT TEMPLATE</string><string-array name="resolution_options">
+        <item>NAT</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>SD</item>
+    </string-array><string-array name="bitrate_options">
+        <item>2M</item>
+        <item>4M</item>
+        <item>8M</item>
+        <item>12M</item>
+        <item>20M</item>
+        <item>40M</item>
+    </string-array><string-array name="fps_options">
+        <item>24</item>
+        <item>30</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+    </string-array><string-array name="codec_options">
+        <item>H.264</item>
+        <item>H.265</item>
+        <item>AV1</item>
+    </string-array><string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array><string-array name="orientation_options">
+        <item>AUTO</item>
+        <item>PORT</item>
+        <item>LAND</item>
+    </string-array><string-array name="audio_options">
+        <item>OFF</item>
+        <item>MIC</item>
+        <item>SYS</item>
+    </string-array><string-array name="audio_quality_options">
+        <item>LOW</item>
+        <item>HIGH</item>
+        <item>EX</item>
+    </string-array><string name="qs_label">RecorderX</string><string name="info_text">Advanced settings are automatically saved.</string></file><file path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/values/colors.xml" qualifiers=""><color name="black">#FF000000</color><color name="white">#FFFFFFFF</color><color name="accent_lavender">#9575CD</color><color name="accent_lavender_dim">#1A9575CD</color><color name="bg_amoled">#000000</color><color name="text_primary">#FFFFFF</color><color name="text_secondary">#80FFFFFF</color><color name="slider_track_inactive">#121212</color></file><file path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/values/themes.xml" qualifiers=""><style name="Theme.RecorderX" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/accent_lavender</item>
+        <item name="android:windowBackground">@color/bg_amoled</item>
+        <item name="android:statusBarColor">@color/bg_amoled</item>
+        <item name="android:navigationBarColor">@color/bg_amoled</item>
+        <item name="colorSecondary">@color/accent_lavender_dim</item>
+        <item name="colorTertiary">@color/text_secondary</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style></file><file name="ic_launcher" path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" qualifiers="anydpi-v26" type="mipmap"/><file path="/home/zygisk/Music/RecorderX_V2/app/src/main/res/values-night/themes.xml" qualifiers="night-v8"><style name="Theme.RecorderX" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style></file></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="release$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/zygisk/Music/RecorderX_V2/app/src/release/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="release" generated-set="release$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="/home/zygisk/Music/RecorderX_V2/app/src/release/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/zygisk/Music/RecorderX_V2/app/build/generated/res/resValues/release"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="/home/zygisk/Music/RecorderX_V2/app/build/generated/res/resValues/release"/></dataSet><mergedItems/></merger>

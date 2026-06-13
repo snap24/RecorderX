@@ -2,14 +2,14 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <!-- Dark theme colors -->
-    <color name="bg_dark">#0F0F13</color>
-    <color name="card_glass">#1AFFFFFF</color>
-    <color name="card_stroke">#33FFFFFF</color>
     
-    <!-- Gen Z Neon Accents -->
-    <color name="neon_purple">#B388FF</color>
-    <color name="neon_pink">#FF4081</color>
-    <color name="neon_cyan">#18FFFF</color>
-    <color name="neon_blue">#2979FF</color>
+    <!-- Rich Deep Lavender -->
+    <color name="accent_lavender">#9575CD</color>
+    <color name="accent_lavender_dim">#1A9575CD</color>
+    
+    <!-- AMOLED Pitch Black -->
+    <color name="bg_amoled">#000000</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#80FFFFFF</color>
+    <color name="slider_track_inactive">#121212</color>
 </resources>

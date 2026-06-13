@@ -3,64 +3,72 @@ package com.zygisk_enc.RecorderX;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
-import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.FileProvider;
+import java.io.File;
 
 public class RecorderService extends Service {
-    public static final String ACTION_START = "START";
-    public static final String ACTION_STOP = "STOP";
-    public static final String EXTRA_RESULT_CODE = "RESULT_CODE";
-    public static final String EXTRA_DATA = "DATA";
-
-    private static Intent staticDataBackup = null;
-    private static int staticResultCodeBackup = Integer.MIN_VALUE;
-
-    public static void setProjectionData(int resultCode, Intent data) {
-        staticResultCodeBackup = resultCode;
-        staticDataBackup = data;
-    }
-
-    private static final String CHANNEL_ID = "RecorderX_Channel";
+    private static final String TAG = "RecorderX_Service";
     private static final int NOTIFICATION_ID = 1;
+    private static final int SAVED_NOTIFICATION_ID = 2;
+    private static final String CHANNEL_ID = "recorder_channel";
+    private static final String SAVED_CHANNEL_ID = "saved_channel";
+
+    public static final String ACTION_START = "ACTION_START";
+    public static final String ACTION_STOP = "ACTION_STOP";
+    public static final String EXTRA_RESULT_CODE = "EXTRA_RESULT_CODE";
+    public static final String EXTRA_DATA = "EXTRA_DATA";
 
     private static boolean isRecording = false;
-    private MediaProjection mediaProjection;
+    private static int resultCode;
+    private static Intent projectionData;
+
     private RecordingSession recordingSession;
 
     public static boolean isRecording() { return isRecording; }
 
+    public static void setProjectionData(int code, Intent data) {
+        resultCode = code;
+        projectionData = data;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null) {
-            Log.w("RecorderX_Service", "onStartCommand: intent is null");
-            return START_NOT_STICKY;
-        }
+        String action = intent != null ? intent.getAction() : null;
+        Log.d(TAG, "onStartCommand: Action = " + action);
 
-        String action = intent.getAction();
-        Log.d("RecorderX_Service", "onStartCommand: Action = " + action);
-        
         if (ACTION_START.equals(action)) {
-            createNotificationChannel();
+            createNotificationChannels();
             Notification notification = createNotification();
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
+                    int type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        SettingsManager settings = new SettingsManager(this);
+                        if (settings.getAudioSource() == 1) {
+                            type |= ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE;
+                        }
+                    }
+                    startForeground(NOTIFICATION_ID, notification, type);
                 } else {
                     startForeground(NOTIFICATION_ID, notification);
                 }
                 startRecording(intent);
             } catch (Exception e) {
-                Log.e("RecorderX_Service", "Failed to start foreground service", e);
-                stopSelf();
+                Log.e(TAG, "Failed to start foreground service", e);
             }
         } else if (ACTION_STOP.equals(action)) {
             stopRecording();
@@ -70,102 +78,108 @@ public class RecorderService extends Service {
     }
 
     private void startRecording(Intent intent) {
-        if (isRecording) {
-            Log.w("RecorderX_Service", "Start requested but already recording");
-            return;
-        }
+        if (isRecording) return;
+        
+        Log.d(TAG, "Acquiring MediaProjection with ResultCode=" + resultCode);
+        android.media.projection.MediaProjectionManager projectionManager = (android.media.projection.MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        android.media.projection.MediaProjection mediaProjection = projectionManager.getMediaProjection(resultCode, projectionData);
 
-        int resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, Integer.MIN_VALUE);
-        Intent data = null;
-
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                data = intent.getParcelableExtra(EXTRA_DATA, Intent.class);
-            } else {
-                data = intent.getParcelableExtra(EXTRA_DATA);
-            }
-        } catch (Exception e) {
-            Log.e("RecorderX_Service", "Error unparcelling Intent data", e);
-        }
-
-        // Static backup fallback
-        if (resultCode == Integer.MIN_VALUE && staticResultCodeBackup != Integer.MIN_VALUE) {
-            Log.w("RecorderX_Service", "ResultCode missing from intent, using backup");
-            resultCode = staticResultCodeBackup;
-        }
-        if (data == null && staticDataBackup != null) {
-            Log.w("RecorderX_Service", "Data missing from intent, using backup");
-            data = staticDataBackup;
-        }
-
-        if (resultCode != Integer.MIN_VALUE && data != null) {
+        if (mediaProjection != null) {
+            Log.i(TAG, "Starting recording session...");
+            SettingsManager settings = new SettingsManager(this);
+            recordingSession = new RecordingSession(this, mediaProjection, settings);
+            recordingSession.setListener(() -> {
+                Log.i(TAG, "Listener: System stopped projection. Terminating service...");
+                stopRecording();
+            });
             try {
-                Log.d("RecorderX_Service", "Acquiring MediaProjection with ResultCode=" + resultCode);
-                MediaProjectionManager projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-                mediaProjection = projectionManager.getMediaProjection(resultCode, data);
-
-                if (mediaProjection == null) {
-                    Log.e("RecorderX_Service", "MediaProjection is null!");
-                    stopSelf();
-                    return;
-                }
-
-                SettingsManager settings = new SettingsManager(this);
-                recordingSession = new RecordingSession(this, mediaProjection, settings);
-                
-                Log.i("RecorderX_Service", "Starting recording session...");
                 recordingSession.start();
                 isRecording = true;
-                Log.i("RecorderX_Service", "Recording is now ACTIVE");
-
-                // Clear backup
-                staticDataBackup = null;
-                staticResultCodeBackup = Integer.MIN_VALUE;
             } catch (Exception e) {
-                Log.e("RecorderX_Service", "Error in startRecording", e);
-                stopRecording();
+                Log.e(TAG, "Error in startRecording", e);
+                stopForeground(true);
+                stopSelf();
             }
-        } else {
-            Log.e("RecorderX_Service", "Missing ResultCode or Data! ResultCode=" + resultCode + ", Data=" + (data != null));
-            stopSelf();
         }
     }
 
     private void stopRecording() {
+        if (!isRecording) return;
+        Log.i(TAG, "Stopping recording service...");
+        
         if (recordingSession != null) {
-            try {
-                recordingSession.stop();
-            } catch (Exception ignored) {}
-            recordingSession = null;
+            String lastPath = recordingSession.getOutputFilePath();
+            Uri lastUri = recordingSession.getOutputUri();
+            recordingSession.stop();
+            
+            showSavedNotification(lastPath, lastUri);
         }
-
-        if (mediaProjection != null) {
-            try {
-                mediaProjection.stop();
-            } catch (Exception ignored) {}
-            mediaProjection = null;
-        }
-
+        
         isRecording = false;
         stopForeground(true);
         stopSelf();
     }
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID, "Screen Recording", NotificationManager.IMPORTANCE_LOW);
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            if (manager != null) {
-                manager.createNotificationChannel(channel);
+    private void showSavedNotification(String path, Uri uri) {
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        
+        Intent openIntent = new Intent(Intent.ACTION_VIEW);
+        Bitmap thumbnail = null;
+
+        try {
+            if (uri != null) {
+                openIntent.setDataAndType(uri, "video/mp4");
+                openIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    thumbnail = getContentResolver().loadThumbnail(uri, new android.util.Size(512, 384), null);
+                }
+            } else if (path != null) {
+                File file = new File(path);
+                Uri fileUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
+                openIntent.setDataAndType(fileUri, "video/mp4");
+                openIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                thumbnail = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.MINI_KIND);
             }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to generate thumbnail", e);
+        }
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, SAVED_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_record)
+            .setContentTitle("Recording Saved")
+            .setContentText("Tap to view your recording in /Movies/RecorderX")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent);
+
+        if (thumbnail != null) {
+            builder.setLargeIcon(thumbnail);
+            builder.setStyle(new NotificationCompat.BigPictureStyle()
+                .bigPicture(thumbnail)
+                .bigLargeIcon(null));
+        }
+
+        manager.notify(SAVED_NOTIFICATION_ID, builder.build());
+    }
+
+    private void createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            
+            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, "Recorder Service", NotificationManager.IMPORTANCE_LOW);
+            manager.createNotificationChannel(serviceChannel);
+            
+            NotificationChannel savedChannel = new NotificationChannel(SAVED_CHANNEL_ID, "Recording Saved", NotificationManager.IMPORTANCE_HIGH);
+            manager.createNotificationChannel(savedChannel);
         }
     }
 
     private Notification createNotification() {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("RecorderX")
-            .setContentText("Recording screen...")
+            .setContentTitle("RecorderX is active")
+            .setContentText("Recording the screen...")
             .setSmallIcon(R.drawable.ic_record)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)

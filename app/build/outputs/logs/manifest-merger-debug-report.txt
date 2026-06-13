@@ -1,0 +1,340 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:2:1-49:12
+INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:2:1-49:12
+INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:2:1-49:12
+INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:2:1-49:12
+MERGED from [com.google.android.material:material:1.11.0] /home/zygisk/.gradle/caches/9.4.1/transforms/76fa767f24698f3863f6bae9b730eea0/transformed/material-1.11.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/8dd34b72af0cca2978188137b3a998ed/transformed/jetified-appcompat-resources-1.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] /home/zygisk/.gradle/caches/9.4.1/transforms/b1504ec4969f6bfd04b35d75f6c3b6d5/transformed/constraintlayout-2.0.1/AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.appcompat:appcompat:1.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/ca40241efded7819587679b12e0a2814/transformed/appcompat-1.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/3ee799bef620dddfa4881dd29f836065/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.fragment:fragment:1.3.6] /home/zygisk/.gradle/caches/9.4.1/transforms/2ac03ae0ef3b8fd1a48a11f05772b75c/transformed/fragment-1.3.6/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.activity:activity:1.8.0] /home/zygisk/.gradle/caches/9.4.1/transforms/113237b7751475488cc9c1bed5efc5d9/transformed/jetified-activity-1.8.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/51f49e923b17517921fe08892e15775a/transformed/jetified-emoji2-views-helper-1.2.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/a2b125d1b208d44031774bca0c22821b/transformed/drawerlayout-1.1.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7007c76d672fabad510b2bd8a944d9c9/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/28395283fa0865766b4f7e1b2569f574/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.transition:transition:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/3f6438153ce54d00f27cf304067563e2/transformed/transition-1.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/351180ca8cd2041cccbd54b867ed40e0/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/76d3e78fe792cabc29de374a8bb50692/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/8bb742803a8df13cbdb103c193e6c57c/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/96ec6b53b5608d5421bb29f6657ae20a/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/zygisk/.gradle/caches/9.4.1/transforms/76673dab6813603a919c8b17f1354804/transformed/jetified-savedstate-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/51025b1edaf3766c66bf6ec6e80260b0/transformed/lifecycle-livedata-core-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/b1375f9711f91322b4c89f714bff194f/transformed/lifecycle-livedata-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/bb9a8a5086c40e01f9a5fe0f47e1b70f/transformed/lifecycle-viewmodel-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/46f3328c2b76affbcacacfd7f6deb7ba/transformed/lifecycle-runtime-2.6.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/bf4ea0a67737e23d1ec0cca7332eaae1/transformed/jetified-lifecycle-viewmodel-savedstate-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-ktx:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/14fadf954c7ba0b769cddfd82b8f205e/transformed/jetified-core-ktx-1.9.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/b6ff1ddd5ca347298384c4210c7cb2de/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/fb2c611f2a4ef0ea60b8554e1eb678b9/transformed/recyclerview-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.customview:customview:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/62f6f229b06d518bb513f80e59f3f3ef/transformed/customview-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/341a38283e72f86a2eca368d1fd0f5c9/transformed/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cardview:cardview:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a74102a648068ee8b762fbde87c7ae0b/transformed/cardview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/933678d58fd489db33712c3b10fcebd6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/45b13e383e79462e7553c235340ea54a/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/95ae2b70b07eb850853dfac660c69acb/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/80d24e07c55a31343578b39ec68d677f/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/15ef5566b512ac49759d4b55e09b5f01/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/1cf511694c0816ac6bfef1fd3365f1d4/transformed/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/6dd9ea9e77263747fa71ec7a0cb147ec/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/1557a81668199d23a848bbba118b8e0c/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/b63f9ee0757edeefe589a0a5b07cc63c/transformed/jetified-annotation-experimental-1.3.0/AndroidManifest.xml:17:1-22:12
+	package
+		INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:4:5-77
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:4:22-74
+uses-permission#android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:5:5-94
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:5:22-91
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:6:5-71
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:6:22-68
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:7:5-108
+	android:maxSdkVersion
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:7:79-105
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:7:22-78
+application
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:9:5-47:19
+INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:9:5-47:19
+MERGED from [com.google.android.material:material:1.11.0] /home/zygisk/.gradle/caches/9.4.1/transforms/76fa767f24698f3863f6bae9b730eea0/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.material:material:1.11.0] /home/zygisk/.gradle/caches/9.4.1/transforms/76fa767f24698f3863f6bae9b730eea0/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] /home/zygisk/.gradle/caches/9.4.1/transforms/b1504ec4969f6bfd04b35d75f6c3b6d5/transformed/constraintlayout-2.0.1/AndroidManifest.xml:9:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] /home/zygisk/.gradle/caches/9.4.1/transforms/b1504ec4969f6bfd04b35d75f6c3b6d5/transformed/constraintlayout-2.0.1/AndroidManifest.xml:9:5-20
+MERGED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/933678d58fd489db33712c3b10fcebd6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/933678d58fd489db33712c3b10fcebd6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/45b13e383e79462e7553c235340ea54a/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/45b13e383e79462e7553c235340ea54a/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+	android:extractNativeLibs
+		INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:14:9-35
+	android:label
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:12:9-34
+	android:roundIcon
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:13:9-48
+	android:icon
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:11:9-43
+	android:allowBackup
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:10:9-35
+	android:theme
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:15:9-47
+activity#com.zygisk_enc.RecorderX.MainActivity
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:17:9-24:20
+	android:exported
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:19:13-36
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:18:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:20:13-23:29
+action#android.intent.action.MAIN
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:21:17-69
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:21:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:22:17-77
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:22:27-74
+activity#com.zygisk_enc.RecorderX.RequestCaptureActivity
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:26:9-30:40
+	android:excludeFromRecents
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:29:13-46
+	android:exported
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:30:13-37
+	android:theme
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:28:13-72
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:27:13-51
+service#com.zygisk_enc.RecorderX.RecorderService
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:32:9-35:63
+	android:exported
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:34:13-37
+	android:foregroundServiceType
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:35:13-60
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:33:13-44
+service#com.zygisk_enc.RecorderX.RecorderTileService
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:37:9-46:19
+	android:label
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:40:13-45
+	android:exported
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:39:13-36
+	android:permission
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:42:13-77
+	android:icon
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:41:13-47
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:38:13-48
+intent-filter#action:name:android.service.quicksettings.action.QS_TILE
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:43:13-45:29
+action#android.service.quicksettings.action.QS_TILE
+ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:44:17-87
+	android:name
+		ADDED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml:44:25-84
+uses-sdk
+INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml
+INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml
+MERGED from [com.google.android.material:material:1.11.0] /home/zygisk/.gradle/caches/9.4.1/transforms/76fa767f24698f3863f6bae9b730eea0/transformed/material-1.11.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.material:material:1.11.0] /home/zygisk/.gradle/caches/9.4.1/transforms/76fa767f24698f3863f6bae9b730eea0/transformed/material-1.11.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/8dd34b72af0cca2978188137b3a998ed/transformed/jetified-appcompat-resources-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/8dd34b72af0cca2978188137b3a998ed/transformed/jetified-appcompat-resources-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] /home/zygisk/.gradle/caches/9.4.1/transforms/b1504ec4969f6bfd04b35d75f6c3b6d5/transformed/constraintlayout-2.0.1/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] /home/zygisk/.gradle/caches/9.4.1/transforms/b1504ec4969f6bfd04b35d75f6c3b6d5/transformed/constraintlayout-2.0.1/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.appcompat:appcompat:1.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/ca40241efded7819587679b12e0a2814/transformed/appcompat-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/ca40241efded7819587679b12e0a2814/transformed/appcompat-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/3ee799bef620dddfa4881dd29f836065/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/3ee799bef620dddfa4881dd29f836065/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.3.6] /home/zygisk/.gradle/caches/9.4.1/transforms/2ac03ae0ef3b8fd1a48a11f05772b75c/transformed/fragment-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.3.6] /home/zygisk/.gradle/caches/9.4.1/transforms/2ac03ae0ef3b8fd1a48a11f05772b75c/transformed/fragment-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.8.0] /home/zygisk/.gradle/caches/9.4.1/transforms/113237b7751475488cc9c1bed5efc5d9/transformed/jetified-activity-1.8.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.8.0] /home/zygisk/.gradle/caches/9.4.1/transforms/113237b7751475488cc9c1bed5efc5d9/transformed/jetified-activity-1.8.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/51f49e923b17517921fe08892e15775a/transformed/jetified-emoji2-views-helper-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/51f49e923b17517921fe08892e15775a/transformed/jetified-emoji2-views-helper-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/a2b125d1b208d44031774bca0c22821b/transformed/drawerlayout-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/a2b125d1b208d44031774bca0c22821b/transformed/drawerlayout-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7007c76d672fabad510b2bd8a944d9c9/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7007c76d672fabad510b2bd8a944d9c9/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/28395283fa0865766b4f7e1b2569f574/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/28395283fa0865766b4f7e1b2569f574/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.transition:transition:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/3f6438153ce54d00f27cf304067563e2/transformed/transition-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/3f6438153ce54d00f27cf304067563e2/transformed/transition-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/351180ca8cd2041cccbd54b867ed40e0/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/351180ca8cd2041cccbd54b867ed40e0/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/76d3e78fe792cabc29de374a8bb50692/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/76d3e78fe792cabc29de374a8bb50692/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/8bb742803a8df13cbdb103c193e6c57c/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/8bb742803a8df13cbdb103c193e6c57c/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/96ec6b53b5608d5421bb29f6657ae20a/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/96ec6b53b5608d5421bb29f6657ae20a/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/zygisk/.gradle/caches/9.4.1/transforms/76673dab6813603a919c8b17f1354804/transformed/jetified-savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/zygisk/.gradle/caches/9.4.1/transforms/76673dab6813603a919c8b17f1354804/transformed/jetified-savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/51025b1edaf3766c66bf6ec6e80260b0/transformed/lifecycle-livedata-core-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/51025b1edaf3766c66bf6ec6e80260b0/transformed/lifecycle-livedata-core-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/b1375f9711f91322b4c89f714bff194f/transformed/lifecycle-livedata-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/b1375f9711f91322b4c89f714bff194f/transformed/lifecycle-livedata-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/bb9a8a5086c40e01f9a5fe0f47e1b70f/transformed/lifecycle-viewmodel-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/bb9a8a5086c40e01f9a5fe0f47e1b70f/transformed/lifecycle-viewmodel-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/46f3328c2b76affbcacacfd7f6deb7ba/transformed/lifecycle-runtime-2.6.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/46f3328c2b76affbcacacfd7f6deb7ba/transformed/lifecycle-runtime-2.6.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/bf4ea0a67737e23d1ec0cca7332eaae1/transformed/jetified-lifecycle-viewmodel-savedstate-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/bf4ea0a67737e23d1ec0cca7332eaae1/transformed/jetified-lifecycle-viewmodel-savedstate-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-ktx:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/14fadf954c7ba0b769cddfd82b8f205e/transformed/jetified-core-ktx-1.9.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/14fadf954c7ba0b769cddfd82b8f205e/transformed/jetified-core-ktx-1.9.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/b6ff1ddd5ca347298384c4210c7cb2de/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/b6ff1ddd5ca347298384c4210c7cb2de/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/fb2c611f2a4ef0ea60b8554e1eb678b9/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/fb2c611f2a4ef0ea60b8554e1eb678b9/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/62f6f229b06d518bb513f80e59f3f3ef/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.1.0] /home/zygisk/.gradle/caches/9.4.1/transforms/62f6f229b06d518bb513f80e59f3f3ef/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/341a38283e72f86a2eca368d1fd0f5c9/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/341a38283e72f86a2eca368d1fd0f5c9/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a74102a648068ee8b762fbde87c7ae0b/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a74102a648068ee8b762fbde87c7ae0b/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/933678d58fd489db33712c3b10fcebd6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/933678d58fd489db33712c3b10fcebd6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/45b13e383e79462e7553c235340ea54a/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/45b13e383e79462e7553c235340ea54a/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/95ae2b70b07eb850853dfac660c69acb/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/95ae2b70b07eb850853dfac660c69acb/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/80d24e07c55a31343578b39ec68d677f/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/80d24e07c55a31343578b39ec68d677f/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/15ef5566b512ac49759d4b55e09b5f01/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/15ef5566b512ac49759d4b55e09b5f01/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/1cf511694c0816ac6bfef1fd3365f1d4/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/1cf511694c0816ac6bfef1fd3365f1d4/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/6dd9ea9e77263747fa71ec7a0cb147ec/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/6dd9ea9e77263747fa71ec7a0cb147ec/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/1557a81668199d23a848bbba118b8e0c/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/zygisk/.gradle/caches/9.4.1/transforms/1557a81668199d23a848bbba118b8e0c/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/b63f9ee0757edeefe589a0a5b07cc63c/transformed/jetified-annotation-experimental-1.3.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/b63f9ee0757edeefe589a0a5b07cc63c/transformed/jetified-annotation-experimental-1.3.0/AndroidManifest.xml:20:5-44
+	android:targetSdkVersion
+		INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/zygisk/Music/RecorderX/app/src/main/AndroidManifest.xml
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/45b13e383e79462e7553c235340ea54a/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/zygisk/.gradle/caches/9.4.1/transforms/45b13e383e79462e7553c235340ea54a/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /home/zygisk/.gradle/caches/9.4.1/transforms/42599b52dbd0a92aadc8e0c8f900c371/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:30:17-75
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.1] /home/zygisk/.gradle/caches/9.4.1/transforms/6836f75e9e3e3d8b9358198f2d386bee/transformed/jetified-lifecycle-process-2.6.1/AndroidManifest.xml:30:17-78
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+permission#com.zygisk_enc.RecorderX.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+uses-permission#com.zygisk_enc.RecorderX.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /home/zygisk/.gradle/caches/9.4.1/transforms/7241f257c8a6819728a3f1dfe976f7ce/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/zygisk/.gradle/caches/9.4.1/transforms/a72ce682b0b137ca54cde3b0fdda510d/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:50:25-92

@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         });
             
         findViewById(R.id.btnViewSource).setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/zygisk-enc/RecorderX"));
+            Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/snap24/RecorderX"));
             startActivity(intent);
         });
 

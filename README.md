@@ -1,29 +1,29 @@
 <div align="center">
-  <img src="app/src/main/res/drawable/ic_record.xml" width="100" height="100" />
+  <img src="metadata/images/icon.png" width="128" height="128" />
   <h1>RecorderX</h1>
-  <p><b>Peak Performance Screen Recording for Android</b></p>
+  <p>Professional high-performance screen recording for Android</p>
   
-  [![Version](https://img.shields.io/badge/Version-v1.1.0-9575CD?style=for-the-badge&logo=android)](https://github.com/zygisk-enc/RecorderX/releases)
-  [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge)](LICENSE)
-  [![F--Droid](https://img.shields.io/badge/F--Droid-Submission_Pending-orange?style=for-the-badge&logo=fdroid)](https://gitlab.com/fdroid/fdroiddata/-/merge_requests/40172)
+  [![Version](https://img.shields.io/badge/Version-v1.1.0-9575CD?style=flat-square)](https://github.com/zygisk-enc/RecorderX/releases)
+  [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square)](LICENSE)
+  [![Platform](https://img.shields.io/badge/Platform-Android_10+-brightgreen?style=flat-square)](https://developer.android.com)
 </div>
 
 ---
 
-A professional-grade, privacy-focused screen recorder built for power users. Optimized for AMOLED displays and high-refresh-rate gaming devices.
+RecorderX is a specialized, privacy-focused tool designed for high-fidelity screen capture. It is optimized for devices with high-refresh-rate displays and AMOLED screens, providing near-lossless output with minimal system overhead.
 
-## 🚀 Key Features
+## Features
 
-- **⚡ Extreme Performance:** Record in **4K (UHD)** and **2K (QHD)** with ease.
-- **🕹️ Gaming Optimized:** Native support for **90 FPS** and **120 FPS** recording.
-- **🎨 Premium Aesthetic:** Modern **AMOLED Black** and **Deep Lavender** UI with precision Pill-Sliders.
-- **🔊 Self-Healing Audio:** Automatically recovers and reconnects audio if the system blocks capture.
-- **📸 Instant Feedback:** High-quality notifications with **live video thumbnails** after each recording.
-- **📐 Orientation Lock:** Explicit Portrait and Landscape modes to prevent scaling distortion.
-- **🔒 Privacy First:** Works **entirely offline**. No internet permission, no ads, no tracking.
+- **High Resolution Capture:** Support for 4K (UHD), 2K (QHD), and standard definitions.
+- **Enhanced Framerates:** Native support for 90 FPS and 120 FPS recording modes.
+- **Advanced Codecs:** Integrated support for H.264 (AVC), H.265 (HEVC), and AV1.
+- **Audio Management:** Simultaneous capture of Microphone and System audio with automated recovery logic.
+- **AMOLED Interface:** High-contrast Dark and Lavender theme with precision-aligned controls.
+- **Post-Capture Feedback:** Automated thumbnail generation and system notification on session completion.
+- **Security:** Operates entirely offline with no internet permissions or external data transmission.
 
 <details>
-<summary><b>📸 View Screenshots (Click to Expand)</b></summary>
+<summary><b>Interface Gallery</b></summary>
 <br>
 <div align="center">
   <img src="metadata/en-US/images/phoneScreenshots/1.jpeg" width="200" />
@@ -33,25 +33,25 @@ A professional-grade, privacy-focused screen recorder built for power users. Opt
 </div>
 </details>
 
-## 🛠️ System Configuration
+## Technical Configuration
 
-- **Codecs:** H.264 (AVC), H.265 (HEVC), and AV1.
-- **Bitrate:** Up to 40 Mbps (CBR/VBR support).
-- **Audio:** Adjustable quality from 64kbps to 320kbps (EX).
-- **Naming:** Fully customizable file naming templates.
+- **Video Bitrate:** Configurable up to 40 Mbps (CBR/VBR support).
+- **Audio Fidelity:** Adjustable sample rates from 64kbps to 320kbps.
+- **Storage Path:** All recordings are stored locally in `/Movies/RecorderX`.
+- **Naming Conventions:** Support for custom filename templates using date and timestamp variables.
 
-## 📥 Build Instructions
+## Build Requirements
 
-1. Clone the repository: `git clone https://github.com/zygisk-enc/RecorderX.git`
-2. Open in **Android Studio** (Koala or newer recommended).
-3. Ensure **minSdk 29** and **Java 17** are configured.
-4. Run `./gradlew assembleRelease` to generate the high-performance APK.
+1. **Clone:** `git clone https://github.com/zygisk-enc/RecorderX.git`
+2. **Environment:** Android Studio Koala+, JDK 17.
+3. **Target:** Minimum SDK 29 (Android 10).
+4. **Execution:** Use `./gradlew assembleRelease` for optimized production binaries.
 
-## 📄 License
+## License
 
-This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for more details.
+Distributed under the Apache License 2.0. See `LICENSE` for further information.
 
 ---
 <div align="center">
-  Built with ❤️ by zygisk-enc
+  Maintained by zygisk-enc
 </div>

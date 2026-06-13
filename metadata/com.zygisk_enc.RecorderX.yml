@@ -1,6 +1,5 @@
 Categories:
   - Multimedia
-  - System
 License: Apache-2.0
 SourceCode: https://github.com/snap24/RecorderX
 IssueTracker: https://github.com/snap24/RecorderX/issues
@@ -15,7 +14,7 @@ Binaries:
 Builds:
   - versionName: 1.1.0
     versionCode: 2
-    commit: 3fe2191a6698136ae9b47ad31072a0768f1debeb
+    commit: 27587474bbd3c3393535ab16c464a700881a7fe8
     subdir: app
     gradle:
       - yes

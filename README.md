@@ -1,6 +1,6 @@
 <div align="center">
   <h1>RecorderX</h1>
-  <p>Professional high-performance screen recording for Android</p>
+  <p>High-performance screen recorder for Android</p>
   <img src="metadata/images/icon.png" width="128" height="128" />
   <br><br>
   

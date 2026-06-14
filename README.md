@@ -23,8 +23,7 @@ RecorderX is a specialized, privacy-focused app designed for high-fidelity scree
 - **High Resolution Capture:** Support for 4K (UHD), 2K (QHD), and standard definitions.
 - **Enhanced Framerates:** Native support for 90 FPS and 120 FPS recording modes.
 - **Advanced Codecs:** Integrated support for H.264 (AVC), H.265 (HEVC), and AV1.
-- **Audio Management:** Simultaneous capture of Microphone and System audio with automated recovery logic.
-- **AMOLED Interface:** High-contrast Dark and Lavender theme with precision-aligned controls.
+- **Audio Management:** Capture of Microphone or System audio with automated recovery logic.
 - **Post-Capture Feedback:** Automated thumbnail generation and system notification on session completion.
 - **Security:** Operates entirely offline with no internet permissions or external data transmission.
 

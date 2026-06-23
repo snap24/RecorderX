@@ -1,1 +1,1 @@
-High-performance screen recorder with internal audio support
+RecorderX is an application designed for high-fidelity screen capture.

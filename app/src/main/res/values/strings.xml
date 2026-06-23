@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RecorderX V2</string>
+    <string name="app_name">RecorderX</string>
     <string name="start_recording">START RECORDING</string>
     <string name="stop_recording">STOP RECORDING</string>
     <string name="settings_title">SYSTEM CONFIGURATION</string>

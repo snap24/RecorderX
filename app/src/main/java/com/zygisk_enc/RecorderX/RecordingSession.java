@@ -45,8 +45,11 @@ public class RecordingSession {
     private MediaCodec audioEncoder;
     private MediaMuxer muxer;
     private AudioRecord audioRecord;
+    private AudioRecord audioRecordSecondary;
     private VirtualDisplay virtualDisplay;
     private Surface inputSurface;
+    private ParcelFileDescriptor pfd;
+
     
     private int videoTrackIndex = -1;
     private int audioTrackIndex = -1;
@@ -58,6 +61,12 @@ public class RecordingSession {
 
     private String outputFilePath;
     private Uri outputUri;
+    
+    private int activeWidth;
+    private int activeHeight;
+    private MediaProjection.Callback projectionCallback;
+    
+    private volatile int videoFrameCount = 0;
 
     public interface SessionListener {
         void onSystemStop();
@@ -80,7 +89,8 @@ public class RecordingSession {
     public void start() throws IOException {
         Log.i(TAG, "start() called. Initializing session components...");
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String fileName = "RecorderX_" + timestamp + ".mp4";
+        String template = settings.getNamingTemplate().replaceAll("[^a-zA-Z0-9_\\-{}, ]", "");
+        String fileName = template.replace("{timestamp}", timestamp) + ".mp4";
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -92,7 +102,7 @@ public class RecordingSession {
                 outputUri = context.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
                 if (outputUri == null) throw new IOException("Failed to create MediaStore entry");
 
-                ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(outputUri, "rw");
+                pfd = context.getContentResolver().openFileDescriptor(outputUri, "rw");
                 if (pfd == null) throw new IOException("Failed to open FileDescriptor");
                 muxer = new MediaMuxer(pfd.getFileDescriptor(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
             } else {
@@ -129,7 +139,10 @@ public class RecordingSession {
             int density = metrics.densityDpi > 0 ? metrics.densityDpi : 300;
 
             Log.d(TAG, "Registering MediaProjection callback (required for Android 14+)...");
-            mediaProjection.registerCallback(new MediaProjection.Callback() {
+            if (projectionCallback != null) {
+                mediaProjection.unregisterCallback(projectionCallback);
+            }
+            projectionCallback = new MediaProjection.Callback() {
                 @Override
                 public void onStop() {
                     Log.i(TAG, "MediaProjection onStop() triggered by system");
@@ -139,11 +152,12 @@ public class RecordingSession {
                         stop();
                     }
                 }
-            }, new Handler(Looper.getMainLooper()));
+            };
+            mediaProjection.registerCallback(projectionCallback, new Handler(Looper.getMainLooper()));
 
-            Log.d(TAG, "Creating VirtualDisplay (" + settings.getResolutionWidth() + "x" + settings.getResolutionHeight() + ")...");
+            Log.d(TAG, "Creating VirtualDisplay (" + activeWidth + "x" + activeHeight + ")...");
             virtualDisplay = mediaProjection.createVirtualDisplay("RecorderX",
-                    settings.getResolutionWidth(), settings.getResolutionHeight(), density,
+                    activeWidth, activeHeight, density,
                     DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR | 
                     DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC | 
                     DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION,
@@ -162,62 +176,149 @@ public class RecordingSession {
         }
     }
 
-    private void setupVideoEncoder() throws IOException {
-        String mime = settings.getVideoMimeType();
-        int width = settings.getResolutionWidth();
-        int height = settings.getResolutionHeight();
-        
-        MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
-        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, settings.getBitrateValue());
-        
-        int fps = settings.getFpsValue();
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, fps);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            format.setFloat(MediaFormat.KEY_MAX_FPS_TO_ENCODER, (float) fps);
-        }
-        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
-        
-        int bitrateMode = settings.getBitrateMode() == 0 ? 
-                MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR : 
-                MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR;
-        format.setInteger(MediaFormat.KEY_BITRATE_MODE, bitrateMode);
-
-        if (MediaFormat.MIMETYPE_VIDEO_AVC.equals(mime)) {
-            format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
-            // Removed AVCLevel41 constraint. Level 4.1 restricts macroblock processing (maxing out at 1080p30).
-            // Removing this allows the encoder to dynamically select Level 5.1/5.2 for 4K/60fps+.
-        }
-
+    private boolean tryConfigureVideoEncoder(String mime, int width, int height, int fps, int bitrate, int bitrateMode, boolean useHighProfile) {
         try {
-            videoEncoder = MediaCodec.createEncoderByType(mime);
-            videoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-            inputSurface = videoEncoder.createInputSurface();
-        } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Hardware encoder rejected High Quality/AV1 configuration. Falling back to safe defaults.", e);
-            if (videoEncoder != null) videoEncoder.release();
-            
-            mime = MediaFormat.MIMETYPE_VIDEO_AVC;
-            format = MediaFormat.createVideoFormat(mime, width, height);
+            MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            format.setInteger(MediaFormat.KEY_BIT_RATE, settings.getBitrateValue());
-            format.setInteger(MediaFormat.KEY_FRAME_RATE, 60);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, fps);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                format.setFloat(MediaFormat.KEY_MAX_FPS_TO_ENCODER, (float) fps);
+            }
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
-            format.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR);
+            format.setLong(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER, 1000000L / fps);
+            format.setInteger(MediaFormat.KEY_BITRATE_MODE, bitrateMode);
+
+            if (useHighProfile && MediaFormat.MIMETYPE_VIDEO_AVC.equals(mime)) {
+                format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+            }
 
             videoEncoder = MediaCodec.createEncoderByType(mime);
+            
+            // Proactive hardware capabilities check to prevent silent encoder failures
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                MediaCodecInfo.CodecCapabilities caps = videoEncoder.getCodecInfo().getCapabilitiesForType(mime);
+                if (caps != null) {
+                    MediaCodecInfo.VideoCapabilities videoCaps = caps.getVideoCapabilities();
+                    if (videoCaps != null) {
+                        if (!videoCaps.getBitrateRange().contains(bitrate)) {
+                            int clampedBitrate = Math.max(videoCaps.getBitrateRange().getLower(), Math.min(bitrate, videoCaps.getBitrateRange().getUpper()));
+                            Log.w(TAG, "Bitrate " + bitrate + " not supported. Clamping to " + clampedBitrate);
+                            bitrate = clampedBitrate;
+                            format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
+                        }
+                    }
+                }
+            }
+
             videoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             inputSurface = videoEncoder.createInputSurface();
+            
+            this.activeWidth = width;
+            this.activeHeight = height;
+            
+            return true;
+        } catch (Exception e) {
+            Log.w(TAG, "Encoder fallback: Rejected " + width + "x" + height + "@" + fps + "fps (" + mime + ")");
+            if (videoEncoder != null) {
+                try { videoEncoder.release(); } catch (Exception ignored) {}
+                videoEncoder = null;
+            }
+            return false;
         }
     }
 
+    private void setupVideoEncoder() throws IOException {
+        String originalMime = settings.getVideoMimeType();
+        int originalWidth = settings.getResolutionWidth();
+        int originalHeight = settings.getResolutionHeight();
+        int originalFps = settings.getFpsValue();
+        int originalBitrate = settings.getBitrateValue();
+        int originalBitrateMode = settings.getBitrateMode() == 0 ? 
+                MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR : 
+                MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR;
+
+        String safeMime = MediaFormat.MIMETYPE_VIDEO_AVC;
+        int safeBitrateMode = MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR;
+
+        String[] mimesToTry = originalMime.equals(safeMime) ? 
+                              new String[]{originalMime} : 
+                              new String[]{originalMime, safeMime};
+
+        for (String mime : mimesToTry) {
+            boolean isOriginal = mime.equals(originalMime);
+            int mode = isOriginal ? originalBitrateMode : safeBitrateMode;
+
+            // Step 1: Request with requested/safe settings
+            if (tryConfigureVideoEncoder(mime, originalWidth, originalHeight, originalFps, originalBitrate, mode, isOriginal)) {
+                return;
+            }
+
+            // Step 2: Cap FPS at 60
+            int fpsStep1 = Math.min(originalFps, 60);
+            if (fpsStep1 < originalFps && tryConfigureVideoEncoder(mime, originalWidth, originalHeight, fpsStep1, originalBitrate, mode, false)) {
+                return;
+            }
+
+            // Step 3: Cap FPS at 30
+            int fpsStep2 = Math.min(originalFps, 30);
+            if (fpsStep2 < fpsStep1 && tryConfigureVideoEncoder(mime, originalWidth, originalHeight, fpsStep2, originalBitrate, mode, false)) {
+                return;
+            }
+
+            // Step 4: Scale down to 1080p max (preserving aspect ratio)
+            int longSide = Math.max(originalWidth, originalHeight);
+            int shortSide = Math.min(originalWidth, originalHeight);
+            
+            if (longSide > 1920) {
+                float ratio = 1920f / longSide;
+                int newShortSide = (int) (shortSide * ratio);
+                newShortSide = (newShortSide / 16) * 16; // Ensure multiple of 16 for encoders
+                
+                int safeWidth = originalWidth > originalHeight ? 1920 : newShortSide;
+                int safeHeight = originalWidth > originalHeight ? newShortSide : 1920;
+                
+                if (tryConfigureVideoEncoder(mime, safeWidth, safeHeight, fpsStep2, originalBitrate, mode, false)) {
+                    return;
+                }
+            }
+        }
+
+        // Rock Bottom (720p 30fps safe fallback with safeMime)
+        int safeWidth = originalWidth > originalHeight ? 1280 : 720;
+        int safeHeight = originalWidth > originalHeight ? 720 : 1280;
+        if (tryConfigureVideoEncoder(safeMime, safeWidth, safeHeight, 30, 4000000, safeBitrateMode, false)) {
+            return;
+        }
+
+        throw new IOException("Failed to configure video encoder. Your device does not support screen recording.");
+    }
+
     private void setupAudioEncoder() throws IOException {
-        int sampleRate = 48000;
+        int sampleRate;
+        int bitRate;
+
+        switch (settings.getAudioQuality()) {
+            case 0: // Low
+                sampleRate = 32000;
+                bitRate = 64000;
+                break;
+            case 2: // Extreme
+                sampleRate = 48000;
+                bitRate = 320000;
+                break;
+            case 1: // High
+            default:
+                sampleRate = 44100;
+                bitRate = 128000;
+                break;
+        }
+
         int channelConfig = AudioFormat.CHANNEL_IN_STEREO;
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         int bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat) * 4;
 
-        if (settings.getAudioSource() == 2) {
+        if (settings.getAudioSource() == 2 || settings.getAudioSource() == 3) {
             AudioPlaybackCaptureConfiguration config = new AudioPlaybackCaptureConfiguration.Builder(mediaProjection)
                     .addMatchingUsage(AudioAttributes.USAGE_MEDIA)
                     .addMatchingUsage(AudioAttributes.USAGE_GAME)
@@ -232,12 +333,16 @@ public class RecordingSession {
                             .build())
                     .setBufferSizeInBytes(bufferSize)
                     .build();
+                    
+            if (settings.getAudioSource() == 3) {
+                audioRecordSecondary = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, bufferSize);
+            }
         } else {
             audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, bufferSize);
         }
 
         MediaFormat format = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, sampleRate, 2);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, 128000);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
         format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
         
         audioEncoder = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC);
@@ -245,28 +350,44 @@ public class RecordingSession {
     }
 
     private void startEncodingThreads() {
+        videoFrameCount = 0;
+        
         videoThread = new Thread(() -> {
             drainEncoder(videoEncoder, true);
         }, "VideoEncoderThread");
         videoThread.start();
         
+        // WATCHDOG TIMER
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (isRecording.get() && videoFrameCount == 0) {
+                Log.e(TAG, "WATCHDOG: 0 frames produced in 2.5s. Hardware choked!");
+                triggerWatchdogFallback();
+            }
+        }, 2500);
+        
         if (audioEncoder != null) {
             audioThread = new Thread(() -> {
                 try {
-                    if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
-                        synchronized (muxer) {
-                            audioEncoder = null; // Signal video thread to not wait for audio
+                    if (audioEncoder != null && audioRecord != null) {
+                        if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
+                            throw new IOException("AudioRecord failed to initialize");
                         }
-                        return;
-                    }
-                    audioRecord.startRecording();
-                    if (audioRecord.getRecordingState() != AudioRecord.RECORDSTATE_RECORDING) {
-                        synchronized (muxer) {
-                            audioEncoder = null;
+                        if (audioRecordSecondary != null && audioRecordSecondary.getState() != AudioRecord.STATE_INITIALIZED) {
+                            Log.w(TAG, "Secondary AudioRecord failed. Falling back to single audio.");
+                            audioRecordSecondary.release();
+                            audioRecordSecondary = null;
                         }
-                        return;
+                        
+                        audioRecord.startRecording();
+                        if (audioRecordSecondary != null) {
+                            audioRecordSecondary.startRecording();
+                        }
+                        
+                        if (audioRecord.getRecordingState() != AudioRecord.RECORDSTATE_RECORDING) {
+                            throw new IOException("AudioRecord failed to start");
+                        }
+                        drainAudio();
                     }
-                    drainAudio();
                 } catch (Exception e) {
                     Log.e(TAG, "Fatal audio thread error", e);
                     synchronized (muxer) {
@@ -322,6 +443,7 @@ public class RecordingSession {
                     
                     if (isVideo) {
                         frameCount++;
+                        videoFrameCount++;
                     }
                     encoder.releaseOutputBuffer(outputIndex, false);
                 } else if (outputIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
@@ -346,9 +468,13 @@ public class RecordingSession {
     }
 
     private void drainAudio() {
-        int sampleRate = 48000;
+        int sampleRate = audioRecord.getSampleRate();
         int bufferSize = 4096; 
         ByteBuffer pcmBuffer = ByteBuffer.allocateDirect(bufferSize);
+        ByteBuffer secBuffer = null;
+        if (audioRecordSecondary != null) {
+            secBuffer = ByteBuffer.allocateDirect(bufferSize);
+        }
         
         // Use system time for audio PTS sync if possible, but keep simple for now
         long totalSamples = 0;
@@ -357,18 +483,56 @@ public class RecordingSession {
             while (isRecording.get()) {
                 pcmBuffer.clear();
                 int read = audioRecord.read(pcmBuffer, bufferSize);
-                if (read > 0) {
+                
+                int readSec = 0;
+                if (audioRecordSecondary != null && secBuffer != null) {
+                    secBuffer.clear();
+                    readSec = audioRecordSecondary.read(secBuffer, bufferSize);
+                }
+
+                if (read > 0 || readSec > 0) {
+                    // Mix audio if both are present
+                    if (read > 0 && readSec > 0) {
+                        byte[] primaryBytes = new byte[read];
+                        pcmBuffer.get(primaryBytes);
+                        
+                        byte[] secondaryBytes = new byte[readSec];
+                        secBuffer.get(secondaryBytes);
+                        
+                        int minLen = Math.min(read, readSec);
+                        for (int i = 0; i < minLen - 1; i += 2) {
+                            short sample1 = (short) ((primaryBytes[i] & 0xFF) | (primaryBytes[i+1] << 8));
+                            short sample2 = (short) ((secondaryBytes[i] & 0xFF) | (secondaryBytes[i+1] << 8));
+                            
+                            int mixed = sample1 + sample2;
+                            if (mixed > 32767) mixed = 32767;
+                            if (mixed < -32768) mixed = -32768;
+                            
+                            primaryBytes[i] = (byte) (mixed & 0xFF);
+                            primaryBytes[i+1] = (byte) ((mixed >> 8) & 0xFF);
+                        }
+                        pcmBuffer.clear();
+                        pcmBuffer.put(primaryBytes);
+                        pcmBuffer.position(0);
+                    } else if (read <= 0 && readSec > 0) {
+                        // Only secondary has data
+                        pcmBuffer.clear();
+                        byte[] secondaryBytes = new byte[readSec];
+                        secBuffer.get(secondaryBytes);
+                        pcmBuffer.put(secondaryBytes);
+                        pcmBuffer.position(0);
+                        read = readSec;
+                    }
+
                     int inputIndex = audioEncoder.dequeueInputBuffer(10000);
                     if (inputIndex >= 0) {
                         ByteBuffer inputBuffer = audioEncoder.getInputBuffer(inputIndex);
                         inputBuffer.clear();
                         
                         int bytesToCopy = Math.min(read, inputBuffer.remaining());
-                        pcmBuffer.position(0);
                         pcmBuffer.limit(bytesToCopy);
                         inputBuffer.put(pcmBuffer);
-                        
-                        // Audio PTS starting from 0
+                        // Calculate Audio PTS based on total samples read to ensure it starts exactly at 0
                         long pts = (totalSamples * 1000000L) / sampleRate;
                         audioEncoder.queueInputBuffer(inputIndex, 0, bytesToCopy, pts, 0);
                         totalSamples += (bytesToCopy / 4);
@@ -424,12 +588,15 @@ public class RecordingSession {
         try { if (videoEncoder != null) { videoEncoder.stop(); videoEncoder.release(); } } catch (Exception ignored) {}
         try { if (audioEncoder != null) { audioEncoder.stop(); audioEncoder.release(); } } catch (Exception ignored) {}
         try { if (audioRecord != null) { audioRecord.stop(); audioRecord.release(); } } catch (Exception ignored) {}
+        try { if (audioRecordSecondary != null) { audioRecordSecondary.stop(); audioRecordSecondary.release(); } } catch (Exception ignored) {}
         
         if (muxer != null) { 
             try { if (muxerStarted) muxer.stop(); } catch (Exception ignored) {}
             try { muxer.release(); } catch (Exception ignored) {}
             muxer = null;
         }
+
+        try { if (pfd != null) { pfd.close(); pfd = null; } } catch (Exception ignored) {}
 
         // Finalize MediaStore or notify Scanner
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -442,5 +609,56 @@ public class RecordingSession {
             MediaScannerConnection.scanFile(context, new String[]{outputFilePath}, null, null);
         }
         Log.d(TAG, "Session stopped and saved.");
+    }
+    
+    private void triggerWatchdogFallback() {
+        int currentRes = settings.getResolution();
+        if (currentRes >= 5) {
+            if (listener != null) listener.onSystemStop();
+            return;
+        }
+
+        settings.setResolution(currentRes + 1);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            android.widget.Toast.makeText(context, "Hardware overloaded. Auto-downgrading...", android.widget.Toast.LENGTH_LONG).show();
+        });
+
+        // LIVE REBOOT (No Service Restart)
+        new Thread(() -> {
+            Log.i(TAG, "Performing internal live-reboot to avoid Android 14 token expiration...");
+            
+            // 1. Stop components without killing MediaProjection
+            isRecording.set(false);
+            try { if (virtualDisplay != null) { virtualDisplay.release(); virtualDisplay = null; } } catch (Exception ignored) {}
+            try { if (videoEncoder != null) { videoEncoder.stop(); videoEncoder.release(); videoEncoder = null; } } catch (Exception ignored) {}
+            try { if (audioEncoder != null) { audioEncoder.stop(); audioEncoder.release(); audioEncoder = null; } } catch (Exception ignored) {}
+            try {
+                if (muxerStarted && muxer != null) muxer.stop();
+                if (muxer != null) muxer.release();
+                muxer = null;
+            } catch (Exception ignored) {}
+            muxerStarted = false;
+            try { if (pfd != null) { pfd.close(); pfd = null; } } catch (Exception ignored) {}
+
+            // 2. Delete the 0-byte file
+            try {
+                if (outputFilePath != null) new java.io.File(outputFilePath).delete();
+                else if (outputUri != null) context.getContentResolver().delete(outputUri, null, null);
+            } catch (Exception ignored) {}
+            
+            outputFilePath = null;
+            outputUri = null;
+
+            // 3. Wait a moment for hardware to reset
+            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+
+            // 4. Re-run start logic natively
+            try {
+                start();
+            } catch (Exception e) {
+                Log.e(TAG, "Watchdog live-reboot failed", e);
+                if (listener != null) listener.onSystemStop();
+            }
+        }).start();
     }
 }

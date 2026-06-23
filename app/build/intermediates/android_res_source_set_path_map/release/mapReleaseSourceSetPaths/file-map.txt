@@ -1,9 +1,0 @@
-com.zygisk_enc.RecorderX.app-pngs-0 /home/zygisk/Music/RecorderX_V2/app/build/generated/res/pngs/release
-com.zygisk_enc.RecorderX.app-resValues-1 /home/zygisk/Music/RecorderX_V2/app/build/generated/res/resValues/release
-com.zygisk_enc.RecorderX.app-updated_navigation_xml-2 /home/zygisk/Music/RecorderX_V2/app/build/generated/updated_navigation_xml/release
-com.zygisk_enc.RecorderX.app-packageReleaseResources-3 /home/zygisk/Music/RecorderX_V2/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
-com.zygisk_enc.RecorderX.app-packageReleaseResources-4 /home/zygisk/Music/RecorderX_V2/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
-com.zygisk_enc.RecorderX.app-release-5 /home/zygisk/Music/RecorderX_V2/app/build/intermediates/merged_res/release/mergeReleaseResources
-com.zygisk_enc.RecorderX.app-main-6 /home/zygisk/Music/RecorderX_V2/app/src/main/res
-com.zygisk_enc.RecorderX.app-release-7 /home/zygisk/Music/RecorderX_V2/app/src/release/res
-gradleHome-0 /home/zygisk/.gradle

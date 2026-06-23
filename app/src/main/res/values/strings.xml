@@ -5,6 +5,10 @@
     <string name="stop_recording">STOP RECORDING</string>
     <string name="settings_title">SYSTEM CONFIGURATION</string>
     
+    <string name="guide_title">RECORDER GUIDE</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">UNDERSTOOD</string>
+
     <string name="resolution_label">RESOLUTION</string>
     <string name="bitrate_label">BITRATE</string>
     <string name="fps_label">FRAME RATE</string>
@@ -18,7 +22,7 @@
     <string name="naming_template_label">OUTPUT TEMPLATE</string>
     
     <string-array name="resolution_options">
-        <item>NAT</item>
+        <item>NATIVE</item>
         <item>4K</item>
         <item>2K</item>
         <item>FHD</item>
@@ -64,6 +68,7 @@
         <item>OFF</item>
         <item>MIC</item>
         <item>SYS</item>
+        <item>SYS+MIC</item>
     </string-array>
 
     <string-array name="audio_quality_options">

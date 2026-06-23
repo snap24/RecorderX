@@ -1,0 +1,3 @@
+- Fixed recording failure in legacy devices.
+- Fixed the VBR/CBR bug.
+- Added watchdog for encoder fallback.

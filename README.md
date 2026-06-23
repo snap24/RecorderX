@@ -1,5 +1,6 @@
 <div align="center">
   <h1>RecorderX</h1>
+  <p>A resilient, open-source recording solution featuring automated codec recovery and offline processing.</p>
   <img src=".github/assets/iconz.png" width="256" height="256" />
   <br>
 

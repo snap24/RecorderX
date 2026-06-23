@@ -58,7 +58,7 @@ public class RecorderService extends Service {
                     int type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         SettingsManager settings = new SettingsManager(this);
-                        if (settings.getAudioSource() == 1) {
+                        if (settings.getAudioSource() == 1 || settings.getAudioSource() == 3) {
                             type |= ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE;
                         }
                     }
@@ -80,9 +80,13 @@ public class RecorderService extends Service {
     private void startRecording(Intent intent) {
         if (isRecording) return;
         
-        Log.d(TAG, "Acquiring MediaProjection with ResultCode=" + resultCode);
+        int currentResultCode = intent != null ? intent.getIntExtra(EXTRA_RESULT_CODE, resultCode) : resultCode;
+        Intent currentData = intent != null ? intent.getParcelableExtra(EXTRA_DATA) : null;
+        if (currentData == null) currentData = projectionData;
+
+        Log.d(TAG, "Acquiring MediaProjection with ResultCode=" + currentResultCode);
         android.media.projection.MediaProjectionManager projectionManager = (android.media.projection.MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-        android.media.projection.MediaProjection mediaProjection = projectionManager.getMediaProjection(resultCode, projectionData);
+        android.media.projection.MediaProjection mediaProjection = projectionManager.getMediaProjection(currentResultCode, currentData);
 
         if (mediaProjection != null) {
             Log.i(TAG, "Starting recording session...");
@@ -131,7 +135,20 @@ public class RecorderService extends Service {
                 openIntent.setDataAndType(uri, "video/mp4");
                 openIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    thumbnail = getContentResolver().loadThumbnail(uri, new android.util.Size(512, 384), null);
+                    try {
+                        thumbnail = getContentResolver().loadThumbnail(uri, new android.util.Size(512, 384), null);
+                    } catch (Exception e) {
+                        // MediaStore might not have indexed it yet. Fallback to Retriever.
+                        android.media.MediaMetadataRetriever retriever = new android.media.MediaMetadataRetriever();
+                        try {
+                            retriever.setDataSource(this, uri);
+                            thumbnail = retriever.getFrameAtTime();
+                        } catch (Exception ignored) {
+                            Log.w(TAG, "Thumbnail generation skipped (video likely too short or empty).");
+                        } finally {
+                            try { retriever.release(); } catch (Exception ignored) {}
+                        }
+                    }
                 }
             } else if (path != null) {
                 File file = new File(path);
@@ -141,7 +158,7 @@ public class RecorderService extends Service {
                 thumbnail = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.MINI_KIND);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Failed to generate thumbnail", e);
+            Log.w(TAG, "Failed to attach thumbnail to notification: " + e.getMessage());
         }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);

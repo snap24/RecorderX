@@ -39,13 +39,13 @@ public class SettingsManager {
     public int getFps() { return prefs.getInt(KEY_FPS, 2); }
 
     public void setAudioSource(int index) { prefs.edit().putInt(KEY_AUDIO_SOURCE, index).apply(); }
-    public int getAudioSource() { return prefs.getInt(KEY_AUDIO_SOURCE, 1); }
+    public int getAudioSource() { return prefs.getInt(KEY_AUDIO_SOURCE, 2); }
 
     public void setCodec(int index) { prefs.edit().putInt(KEY_CODEC, index).apply(); }
     public int getCodec() { return prefs.getInt(KEY_CODEC, 0); }
 
     public void setBitrateMode(int index) { prefs.edit().putInt(KEY_BITRATE_MODE, index).apply(); }
-    public int getBitrateMode() { return prefs.getInt(KEY_BITRATE_MODE, 0); } // 0=VBR, 1=CBR
+    public int getBitrateMode() { return prefs.getInt(KEY_BITRATE_MODE, 1); } // 0=VBR, 1=CBR
 
     public void setAudioQuality(int index) { prefs.edit().putInt(KEY_AUDIO_QUALITY, index).apply(); }
     public int getAudioQuality() { return prefs.getInt(KEY_AUDIO_QUALITY, 1); } // 0=Low, 1=High, 2=Extreme

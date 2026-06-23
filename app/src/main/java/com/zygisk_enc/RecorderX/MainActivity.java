@@ -24,6 +24,7 @@ import com.google.android.material.textfield.TextInputEditText;
 public class MainActivity extends AppCompatActivity {
     private static final int SCREEN_CAPTURE_REQUEST_CODE = 1000;
     private static final int PERMISSION_REQUEST_CODE = 1001;
+    private static final int PERMISSION_REQUEST_CODE_START = 1002;
     
     private SettingsManager settingsManager;
     private Button btnRecord;
@@ -35,6 +36,15 @@ public class MainActivity extends AppCompatActivity {
 
         settingsManager = new SettingsManager(this);
         initUI();
+        
+        if (!checkPermissions()) {
+            java.util.ArrayList<String> permissions = new java.util.ArrayList<>();
+            permissions.add(Manifest.permission.RECORD_AUDIO);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissions.add(Manifest.permission.POST_NOTIFICATIONS);
+            }
+            ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSION_REQUEST_CODE_START);
+        }
     }
 
     private void initUI() {
@@ -43,18 +53,9 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btnGuide).setOnClickListener(v -> {
             androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-            builder.setTitle("RECORDER GUIDE");
-            builder.setMessage(
-                "• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n" +
-                "• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n" +
-                "• RESOLUTION: NAT uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n" +
-                "• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n" +
-                "• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n" +
-                "• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n" +
-                "• AUDIO SOURCE: Record Silence, Microphone, or System Internal sound.\n\n" +
-                "• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity."
-            );
-            builder.setPositiveButton("UNDERSTOOD", null);
+            builder.setTitle(R.string.guide_title);
+            builder.setMessage(R.string.guide_message);
+            builder.setPositiveButton(R.string.guide_understood, null);
             builder.show();
         });
             
@@ -131,15 +132,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean checkPermissions() {
         boolean granted = true;
         
-        // Audio Permission
-        int audioSource = settingsManager.getAudioSource();
-        if (audioSource == 1) { // Mic
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                granted = false;
-            }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            granted = false;
         }
         
-        // Notification Permission (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 granted = false;
@@ -152,17 +148,13 @@ public class MainActivity extends AppCompatActivity {
     private void requestPermissions() {
         java.util.ArrayList<String> permissions = new java.util.ArrayList<>();
         
-        if (settingsManager.getAudioSource() == 1) {
-            permissions.add(Manifest.permission.RECORD_AUDIO);
-        }
+        permissions.add(Manifest.permission.RECORD_AUDIO);
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS);
         }
         
-        if (!permissions.isEmpty()) {
-            ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSION_REQUEST_CODE);
-        }
+        ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSION_REQUEST_CODE);
     }
 
     @Override

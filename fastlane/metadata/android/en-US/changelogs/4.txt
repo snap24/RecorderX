@@ -1,0 +1,1 @@
+- Android 14 background activity compliance fixes.

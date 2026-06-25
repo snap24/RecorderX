@@ -2,6 +2,10 @@ package com.zygisk_enc.RecorderX;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.app.PendingIntent;
+import android.app.NotificationManager;
+import androidx.core.app.NotificationCompat;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.AudioAttributes;
@@ -239,7 +243,6 @@ public class RecordingSession {
                 MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR;
 
         String safeMime = MediaFormat.MIMETYPE_VIDEO_AVC;
-        int safeBitrateMode = MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR;
 
         String[] mimesToTry = originalMime.equals(safeMime) ? 
                               new String[]{originalMime} : 
@@ -247,47 +250,66 @@ public class RecordingSession {
 
         for (String mime : mimesToTry) {
             boolean isOriginal = mime.equals(originalMime);
-            int mode = isOriginal ? originalBitrateMode : safeBitrateMode;
+            int mode = originalBitrateMode; // Always keep user's VBR/CBR preference
 
             // Step 1: Request with requested/safe settings
             if (tryConfigureVideoEncoder(mime, originalWidth, originalHeight, originalFps, originalBitrate, mode, isOriginal)) {
                 return;
             }
 
-            // Step 2: Cap FPS at 60
-            int fpsStep1 = Math.min(originalFps, 60);
-            if (fpsStep1 < originalFps && tryConfigureVideoEncoder(mime, originalWidth, originalHeight, fpsStep1, originalBitrate, mode, false)) {
+            boolean isLandscape = originalWidth > originalHeight;
+
+            // Compute Native
+            android.util.DisplayMetrics dm = new android.util.DisplayMetrics();
+            android.view.WindowManager wm = (android.view.WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            if (wm != null) {
+                wm.getDefaultDisplay().getRealMetrics(dm);
+            } else {
+                dm = context.getResources().getDisplayMetrics();
+            }
+            int nativeLong = Math.max(dm.widthPixels, dm.heightPixels);
+            int nativeShort = Math.min(dm.widthPixels, dm.heightPixels);
+            nativeLong = (nativeLong / 16) * 16;
+            nativeShort = (nativeShort / 16) * 16;
+            int nativeWidth = isLandscape ? nativeLong : nativeShort;
+            int nativeHeight = isLandscape ? nativeShort : nativeLong;
+
+            // Step 2: Native @ 60 FPS, 20M
+            if (tryConfigureVideoEncoder(mime, nativeWidth, nativeHeight, 60, 20000000, mode, false)) {
                 return;
             }
 
-            // Step 3: Cap FPS at 30
-            int fpsStep2 = Math.min(originalFps, 30);
-            if (fpsStep2 < fpsStep1 && tryConfigureVideoEncoder(mime, originalWidth, originalHeight, fpsStep2, originalBitrate, mode, false)) {
+            // Dimensions for 1080p and 720p
+            int w1080 = isLandscape ? 1920 : 1080;
+            int h1080 = isLandscape ? 1080 : 1920;
+            int w720 = isLandscape ? 1280 : 720;
+            int h720 = isLandscape ? 720 : 1280;
+
+            // Step 3: 1080p @ 60 FPS, 20M
+            if (tryConfigureVideoEncoder(mime, w1080, h1080, 60, 20000000, mode, false)) {
                 return;
             }
 
-            // Step 4: Scale down to 1080p max (preserving aspect ratio)
-            int longSide = Math.max(originalWidth, originalHeight);
-            int shortSide = Math.min(originalWidth, originalHeight);
-            
-            if (longSide > 1920) {
-                float ratio = 1920f / longSide;
-                int newShortSide = (int) (shortSide * ratio);
-                newShortSide = (newShortSide / 16) * 16; // Ensure multiple of 16 for encoders
-                
-                int safeWidth = originalWidth > originalHeight ? 1920 : newShortSide;
-                int safeHeight = originalWidth > originalHeight ? newShortSide : 1920;
-                
-                if (tryConfigureVideoEncoder(mime, safeWidth, safeHeight, fpsStep2, originalBitrate, mode, false)) {
-                    return;
-                }
+            // Step 4: 720p @ 60 FPS, 20M
+            if (tryConfigureVideoEncoder(mime, w720, h720, 60, 20000000, mode, false)) {
+                return;
+            }
+
+            // Step 5: 1080p @ 30 FPS, 12M
+            if (tryConfigureVideoEncoder(mime, w1080, h1080, 30, 12000000, mode, false)) {
+                return;
+            }
+
+            // Step 6: 720p @ 30 FPS, 12M
+            if (tryConfigureVideoEncoder(mime, w720, h720, 30, 12000000, mode, false)) {
+                return;
             }
         }
 
         // Rock Bottom (720p 30fps safe fallback with safeMime)
         int safeWidth = originalWidth > originalHeight ? 1280 : 720;
         int safeHeight = originalWidth > originalHeight ? 720 : 1280;
-        if (tryConfigureVideoEncoder(safeMime, safeWidth, safeHeight, 30, 4000000, safeBitrateMode, false)) {
+        if (tryConfigureVideoEncoder(safeMime, safeWidth, safeHeight, 30, 4000000, originalBitrateMode, false)) {
             return;
         }
 
@@ -613,21 +635,21 @@ public class RecordingSession {
     
     private void triggerWatchdogFallback() {
         int currentRes = settings.getResolution();
-        if (currentRes >= 5) {
+        if (currentRes >= 4) { // Don't go below 720p (index 4)
             if (listener != null) listener.onSystemStop();
             return;
         }
 
+        // Drop resolution down a notch (e.g. from 4K to 2K, or 1080p to 720p)
         settings.setResolution(currentRes + 1);
         new Handler(Looper.getMainLooper()).post(() -> {
             android.widget.Toast.makeText(context, "Hardware overloaded. Auto-downgrading...", android.widget.Toast.LENGTH_LONG).show();
         });
 
-        // LIVE REBOOT (No Service Restart)
         new Thread(() -> {
-            Log.i(TAG, "Performing internal live-reboot to avoid Android 14 token expiration...");
+            Log.i(TAG, "Performing cleanup for fallback...");
             
-            // 1. Stop components without killing MediaProjection
+            // 1. Stop components without killing MediaProjection directly
             isRecording.set(false);
             try { if (virtualDisplay != null) { virtualDisplay.release(); virtualDisplay = null; } } catch (Exception ignored) {}
             try { if (videoEncoder != null) { videoEncoder.stop(); videoEncoder.release(); videoEncoder = null; } } catch (Exception ignored) {}
@@ -649,15 +671,45 @@ public class RecordingSession {
             outputFilePath = null;
             outputUri = null;
 
-            // 3. Wait a moment for hardware to reset
-            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+            if (Build.VERSION.SDK_INT >= 34) { // Android 14+ (UPSIDE_DOWN_CAKE)
+                Log.i(TAG, "Android 14+ detected. Re-prompting for MediaProjection...");
+                
+                // Stop current service so it can be restarted cleanly
+                if (listener != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> listener.onSystemStop());
+                }
+                
+                // Fire standard clickable Notification to bypass background restrictions smoothly
+                Intent promptIntent = new Intent(context, RequestCaptureActivity.class);
+                promptIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                
+                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, promptIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "saved_channel")
+                        .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                        .setContentTitle("Hardware Overloaded")
+                        .setContentText("Recording failed. Tap to restart with safe settings.")
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setContentIntent(pendingIntent) // Tap to open RequestCaptureActivity
+                        .setAutoCancel(true);
+                
+                NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                if (manager != null) {
+                    manager.notify(9999, builder.build());
+                }
+                
+            } else {
+                Log.i(TAG, "Performing internal live-reboot for pre-A14...");
+                // 3. Wait a moment for hardware to reset
+                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
-            // 4. Re-run start logic natively
-            try {
-                start();
-            } catch (Exception e) {
-                Log.e(TAG, "Watchdog live-reboot failed", e);
-                if (listener != null) listener.onSystemStop();
+                // 4. Re-run start logic natively
+                try {
+                    start();
+                } catch (Exception e) {
+                    Log.e(TAG, "Watchdog live-reboot failed", e);
+                    if (listener != null) listener.onSystemStop();
+                }
             }
         }).start();
     }

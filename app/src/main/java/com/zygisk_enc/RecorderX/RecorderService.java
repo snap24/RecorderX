@@ -116,7 +116,9 @@ public class RecorderService extends Service {
             Uri lastUri = recordingSession.getOutputUri();
             recordingSession.stop();
             
-            showSavedNotification(lastPath, lastUri);
+            if (lastPath != null || lastUri != null) {
+                showSavedNotification(lastPath, lastUri);
+            }
         }
         
         isRecording = false;

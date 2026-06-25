@@ -321,6 +321,7 @@ public class RecordingSession {
         throw new IOException("Failed to configure video encoder. Your device does not support screen recording.");
     }
 
+    @android.annotation.SuppressLint("MissingPermission")
     private void setupAudioEncoder() throws IOException {
         int sampleRate;
         int bitRate;

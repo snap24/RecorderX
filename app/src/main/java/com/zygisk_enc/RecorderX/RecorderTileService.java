@@ -22,6 +22,8 @@ public class RecorderTileService extends TileService {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    @android.annotation.SuppressLint("StartActivityAndCollapseDeprecated")
     @Override
     public void onClick() {
         super.onClick();

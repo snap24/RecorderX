@@ -259,53 +259,28 @@ public class RecordingSession {
 
             boolean isLandscape = originalWidth > originalHeight;
 
-            // Compute Native
-            android.util.DisplayMetrics dm = new android.util.DisplayMetrics();
-            android.view.WindowManager wm = (android.view.WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            if (wm != null) {
-                wm.getDefaultDisplay().getRealMetrics(dm);
-            } else {
-                dm = context.getResources().getDisplayMetrics();
-            }
-            int nativeLong = Math.max(dm.widthPixels, dm.heightPixels);
-            int nativeShort = Math.min(dm.widthPixels, dm.heightPixels);
-            nativeLong = (nativeLong / 16) * 16;
-            nativeShort = (nativeShort / 16) * 16;
-            int nativeWidth = isLandscape ? nativeLong : nativeShort;
-            int nativeHeight = isLandscape ? nativeShort : nativeLong;
-
-            // Step 2: Native @ Original FPS
-            if (tryConfigureVideoEncoder(mime, nativeWidth, nativeHeight, originalFps, originalBitrate, mode, false)) {
-                return;
-            }
-
-            // Step 3: Native @ Max 60 FPS
-            if (tryConfigureVideoEncoder(mime, nativeWidth, nativeHeight, Math.min(originalFps, 60), 20000000, mode, false)) {
-                return;
-            }
-
             // Dimensions for 1080p and 720p
             int w1080 = isLandscape ? 1920 : 1080;
             int h1080 = isLandscape ? 1080 : 1920;
             int w720 = isLandscape ? 1280 : 720;
             int h720 = isLandscape ? 720 : 1280;
 
-            // Step 4: 1080p @ Max 60 FPS
-            if (tryConfigureVideoEncoder(mime, w1080, h1080, Math.min(originalFps, 60), 20000000, mode, false)) {
+            // Step 2: 1080p @ Max 60 FPS (12 Mbps)
+            if (tryConfigureVideoEncoder(mime, w1080, h1080, Math.min(originalFps, 60), 12000000, mode, false)) {
                 return;
             }
 
-            // Step 5: 720p @ Max 60 FPS
-            if (tryConfigureVideoEncoder(mime, w720, h720, Math.min(originalFps, 60), 20000000, mode, false)) {
+            // Step 3: 720p @ Max 60 FPS (12 Mbps)
+            if (tryConfigureVideoEncoder(mime, w720, h720, Math.min(originalFps, 60), 12000000, mode, false)) {
                 return;
             }
 
-            // Step 6: 1080p @ Max 30 FPS
+            // Step 4: 1080p @ Max 30 FPS (12 Mbps)
             if (tryConfigureVideoEncoder(mime, w1080, h1080, Math.min(originalFps, 30), 12000000, mode, false)) {
                 return;
             }
 
-            // Step 7: 720p @ Max 30 FPS
+            // Step 5: 720p @ Max 30 FPS (12 Mbps)
             if (tryConfigureVideoEncoder(mime, w720, h720, Math.min(originalFps, 30), 12000000, mode, false)) {
                 return;
             }

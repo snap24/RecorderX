@@ -4,8 +4,8 @@
   <img src=".github/assets/iconz.png" width="256" height="256" />
   <br>
 
-  [![Latest Version](https://img.shields.io/badge/Version-v2.0.1-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/RecorderX/releases)
-  ![Java](https://img.shields.io/badge/Java-17-ED8B00?style=flat&logo=openjdk&logoColor=white)
+  [![Latest Version](https://img.shields.io/badge/Version-v3.0.0-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/RecorderX/releases)
+  ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)
   ![Android](https://img.shields.io/badge/API-29%2B-3DDC84?style=flat&logo=android&logoColor=white)
   [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat&logo=apache&logoColor=white)](LICENSE)
 </div>
@@ -15,7 +15,8 @@
 
 ## Versions
 
-- v2.0.1 (Latest): Android 14 background activity compliance fixes.
+- v3.0.0 (Latest): Title Bar Swipe Gesture Theme Customizer (with custom onboarding and pulsing logo), Floating overlay controls, real-time screen brush tools, compact MediaStyle notification buttons, and compilation transition to Java 21.
+- v2.0.1: Android 14 background activity compliance fixes.
 - v2.0.0: Live-Reboot Watchdog, Encoder Fallback Mechanism, and System + Mic Audio Recording.
 - v1.1.0: 4K/120FPS Support, AMOLED Lavender UI, and Live Thumbnail Notifications.
 - v1.0.0: Initial stable release with H.264/HEVC support.
@@ -28,6 +29,10 @@
 - Audio Management: Capture of Microphone, System audio, or both (Mic + System) simultaneously.
 - Post-Capture Feedback: Automated thumbnail generation and system notification on session completion.
 - Complete Privacy: Operates entirely offline with absolutely no internet permissions or telemetry.
+- Floating Control Overlays: Access quick pause, resume, and stop recording actions floating over other applications.
+- Screen Brush & Drawing Tool: Sketch and highlight directly on your screen while recording is active.
+- Swipe-to-Recolor Theme Customizer: Instantly cycle between 12 distinct AMOLED-compatible neon accent colors by swiping left/right across the top title bar.
+- Compact MediaStyle Notifications: Leverages custom text action drawing so control buttons remain functional and visible even in Android 14 collapsed/compact notification views.
 
 ## Advanced Capabilities
 
@@ -56,7 +61,7 @@
 ## Build Requirements
 
 1. Clone: `git clone https://github.com/snap24/RecorderX.git`
-2. Environment: Android Studio Koala+, JDK 17.
+2. Environment: Android Studio Koala+, JDK 21.
 3. Target: Minimum SDK 29 (Android 10), Target SDK 34 (Android 14).
 4. Execution: Run `./gradlew assembleRelease` for optimized production binaries.
 

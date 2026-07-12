@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Mode Color Palette (AMOLED) -->
+    <color name="bg_main">#000000</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#80FFFFFF</color>
+    <color name="slider_track_inactive">#121212</color>
+</resources>

@@ -1,13 +1,13 @@
 <resources>
-    <!-- Forced AMOLED Theme (Ignores System Light/Dark) -->
-    <style name="Theme.RecorderX" parent="Theme.Material3.Dark.NoActionBar">
+    <!-- DayNight Theme (Supports Light and Dark mode switching automatically) -->
+    <style name="Theme.RecorderX" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/accent_lavender</item>
-        <item name="android:windowBackground">@color/bg_amoled</item>
-        <item name="android:statusBarColor">@color/bg_amoled</item>
-        <item name="android:navigationBarColor">@color/bg_amoled</item>
+        <item name="android:windowBackground">@color/bg_main</item>
+        <item name="android:statusBarColor">@color/bg_main</item>
+        <item name="android:navigationBarColor">@color/bg_main</item>
         <item name="colorSecondary">@color/accent_lavender_dim</item>
         <item name="colorTertiary">@color/text_secondary</item>
-        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
     </style>
 </resources>

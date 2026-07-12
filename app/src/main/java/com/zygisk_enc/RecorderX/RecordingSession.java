@@ -50,6 +50,7 @@ public class RecordingSession {
     private MediaMuxer muxer;
     private AudioRecord audioRecord;
     private AudioRecord audioRecordSecondary;
+    private final Object audioRecordLock = new Object();
     private VirtualDisplay virtualDisplay;
     private Surface inputSurface;
     private ParcelFileDescriptor pfd;
@@ -59,9 +60,18 @@ public class RecordingSession {
     private int audioTrackIndex = -1;
     private boolean muxerStarted = false;
     private final AtomicBoolean isRecording = new AtomicBoolean(false);
+    private final AtomicBoolean isPaused = new AtomicBoolean(false);
+    private long pauseStartTimeUs = -1;
+    private long totalPauseDurationUs = 0;
     
     private Thread audioThread;
     private Thread videoThread;
+
+    private long sessionStartTimeMs = -1;
+    private long pauseStartTimeMs = -1;
+    private long totalPauseDurationMs = 0;
+    
+    private final AtomicBoolean isMicMuted = new AtomicBoolean(true);
 
     private String outputFilePath;
     private Uri outputUri;
@@ -84,6 +94,43 @@ public class RecordingSession {
     public String getOutputFilePath() { return outputFilePath; }
     public Uri getOutputUri() { return outputUri; }
 
+    public boolean isPaused() { return isPaused.get(); }
+
+    public void pause() {
+        if (isRecording.get() && !isPaused.get()) {
+            isPaused.set(true);
+            pauseStartTimeUs = System.nanoTime() / 1000;
+            pauseStartTimeMs = System.currentTimeMillis();
+            if (videoEncoder != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                android.os.Bundle params = new android.os.Bundle();
+                params.putInt(MediaCodec.PARAMETER_KEY_SUSPEND, 1);
+                videoEncoder.setParameters(params);
+            }
+            Log.i(TAG, "Session paused");
+        }
+    }
+
+    public void resume() {
+        if (isRecording.get() && isPaused.get()) {
+            if (pauseStartTimeUs != -1) {
+                long resumeTimeUs = System.nanoTime() / 1000;
+                totalPauseDurationUs += (resumeTimeUs - pauseStartTimeUs);
+                pauseStartTimeUs = -1;
+            }
+            if (pauseStartTimeMs != -1) {
+                totalPauseDurationMs += (System.currentTimeMillis() - pauseStartTimeMs);
+                pauseStartTimeMs = -1;
+            }
+            isPaused.set(false);
+            if (videoEncoder != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                android.os.Bundle params = new android.os.Bundle();
+                params.putInt(MediaCodec.PARAMETER_KEY_SUSPEND, 0);
+                videoEncoder.setParameters(params);
+            }
+            Log.i(TAG, "Session resumed");
+        }
+    }
+
     public RecordingSession(Context context, MediaProjection mediaProjection, SettingsManager settings) {
         this.context = context;
         this.mediaProjection = mediaProjection;
@@ -92,6 +139,9 @@ public class RecordingSession {
 
     public void start() throws IOException {
         Log.i(TAG, "start() called. Initializing session components...");
+        sessionStartTimeMs = System.currentTimeMillis();
+        totalPauseDurationMs = 0;
+        pauseStartTimeMs = -1;
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String template = settings.getNamingTemplate().replaceAll("[^a-zA-Z0-9_\\-{}, ]", "");
         String fileName = template.replace("{timestamp}", timestamp) + ".mp4";
@@ -337,11 +387,16 @@ public class RecordingSession {
                     .setBufferSizeInBytes(bufferSize)
                     .build();
                     
-            if (settings.getAudioSource() == 3) {
+            boolean defaultMute = (settings.getAudioSource() == 2);
+            isMicMuted.set(defaultMute);
+            if (!defaultMute) {
                 audioRecordSecondary = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, bufferSize);
+            } else {
+                audioRecordSecondary = null;
             }
         } else {
             audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, bufferSize);
+            isMicMuted.set(false); // If mic-only, it starts active
         }
 
         MediaFormat format = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, sampleRate, 2);
@@ -375,15 +430,19 @@ public class RecordingSession {
                         if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
                             throw new IOException("AudioRecord failed to initialize");
                         }
-                        if (audioRecordSecondary != null && audioRecordSecondary.getState() != AudioRecord.STATE_INITIALIZED) {
-                            Log.w(TAG, "Secondary AudioRecord failed. Falling back to single audio.");
-                            audioRecordSecondary.release();
-                            audioRecordSecondary = null;
+                        synchronized (audioRecordLock) {
+                            if (audioRecordSecondary != null && audioRecordSecondary.getState() != AudioRecord.STATE_INITIALIZED) {
+                                Log.w(TAG, "Secondary AudioRecord failed. Falling back to single audio.");
+                                audioRecordSecondary.release();
+                                audioRecordSecondary = null;
+                            }
                         }
                         
                         audioRecord.startRecording();
-                        if (audioRecordSecondary != null) {
-                            audioRecordSecondary.startRecording();
+                        synchronized (audioRecordLock) {
+                            if (audioRecordSecondary != null) {
+                                audioRecordSecondary.startRecording();
+                            }
                         }
                         
                         if (audioRecord.getRecordingState() != AudioRecord.RECORDSTATE_RECORDING) {
@@ -436,7 +495,7 @@ public class RecordingSession {
                         // NORMALIZE PTS: Most hardware encoders use system uptime which causes huge offsets
                         if (isVideo) {
                             if (videoStartTimeUs == -1) videoStartTimeUs = bufferInfo.presentationTimeUs;
-                            bufferInfo.presentationTimeUs -= videoStartTimeUs;
+                            bufferInfo.presentationTimeUs -= (videoStartTimeUs + totalPauseDurationUs);
                         }
 
                         if (bufferInfo.presentationTimeUs < 0) bufferInfo.presentationTimeUs = 0;
@@ -474,10 +533,7 @@ public class RecordingSession {
         int sampleRate = audioRecord.getSampleRate();
         int bufferSize = 4096; 
         ByteBuffer pcmBuffer = ByteBuffer.allocateDirect(bufferSize);
-        ByteBuffer secBuffer = null;
-        if (audioRecordSecondary != null) {
-            secBuffer = ByteBuffer.allocateDirect(bufferSize);
-        }
+        ByteBuffer secBuffer = ByteBuffer.allocateDirect(bufferSize);
         
         // Use system time for audio PTS sync if possible, but keep simple for now
         long totalSamples = 0;
@@ -487,10 +543,23 @@ public class RecordingSession {
                 pcmBuffer.clear();
                 int read = audioRecord.read(pcmBuffer, bufferSize);
                 
+                if (isPaused.get()) {
+                    continue;
+                }
+                
                 int readSec = 0;
-                if (audioRecordSecondary != null && secBuffer != null) {
-                    secBuffer.clear();
-                    readSec = audioRecordSecondary.read(secBuffer, bufferSize);
+                synchronized (audioRecordLock) {
+                    if (audioRecordSecondary != null) {
+                        secBuffer.clear();
+                        try {
+                            int bytesRead = audioRecordSecondary.read(secBuffer, bufferSize);
+                            if (!isMicMuted.get()) {
+                                readSec = bytesRead;
+                            }
+                        } catch (Exception e) {
+                            Log.w(TAG, "Error reading from secondary audio record", e);
+                        }
+                    }
                 }
 
                 if (read > 0 || readSec > 0) {
@@ -693,5 +762,169 @@ public class RecordingSession {
                 }
             }
         }).start();
+    }
+
+    public void takeScreenshot(final Runnable onCompleted) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (wm != null) wm.getDefaultDisplay().getRealMetrics(metrics);
+        int density = metrics.densityDpi > 0 ? metrics.densityDpi : 300;
+
+        @android.annotation.SuppressLint("WrongConstant")
+        final android.media.ImageReader imageReader = android.media.ImageReader.newInstance(
+            activeWidth, activeHeight, android.graphics.PixelFormat.RGBA_8888, 2
+        );
+
+        final VirtualDisplay screenDisplay = mediaProjection.createVirtualDisplay(
+            "Screenshot",
+            activeWidth, activeHeight, density,
+            DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY | 
+            DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC,
+            imageReader.getSurface(), null, null
+        );
+
+        if (screenDisplay == null) {
+            imageReader.close();
+            if (onCompleted != null) onCompleted.run();
+            return;
+        }
+
+        imageReader.setOnImageAvailableListener(new android.media.ImageReader.OnImageAvailableListener() {
+            private boolean captured = false;
+            @Override
+            public void onImageAvailable(android.media.ImageReader reader) {
+                if (captured) return;
+                android.media.Image image = null;
+                try {
+                    image = reader.acquireLatestImage();
+                    if (image != null) {
+                        captured = true;
+                        android.media.Image.Plane[] planes = image.getPlanes();
+                        java.nio.ByteBuffer buffer = planes[0].getBuffer();
+                        int pixelStride = planes[0].getPixelStride();
+                        int rowStride = planes[0].getRowStride();
+                        int rowPadding = rowStride - pixelStride * activeWidth;
+                        
+                        android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(
+                            activeWidth + rowPadding / pixelStride, activeHeight, android.graphics.Bitmap.Config.ARGB_8888
+                        );
+                        bitmap.copyPixelsFromBuffer(buffer);
+                        
+                        android.graphics.Bitmap croppedBitmap = android.graphics.Bitmap.createBitmap(
+                            bitmap, 0, 0, activeWidth, activeHeight
+                        );
+                        bitmap.recycle();
+                        
+                        saveScreenshotToDisk(croppedBitmap);
+                        
+                        screenDisplay.release();
+                        imageReader.close();
+                        if (onCompleted != null) onCompleted.run();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to capture screenshot", e);
+                    screenDisplay.release();
+                    imageReader.close();
+                    if (onCompleted != null) onCompleted.run();
+                } finally {
+                    if (image != null) image.close();
+                }
+            }
+        }, null);
+    }
+
+    private void saveScreenshotToDisk(android.graphics.Bitmap bitmap) {
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String fileName = "Screenshot_" + timestamp + ".png";
+        
+        try {
+            java.io.OutputStream fos;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/RecorderX");
+                
+                Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                if (uri == null) throw new IOException("Failed to create MediaStore entry");
+                fos = context.getContentResolver().openOutputStream(uri);
+            } else {
+                File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "RecorderX");
+                storageDir.mkdirs();
+                File file = new File(storageDir, fileName);
+                fos = new java.io.FileOutputStream(file);
+            }
+            
+            if (fos != null) {
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, fos);
+                fos.close();
+                
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    android.widget.Toast.makeText(context, "Screenshot saved to Pictures/RecorderX", android.widget.Toast.LENGTH_SHORT).show();
+                });
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error saving screenshot", e);
+        }
+    }
+
+    public long getActiveDurationMs() {
+        if (sessionStartTimeMs == -1) return 0;
+        long currentMs = System.currentTimeMillis();
+        if (isPaused.get()) {
+            return (pauseStartTimeMs != -1 ? pauseStartTimeMs : currentMs) - sessionStartTimeMs - totalPauseDurationMs;
+        }
+        return currentMs - sessionStartTimeMs - totalPauseDurationMs;
+    }
+
+    public boolean isMicMuted() {
+        return isMicMuted.get();
+    }
+
+    public void setMicMuted(boolean muted) {
+        isMicMuted.set(muted);
+        Log.i(TAG, "Microphone mute state changed to: " + muted);
+        
+        // Dynamically start/stop mic input to control system indicator
+        if (settings.getAudioSource() == 2 || settings.getAudioSource() == 3) {
+            new Thread(() -> {
+                synchronized (audioRecordLock) {
+                    if (muted) {
+                        if (audioRecordSecondary != null) {
+                            Log.i(TAG, "Muting mic: releasing secondary AudioRecord");
+                            try {
+                                audioRecordSecondary.stop();
+                            } catch (Exception ignored) {}
+                            try {
+                                audioRecordSecondary.release();
+                            } catch (Exception ignored) {}
+                            audioRecordSecondary = null;
+                        }
+                    } else {
+                        if (audioRecordSecondary == null) {
+                            Log.i(TAG, "Unmuting mic: initializing secondary AudioRecord");
+                            try {
+                                int sampleRate = audioRecord != null ? audioRecord.getSampleRate() : 44100;
+                                int channelConfig = android.media.AudioFormat.CHANNEL_IN_STEREO;
+                                int audioFormat = android.media.AudioFormat.ENCODING_PCM_16BIT;
+                                int bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat) * 4;
+                                
+                                audioRecordSecondary = new AudioRecord(android.media.MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, bufferSize);
+                                if (audioRecordSecondary.getState() == AudioRecord.STATE_INITIALIZED) {
+                                    audioRecordSecondary.startRecording();
+                                } else {
+                                    Log.e(TAG, "Failed to initialize secondary AudioRecord during unmute");
+                                    audioRecordSecondary.release();
+                                    audioRecordSecondary = null;
+                                }
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error starting secondary AudioRecord", e);
+                                audioRecordSecondary = null;
+                            }
+                        }
+                    }
+                }
+            }, "MicToggleThread").start();
+        }
     }
 }

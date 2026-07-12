@@ -79,4 +79,5 @@
 
     <string name="qs_label">RecorderX</string>
     <string name="info_text">Advanced settings are automatically saved.</string>
+    <string name="accessibility_desc">Used solely to trigger native system screenshots during screen recording sessions without interrupting the video capture.</string>
 </resources>

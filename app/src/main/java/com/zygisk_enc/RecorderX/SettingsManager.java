@@ -27,7 +27,7 @@ public class SettingsManager {
     }
 
     public void setOrientation(int index) { prefs.edit().putInt(KEY_ORIENTATION, index).apply(); }
-    public int getOrientation() { return prefs.getInt(KEY_ORIENTATION, 0); } // 0=Auto, 1=Portrait, 2=Landscape
+    public int getOrientation() { return prefs.getInt(KEY_ORIENTATION, 1); } // 0=Auto, 1=Portrait, 2=Landscape
 
     public void setResolution(int index) { prefs.edit().putInt(KEY_RESOLUTION, index).apply(); }
     public int getResolution() { return prefs.getInt(KEY_RESOLUTION, 0); }
@@ -49,6 +49,9 @@ public class SettingsManager {
 
     public void setAudioQuality(int index) { prefs.edit().putInt(KEY_AUDIO_QUALITY, index).apply(); }
     public int getAudioQuality() { return prefs.getInt(KEY_AUDIO_QUALITY, 1); } // 0=Low, 1=High, 2=Extreme
+
+    public void setFloatingControlEnabled(boolean enabled) { prefs.edit().putBoolean("floating_control", enabled).apply(); }
+    public boolean isFloatingControlEnabled() { return prefs.getBoolean("floating_control", false); }
 
     public void setNamingTemplate(String template) { prefs.edit().putString(KEY_NAMING_TEMPLATE, template).apply(); }
     

@@ -29,6 +29,9 @@ public class RecorderService extends Service {
 
     public static final String ACTION_START = "ACTION_START";
     public static final String ACTION_STOP = "ACTION_STOP";
+    public static final String ACTION_PAUSE = "ACTION_PAUSE";
+    public static final String ACTION_RESUME = "ACTION_RESUME";
+    public static final String ACTION_DELETE = "ACTION_DELETE";
     public static final String EXTRA_RESULT_CODE = "EXTRA_RESULT_CODE";
     public static final String EXTRA_DATA = "EXTRA_DATA";
 
@@ -37,6 +40,38 @@ public class RecorderService extends Service {
     private static Intent projectionData;
 
     private RecordingSession recordingSession;
+    private FloatingController floatingController;
+
+    public interface RecordingStateListener {
+        void onStateChanged(boolean isRecording);
+    }
+
+    private static final java.util.List<RecordingStateListener> stateListeners = new java.util.ArrayList<>();
+
+    public static void registerStateListener(RecordingStateListener listener) {
+        synchronized (stateListeners) {
+            stateListeners.add(listener);
+            listener.onStateChanged(isRecording);
+        }
+    }
+
+    public static void unregisterStateListener(RecordingStateListener listener) {
+        synchronized (stateListeners) {
+            stateListeners.remove(listener);
+        }
+    }
+
+    private static void notifyStateChanged() {
+        synchronized (stateListeners) {
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                synchronized (stateListeners) {
+                    for (RecordingStateListener listener : stateListeners) {
+                        listener.onStateChanged(isRecording);
+                    }
+                }
+            });
+        }
+    }
 
     public static boolean isRecording() { return isRecording; }
 
@@ -72,6 +107,18 @@ public class RecorderService extends Service {
             }
         } else if (ACTION_STOP.equals(action)) {
             stopRecording();
+        } else if (ACTION_PAUSE.equals(action)) {
+            pauseRecording();
+        } else if (ACTION_RESUME.equals(action)) {
+            resumeRecording();
+        } else if (ACTION_DELETE.equals(action)) {
+            String deleteUriStr = intent.getStringExtra("delete_uri");
+            String deletePath = intent.getStringExtra("delete_path");
+            deleteRecordingFile(deleteUriStr, deletePath);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager != null) {
+                manager.cancel(SAVED_NOTIFICATION_ID);
+            }
         }
 
         return START_NOT_STICKY;
@@ -99,6 +146,18 @@ public class RecorderService extends Service {
             try {
                 recordingSession.start();
                 isRecording = true;
+                notifyStateChanged();
+
+                if (settings.isFloatingControlEnabled()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(this)) {
+                        Log.w(TAG, "Cannot show floating control: overlay permission not granted");
+                    } else {
+                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                            floatingController = new FloatingController(this);
+                            floatingController.show();
+                        });
+                    }
+                }
             } catch (Exception e) {
                 Log.e(TAG, "Error in startRecording", e);
                 stopForeground(true);
@@ -110,6 +169,11 @@ public class RecorderService extends Service {
     private void stopRecording() {
         if (!isRecording) return;
         Log.i(TAG, "Stopping recording service...");
+
+        if (floatingController != null) {
+            floatingController.dismiss();
+            floatingController = null;
+        }
         
         if (recordingSession != null) {
             String lastPath = recordingSession.getOutputFilePath();
@@ -122,8 +186,97 @@ public class RecorderService extends Service {
         }
         
         isRecording = false;
+        notifyStateChanged();
         stopForeground(true);
         stopSelf();
+    }
+
+    public boolean isPaused() {
+        return recordingSession != null && recordingSession.isPaused();
+    }
+
+    public long getActiveRecordingDurationMs() {
+        return recordingSession != null ? recordingSession.getActiveDurationMs() : 0;
+    }
+
+    public void takeScreenshot(Runnable onCompleted) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            RecorderAccessibilityService serviceInstance = RecorderAccessibilityService.getInstance();
+            if (serviceInstance != null) {
+                boolean success = serviceInstance.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT);
+                if (success) {
+                    Log.i(TAG, "System screenshot triggered via accessibility service");
+                } else {
+                    Log.e(TAG, "Failed to trigger system screenshot via accessibility service");
+                }
+                if (onCompleted != null) onCompleted.run();
+            } else {
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                    android.widget.Toast.makeText(this, "Please enable Accessibility permission for RecorderX to take screenshots", android.widget.Toast.LENGTH_LONG).show();
+                    try {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Could not launch accessibility settings", e);
+                    }
+                });
+                if (onCompleted != null) onCompleted.run();
+            }
+        } else {
+            if (recordingSession != null) {
+                recordingSession.takeScreenshot(onCompleted);
+            } else {
+                if (onCompleted != null) onCompleted.run();
+            }
+        }
+    }
+
+    public boolean isMicMuted() {
+        return recordingSession != null ? recordingSession.isMicMuted() : true;
+    }
+
+    public void setMicMuted(boolean muted) {
+        if (recordingSession != null) {
+            recordingSession.setMicMuted(muted);
+        }
+    }
+
+    public boolean isAudioSourceSystem() {
+        int source = new SettingsManager(this).getAudioSource();
+        return source == 2 || source == 3;
+    }
+
+    public void pauseRecording() {
+        if (recordingSession != null) {
+            recordingSession.pause();
+            updateNotificationPaused(true);
+            if (floatingController != null) {
+                floatingController.updatePauseState(true);
+            }
+        }
+    }
+
+    public void resumeRecording() {
+        if (recordingSession != null) {
+            recordingSession.resume();
+            updateNotificationPaused(false);
+            if (floatingController != null) {
+                floatingController.updatePauseState(false);
+            }
+        }
+    }
+
+    public void stopRecordingExternally() {
+        stopRecording();
+    }
+
+    private void updateNotificationPaused(boolean paused) {
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null) {
+            Notification notification = createActiveNotification(paused);
+            manager.notify(NOTIFICATION_ID, notification);
+        }
     }
 
     private void showSavedNotification(String path, Uri uri) {
@@ -164,6 +317,21 @@ public class RecorderService extends Service {
         }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        
+        Intent deleteIntent = new Intent(this, RecorderService.class);
+        deleteIntent.setAction(ACTION_DELETE);
+        if (uri != null) {
+            deleteIntent.putExtra("delete_uri", uri.toString());
+        }
+        if (path != null) {
+            deleteIntent.putExtra("delete_path", path);
+        }
+        PendingIntent deletePendingIntent = PendingIntent.getService(
+            this,
+            1,
+            deleteIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE
+        );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, SAVED_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_record)
@@ -171,7 +339,8 @@ public class RecorderService extends Service {
             .setContentText("Tap to view your recording in /Movies/RecorderX")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-            .setContentIntent(pendingIntent);
+            .setContentIntent(pendingIntent)
+            .addAction(0, "Delete", deletePendingIntent);
 
         if (thumbnail != null) {
             builder.setLargeIcon(thumbnail);
@@ -183,11 +352,32 @@ public class RecorderService extends Service {
         manager.notify(SAVED_NOTIFICATION_ID, builder.build());
     }
 
+    private void deleteRecordingFile(String uriStr, String path) {
+        try {
+            if (uriStr != null) {
+                Uri uri = Uri.parse(uriStr);
+                getContentResolver().delete(uri, null, null);
+                Log.i(TAG, "Deleted recording via MediaStore Uri: " + uri);
+            } else if (path != null) {
+                File file = new File(path);
+                if (file.exists()) {
+                    file.delete();
+                    Log.i(TAG, "Deleted recording file: " + path);
+                }
+            }
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                android.widget.Toast.makeText(getApplicationContext(), "Recording deleted", android.widget.Toast.LENGTH_SHORT).show();
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to delete recording file", e);
+        }
+    }
+
     private void createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = getSystemService(NotificationManager.class);
             
-            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, "Recorder Service", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, "Recorder Service", NotificationManager.IMPORTANCE_DEFAULT);
             manager.createNotificationChannel(serviceChannel);
             
             NotificationChannel savedChannel = new NotificationChannel(SAVED_CHANNEL_ID, "Recording Saved", NotificationManager.IMPORTANCE_HIGH);
@@ -196,13 +386,75 @@ public class RecorderService extends Service {
     }
 
     private Notification createNotification() {
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("RecorderX is active")
-            .setContentText("Recording the screen...")
+        return createActiveNotification(false);
+    }
+
+    private Notification createActiveNotification(boolean paused) {
+        Intent stopIntent = new Intent(this, RecorderService.class);
+        stopIntent.setAction(ACTION_STOP);
+        PendingIntent stopPendingIntent = PendingIntent.getService(
+            this, 
+            0, 
+            stopIntent, 
+            PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        Intent pauseIntent = new Intent(this, RecorderService.class);
+        pauseIntent.setAction(paused ? ACTION_RESUME : ACTION_PAUSE);
+        PendingIntent pausePendingIntent = PendingIntent.getService(
+            this, 
+            0, 
+            pauseIntent, 
+            PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        String title = paused ? "RecorderX is paused" : "RecorderX is active";
+        String actionLabel = paused ? "Resume Recording" : "Pause Recording";
+
+        android.graphics.drawable.Icon pauseIcon = createTextIcon(paused ? "RESUME" : "PAUSE");
+        android.graphics.drawable.Icon stopIcon = createTextIcon("STOP");
+
+        return new Notification.Builder(this, CHANNEL_ID)
+            .setContentTitle(title)
             .setSmallIcon(R.drawable.ic_record)
             .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .addAction(new Notification.Action.Builder(
+                pauseIcon, actionLabel, pausePendingIntent
+            ).build())
+            .addAction(new Notification.Action.Builder(
+                stopIcon, "Stop Recording", stopPendingIntent
+            ).build())
+            .setStyle(new Notification.MediaStyle()
+                .setShowActionsInCompactView(0, 1))
             .build();
+    }
+
+    private android.graphics.drawable.Icon createTextIcon(String text) {
+        int width = 96;
+        int height = 96;
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
+        
+        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(android.graphics.Color.WHITE);
+        
+        // Dynamically adjust text size based on length to prevent horizontal clipping
+        float textSize = 26f;
+        if (text.length() > 5) {
+            textSize = 21f; // Scaled down for longer words like "RESUME"
+        }
+        paint.setTextSize(textSize);
+        
+        paint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.SANS_SERIF, android.graphics.Typeface.BOLD));
+        paint.setTextAlign(android.graphics.Paint.Align.CENTER);
+        
+        android.graphics.Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+        float fontHeight = fontMetrics.descent - fontMetrics.ascent;
+        float y = (height - fontHeight) / 2f - fontMetrics.ascent;
+        
+        canvas.drawText(text, width / 2f, y, paint);
+        
+        return android.graphics.drawable.Icon.createWithBitmap(bitmap);
     }
 
     @Nullable

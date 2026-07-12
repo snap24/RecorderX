@@ -10,8 +10,8 @@ android {
         applicationId "com.zygisk_enc.RecorderX"
         minSdk 29
         targetSdk 34
-        versionCode 4
-        versionName "2.0.1"
+        versionCode 5
+        versionName "3.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -23,8 +23,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     dependenciesInfo {

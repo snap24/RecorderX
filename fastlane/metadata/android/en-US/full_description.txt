@@ -4,9 +4,12 @@ Key Features:
 - Record up to 4K (UHD) and 2K (QHD) for crystal clear video.
 - High-speed recording at 60fps, 90fps, and 120fps.
 - Custom bitrates up to 40 Mbps for professional quality.
-- Modern AMOLED Black and Lavender Purple theme with precision slider controls.
+- Modern AMOLED Black base theme with a Title Bar Swipe Gesture Theme Customizer to cycle through 12 dynamic accent colors.
+- Floating control overlay panel for convenient recording management.
+- Real-time screen drawing brush tool for annotations.
+- Compact MediaStyle notification controls tailored for Android 14.
 - Automatic file naming with custom templates.
 - Self-healing audio system that recovers if the system blocks capture.
 - Post-recording notifications with live video thumbnails.
 - Works entirely offline with no internet access or ads.
-- Open Source and built for performance.
+- Open Source and compiled with Java 21.

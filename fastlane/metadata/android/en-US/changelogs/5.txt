@@ -1,0 +1,5 @@
+- Title Bar Swipe Gesture Theme Customizer with pulsing logo and onboarding hint.
+- Floating overlay control panel with quick pause, resume, and stop actions.
+- Real-time screen drawing brush tool.
+- Compact MediaStyle notification controls for Android 14.
+- Upgraded build target compatibility to Java 21.

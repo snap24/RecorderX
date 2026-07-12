@@ -44,11 +44,11 @@
 <summary><h3><b>Interface Gallery</b></h3></summary>
 <br>
 <div align="center">
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpeg" width="200" />
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpeg" width="200" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpeg" width="200" />&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpeg" width="200" />&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpeg" width="200" />
   <br><br>
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpeg" width="200" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpeg" width="200" />&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpeg" width="200" />
 </div>
 </details>

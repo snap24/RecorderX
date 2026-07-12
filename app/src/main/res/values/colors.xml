@@ -7,9 +7,9 @@
     <color name="accent_lavender">#9575CD</color>
     <color name="accent_lavender_dim">#1A9575CD</color>
     
-    <!-- AMOLED Pitch Black -->
-    <color name="bg_amoled">#000000</color>
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#80FFFFFF</color>
-    <color name="slider_track_inactive">#121212</color>
+    <!-- Light Mode Color Palette -->
+    <color name="bg_main">#F9F9F9</color>
+    <color name="text_primary">#121212</color>
+    <color name="text_secondary">#666666</color>
+    <color name="slider_track_inactive">#E0E0E0</color>
 </resources>

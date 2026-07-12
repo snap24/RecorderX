@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/onboardingOverlay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#D9060608"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Top Spotlight Highlight -->
+    <View
+        android:id="@+id/spotlightBorder"
+        android:layout_width="220dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_spotlight_border" />
+
+    <!-- Onboarding Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/onboardingCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="32dp"
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="@color/bg_main"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/accent_lavender">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/tvOnboardingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎨 Swipe to Recolor"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/accent_lavender"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Swipe left or right anywhere over the RecorderX title area to cycle between 12 gorgeous theme accent colors!"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/text_primary"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Animated Swipe Indicator -->
+            <FrameLayout
+                android:layout_width="120dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="24dp">
+
+                <ImageView
+                    android:id="@+id/ivSwipeHand"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_swipe_arrows"
+                    android:layout_gravity="center"
+                    android:tint="@color/accent_lavender" />
+            </FrameLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOnboardingClose"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Got It"
+                android:textColor="@color/black"
+                android:fontFamily="sans-serif-black"
+                app:cornerRadius="8dp"
+                app:backgroundTint="@color/accent_lavender"
+                android:elevation="0dp" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>

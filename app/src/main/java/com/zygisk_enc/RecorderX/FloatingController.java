@@ -41,6 +41,7 @@ public class FloatingController {
     private final Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
+            if (!isShowing) return;
             if (isExpanded && tvTimer != null) {
                 long durationMs = service.getActiveRecordingDurationMs();
                 long seconds = (durationMs / 1000) % 60;
@@ -336,7 +337,12 @@ public class FloatingController {
             });
         }
         
-        windowManager.addView(rootLayout, params);
+        try {
+            windowManager.addView(rootLayout, params);
+        } catch (Exception e) {
+            android.util.Log.e("FloatingController", "Overlay window rejected by the system", e);
+            return;
+        }
         isShowing = true;
         if (isExpanded) {
             timerHandler.post(timerRunnable);

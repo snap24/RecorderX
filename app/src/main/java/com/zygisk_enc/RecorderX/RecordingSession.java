@@ -61,6 +61,7 @@ public class RecordingSession {
     private boolean muxerStarted = false;
     private final AtomicBoolean isRecording = new AtomicBoolean(false);
     private final AtomicBoolean isPaused = new AtomicBoolean(false);
+    private final AtomicBoolean released = new AtomicBoolean(false);
     private long pauseStartTimeUs = -1;
     private long totalPauseDurationUs = 0;
     
@@ -199,6 +200,10 @@ public class RecordingSession {
             projectionCallback = new MediaProjection.Callback() {
                 @Override
                 public void onStop() {
+                    if (released.get()) {
+                        Log.i(TAG, "Ignoring onStop() for an already-released session");
+                        return;
+                    }
                     Log.i(TAG, "MediaProjection onStop() triggered by system");
                     if (listener != null) {
                         listener.onSystemStop();
@@ -212,9 +217,7 @@ public class RecordingSession {
             Log.d(TAG, "Creating VirtualDisplay (" + activeWidth + "x" + activeHeight + ")...");
             virtualDisplay = mediaProjection.createVirtualDisplay("RecorderX",
                     activeWidth, activeHeight, density,
-                    DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR | 
-                    DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC | 
-                    DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION,
+                    DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                     inputSurface, null, null);
             
             if (virtualDisplay == null) {
@@ -490,7 +493,11 @@ public class RecordingSession {
                     }
                 } else if (outputIndex >= 0) {
                     ByteBuffer outputBuffer = encoder.getOutputBuffer(outputIndex);
-                    
+
+                    if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                        bufferInfo.size = 0;
+                    }
+
                     if (muxerStarted && bufferInfo.size > 0) {
                         // NORMALIZE PTS: Most hardware encoders use system uptime which causes huge offsets
                         if (isVideo) {
@@ -646,7 +653,14 @@ public class RecordingSession {
     }
 
     public void stop() {
+        if (!released.compareAndSet(false, true)) return;
         isRecording.set(false);
+
+        if (projectionCallback != null) {
+            try { mediaProjection.unregisterCallback(projectionCallback); } catch (Exception ignored) {}
+            projectionCallback = null;
+        }
+
         try {
             if (videoThread != null) videoThread.join(1000);
             if (audioThread != null) audioThread.join(1000);
@@ -656,7 +670,7 @@ public class RecordingSession {
             virtualDisplay.release();
             virtualDisplay = null;
         }
-        
+
         try { if (videoEncoder != null) { videoEncoder.stop(); videoEncoder.release(); } } catch (Exception ignored) {}
         try { if (audioEncoder != null) { audioEncoder.stop(); audioEncoder.release(); } } catch (Exception ignored) {}
         try { if (audioRecord != null) { audioRecord.stop(); audioRecord.release(); } } catch (Exception ignored) {}
@@ -669,6 +683,8 @@ public class RecordingSession {
         }
 
         try { if (pfd != null) { pfd.close(); pfd = null; } } catch (Exception ignored) {}
+
+        try { mediaProjection.stop(); } catch (Exception ignored) {}
 
         // Finalize MediaStore or notify Scanner
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -690,8 +706,8 @@ public class RecordingSession {
             return;
         }
 
-        // Drop resolution down a notch (e.g. from 4K to 2K, or 1080p to 720p)
-        settings.setResolution(currentRes + 1);
+        // Index 0 is Native, 1 is 4K — stepping 0->1 would raise it, so send Native straight to 1080p
+        settings.setResolution(currentRes == 0 ? 3 : currentRes + 1);
         new Handler(Looper.getMainLooper()).post(() -> {
             android.widget.Toast.makeText(context, "Hardware overloaded. Auto-downgrading...", android.widget.Toast.LENGTH_LONG).show();
         });

@@ -56,32 +56,38 @@ public class BrushController {
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : 
                 WindowManager.LayoutParams.TYPE_PHONE;
 
-        // 1. Full-screen drawing overlay window
-        drawingParams = new WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
-            layoutType,
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | 
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | 
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            PixelFormat.TRANSLUCENT
-        );
+        // 1. Full-screen drawing overlay window, kept alive across minimise so strokes persist
+        if (drawingView == null) {
+            drawingParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                layoutType,
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                PixelFormat.TRANSLUCENT
+            );
 
-        drawingView = new DrawingOverlayView(context);
-        drawingView.setBrushColor(Color.RED); // default red brush
-        drawingView.setStrokeWidth(12f);
-        windowManager.addView(drawingView, drawingParams);
+            drawingView = new DrawingOverlayView(context);
+            drawingView.setBrushColor(Color.RED); // default red brush
+            drawingView.setStrokeWidth(12f);
+            windowManager.addView(drawingView, drawingParams);
+        } else {
+            setDrawingTouchable(true);
+        }
 
         // 2. Translucent floating toolbar window
-        toolbarParams = new WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            layoutType,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            PixelFormat.TRANSLUCENT
-        );
-        toolbarParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        toolbarParams.y = dpToPx(80); // Positioned above navigation bar
+        if (toolbarParams == null) {
+            toolbarParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                layoutType,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
+            );
+            toolbarParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            toolbarParams.y = dpToPx(80); // Positioned above navigation bar
+        }
 
         toolbarView = new LinearLayout(context);
         toolbarView.setOrientation(LinearLayout.HORIZONTAL);
@@ -100,6 +106,7 @@ public class BrushController {
         btnArrow = createToolbarButton(new ArrowIconDrawable(), v -> selectMode(DrawingOverlayView.Mode.ARROW, btnArrow));
         btnLine = createToolbarButton(new LineIconDrawable(), v -> selectMode(DrawingOverlayView.Mode.LINE, btnLine));
         
+        shapeButtons.clear();
         shapeButtons.add(btnBrush);
         shapeButtons.add(btnRect);
         shapeButtons.add(btnCircle);
@@ -111,7 +118,7 @@ public class BrushController {
 
         ImageView btnUndo = createToolbarButton(new UndoIconDrawable(), v -> drawingView.undo());
         ImageView btnClear = createToolbarButton(new ClearIconDrawable(), v -> drawingView.clear());
-        ImageView btnExit = createToolbarButton(new ExitIconDrawable(), v -> dismiss());
+        ImageView btnExit = createToolbarButton(new ExitIconDrawable(), v -> minimise());
 
         toolbarView.addView(btnBrush);
         toolbarView.addView(btnRect);
@@ -154,23 +161,50 @@ public class BrushController {
     }
 
     public void dismiss() {
-        if (!isShowing) return;
+        if (!isShowing && drawingView == null) return;
 
         if (drawingView != null) {
-            windowManager.removeView(drawingView);
+            try { windowManager.removeView(drawingView); } catch (Exception ignored) {}
             drawingView = null;
         }
 
         if (toolbarView != null) {
-            windowManager.removeView(toolbarView);
+            try { windowManager.removeView(toolbarView); } catch (Exception ignored) {}
             toolbarView = null;
         }
 
         isShowing = false;
-        
+
         if (onDismissCallback != null) {
             onDismissCallback.run();
         }
+    }
+
+    // Red exit puts the toolbar away but leaves the strokes on screen; only Clear erases them
+    public void minimise() {
+        if (!isShowing) return;
+
+        if (toolbarView != null) {
+            try { windowManager.removeView(toolbarView); } catch (Exception ignored) {}
+            toolbarView = null;
+        }
+
+        setDrawingTouchable(false);
+        isShowing = false;
+
+        if (onDismissCallback != null) {
+            onDismissCallback.run();
+        }
+    }
+
+    private void setDrawingTouchable(boolean touchable) {
+        if (drawingView == null || drawingParams == null) return;
+        if (touchable) {
+            drawingParams.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        } else {
+            drawingParams.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        }
+        try { windowManager.updateViewLayout(drawingView, drawingParams); } catch (Exception ignored) {}
     }
 
     private void selectMode(DrawingOverlayView.Mode mode, ImageView selectedButton) {

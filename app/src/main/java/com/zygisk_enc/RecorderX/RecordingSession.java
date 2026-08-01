@@ -285,12 +285,20 @@ public class RecordingSession {
         }
     }
 
+    // A flat bitrate starves high-resolution captures, so scale a floor from pixels per second
+    private int minimumBitrate(int width, int height, int fps, String mime) {
+        double bitsPerPixel = MediaFormat.MIMETYPE_VIDEO_AVC.equals(mime) ? 0.10 : 0.07;
+        long floor = (long) ((long) width * height * fps * bitsPerPixel);
+        return (int) Math.min(floor, 40000000L);
+    }
+
     private void setupVideoEncoder() throws IOException {
         String originalMime = settings.getVideoMimeType();
         int originalWidth = settings.getResolutionWidth();
         int originalHeight = settings.getResolutionHeight();
         int originalFps = settings.getFpsValue();
-        int originalBitrate = settings.getBitrateValue();
+        int originalBitrate = Math.max(settings.getBitrateValue(),
+                minimumBitrate(originalWidth, originalHeight, originalFps, originalMime));
         int originalBitrateMode = settings.getBitrateMode() == 0 ? 
                 MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR : 
                 MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR;
@@ -541,6 +549,8 @@ public class RecordingSession {
         int bufferSize = 4096; 
         ByteBuffer pcmBuffer = ByteBuffer.allocateDirect(bufferSize);
         ByteBuffer secBuffer = ByteBuffer.allocateDirect(bufferSize);
+        byte[] primaryBytes = new byte[bufferSize];
+        byte[] secondaryBytes = new byte[bufferSize];
         
         // Use system time for audio PTS sync if possible, but keep simple for now
         long totalSamples = 0;
@@ -572,12 +582,9 @@ public class RecordingSession {
                 if (read > 0 || readSec > 0) {
                     // Mix audio if both are present
                     if (read > 0 && readSec > 0) {
-                        byte[] primaryBytes = new byte[read];
-                        pcmBuffer.get(primaryBytes);
-                        
-                        byte[] secondaryBytes = new byte[readSec];
-                        secBuffer.get(secondaryBytes);
-                        
+                        pcmBuffer.get(primaryBytes, 0, read);
+                        secBuffer.get(secondaryBytes, 0, readSec);
+
                         int minLen = Math.min(read, readSec);
                         for (int i = 0; i < minLen - 1; i += 2) {
                             short sample1 = (short) ((primaryBytes[i] & 0xFF) | (primaryBytes[i+1] << 8));
@@ -591,14 +598,13 @@ public class RecordingSession {
                             primaryBytes[i+1] = (byte) ((mixed >> 8) & 0xFF);
                         }
                         pcmBuffer.clear();
-                        pcmBuffer.put(primaryBytes);
+                        pcmBuffer.put(primaryBytes, 0, read);
                         pcmBuffer.position(0);
                     } else if (read <= 0 && readSec > 0) {
                         // Only secondary has data
+                        secBuffer.get(secondaryBytes, 0, readSec);
                         pcmBuffer.clear();
-                        byte[] secondaryBytes = new byte[readSec];
-                        secBuffer.get(secondaryBytes);
-                        pcmBuffer.put(secondaryBytes);
+                        pcmBuffer.put(secondaryBytes, 0, readSec);
                         pcmBuffer.position(0);
                         read = readSec;
                     }

@@ -224,21 +224,22 @@ public class FloatingController {
             ImageView btnBrush = createMenuButton(new BrushController.BrushIconDrawable(), v -> {
                 collapse();
                 bubbleView.setVisibility(View.GONE);
-                brushController = new BrushController(context, () -> {
-                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                        bubbleView.setVisibility(View.VISIBLE);
-                        bubbleView.setScaleX(0.5f);
-                        bubbleView.setScaleY(0.5f);
-                        bubbleView.setAlpha(0f);
-                        bubbleView.animate()
-                            .scaleX(1f)
-                            .scaleY(1f)
-                            .alpha(1f)
-                            .setDuration(150)
-                            .start();
-                        brushController = null;
+                if (brushController == null) {
+                    brushController = new BrushController(context, () -> {
+                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                            bubbleView.setVisibility(View.VISIBLE);
+                            bubbleView.setScaleX(0.5f);
+                            bubbleView.setScaleY(0.5f);
+                            bubbleView.setAlpha(0f);
+                            bubbleView.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .alpha(1f)
+                                .setDuration(150)
+                                .start();
+                        });
                     });
-                });
+                }
                 brushController.show();
             });
 

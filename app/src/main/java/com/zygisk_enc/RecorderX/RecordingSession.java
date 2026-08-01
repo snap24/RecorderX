@@ -79,6 +79,7 @@ public class RecordingSession {
     
     private int activeWidth;
     private int activeHeight;
+    private String activeMime;
     private MediaProjection.Callback projectionCallback;
     
     private volatile int videoFrameCount = 0;
@@ -172,7 +173,8 @@ public class RecordingSession {
             }
 
             setupVideoEncoder();
-            
+            warnIfCodecChanged(settings.getVideoMimeType());
+
             if (settings.getAudioSource() != 0) {
                 try {
                     setupAudioEncoder();
@@ -233,7 +235,7 @@ public class RecordingSession {
         }
     }
 
-    private boolean tryConfigureVideoEncoder(String mime, int width, int height, int fps, int bitrate, int bitrateMode, boolean useHighProfile) {
+    private boolean tryConfigureVideoEncoder(String mime, int width, int height, int fps, int bitrate, int bitrateMode, boolean useHighProfile, boolean requireHardware) {
         try {
             MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
@@ -251,7 +253,14 @@ public class RecordingSession {
             }
 
             videoEncoder = MediaCodec.createEncoderByType(mime);
-            
+
+            // A CPU encoder cannot sustain screen capture. AV1 has no hardware encoder on most
+            // devices, so createEncoderByType silently hands back libaom and the capture crawls
+            if (requireHardware && !videoEncoder.getCodecInfo().isHardwareAccelerated()) {
+                Log.w(TAG, "Rejecting software encoder " + videoEncoder.getCodecInfo().getName() + " for " + mime);
+                throw new IllegalStateException("no hardware encoder for " + mime);
+            }
+
             // Proactive hardware capabilities check to prevent silent encoder failures
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 MediaCodecInfo.CodecCapabilities caps = videoEncoder.getCodecInfo().getCapabilitiesForType(mime);
@@ -273,7 +282,8 @@ public class RecordingSession {
             
             this.activeWidth = width;
             this.activeHeight = height;
-            
+            this.activeMime = mime;
+
             return true;
         } catch (Exception e) {
             Log.w(TAG, "Encoder fallback: Rejected " + width + "x" + height + "@" + fps + "fps (" + mime + ")");
@@ -283,6 +293,22 @@ public class RecordingSession {
             }
             return false;
         }
+    }
+
+    private String codecLabel(String mime) {
+        if (MediaFormat.MIMETYPE_VIDEO_HEVC.equals(mime)) return "H.265";
+        if (MediaFormat.MIMETYPE_VIDEO_AV1.equals(mime)) return "AV1";
+        return "H.264";
+    }
+
+    // Falling back silently is what makes the recorded frame rate look like a lie
+    private void warnIfCodecChanged(String requestedMime) {
+        if (activeMime == null || activeMime.equals(requestedMime)) return;
+        final String message = codecLabel(requestedMime) + " has no hardware encoder here, recording in "
+                + codecLabel(activeMime);
+        Log.w(TAG, message);
+        new Handler(Looper.getMainLooper()).post(() ->
+                android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show());
     }
 
     // A flat bitrate starves high-resolution captures, so scale a floor from pixels per second
@@ -314,7 +340,7 @@ public class RecordingSession {
             int mode = originalBitrateMode; // Always keep user's VBR/CBR preference
 
             // Step 1: Request with requested/safe settings
-            if (tryConfigureVideoEncoder(mime, originalWidth, originalHeight, originalFps, originalBitrate, mode, isOriginal)) {
+            if (tryConfigureVideoEncoder(mime, originalWidth, originalHeight, originalFps, originalBitrate, mode, isOriginal, true)) {
                 return;
             }
 
@@ -327,22 +353,22 @@ public class RecordingSession {
             int h720 = isLandscape ? 720 : 1280;
 
             // Step 2: 1080p @ Max 60 FPS (12 Mbps)
-            if (tryConfigureVideoEncoder(mime, w1080, h1080, Math.min(originalFps, 60), 12000000, mode, false)) {
+            if (tryConfigureVideoEncoder(mime, w1080, h1080, Math.min(originalFps, 60), 12000000, mode, false, true)) {
                 return;
             }
 
             // Step 3: 720p @ Max 60 FPS (12 Mbps)
-            if (tryConfigureVideoEncoder(mime, w720, h720, Math.min(originalFps, 60), 12000000, mode, false)) {
+            if (tryConfigureVideoEncoder(mime, w720, h720, Math.min(originalFps, 60), 12000000, mode, false, true)) {
                 return;
             }
 
             // Step 4: 1080p @ Max 30 FPS (12 Mbps)
-            if (tryConfigureVideoEncoder(mime, w1080, h1080, Math.min(originalFps, 30), 12000000, mode, false)) {
+            if (tryConfigureVideoEncoder(mime, w1080, h1080, Math.min(originalFps, 30), 12000000, mode, false, true)) {
                 return;
             }
 
             // Step 5: 720p @ Max 30 FPS (12 Mbps)
-            if (tryConfigureVideoEncoder(mime, w720, h720, Math.min(originalFps, 30), 12000000, mode, false)) {
+            if (tryConfigureVideoEncoder(mime, w720, h720, Math.min(originalFps, 30), 12000000, mode, false, true)) {
                 return;
             }
         }
@@ -350,7 +376,8 @@ public class RecordingSession {
         // Rock Bottom (720p 30fps safe fallback with safeMime)
         int safeWidth = originalWidth > originalHeight ? 1280 : 720;
         int safeHeight = originalWidth > originalHeight ? 720 : 1280;
-        if (tryConfigureVideoEncoder(safeMime, safeWidth, safeHeight, 30, 4000000, originalBitrateMode, false)) {
+        // Last resort only: accept a software encoder rather than fail to record at all
+        if (tryConfigureVideoEncoder(safeMime, safeWidth, safeHeight, 30, 4000000, originalBitrateMode, false, false)) {
             return;
         }
 

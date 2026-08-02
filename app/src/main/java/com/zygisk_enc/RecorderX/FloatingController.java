@@ -41,6 +41,7 @@ public class FloatingController {
     private final Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
+            if (!isShowing) return;
             if (isExpanded && tvTimer != null) {
                 long durationMs = service.getActiveRecordingDurationMs();
                 long seconds = (durationMs / 1000) % 60;
@@ -223,21 +224,22 @@ public class FloatingController {
             ImageView btnBrush = createMenuButton(new BrushController.BrushIconDrawable(), v -> {
                 collapse();
                 bubbleView.setVisibility(View.GONE);
-                brushController = new BrushController(context, () -> {
-                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                        bubbleView.setVisibility(View.VISIBLE);
-                        bubbleView.setScaleX(0.5f);
-                        bubbleView.setScaleY(0.5f);
-                        bubbleView.setAlpha(0f);
-                        bubbleView.animate()
-                            .scaleX(1f)
-                            .scaleY(1f)
-                            .alpha(1f)
-                            .setDuration(150)
-                            .start();
-                        brushController = null;
+                if (brushController == null) {
+                    brushController = new BrushController(context, () -> {
+                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                            bubbleView.setVisibility(View.VISIBLE);
+                            bubbleView.setScaleX(0.5f);
+                            bubbleView.setScaleY(0.5f);
+                            bubbleView.setAlpha(0f);
+                            bubbleView.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .alpha(1f)
+                                .setDuration(150)
+                                .start();
+                        });
                     });
-                });
+                }
                 brushController.show();
             });
 
@@ -336,7 +338,12 @@ public class FloatingController {
             });
         }
         
-        windowManager.addView(rootLayout, params);
+        try {
+            windowManager.addView(rootLayout, params);
+        } catch (Exception e) {
+            android.util.Log.e("FloatingController", "Overlay window rejected by the system", e);
+            return;
+        }
         isShowing = true;
         if (isExpanded) {
             timerHandler.post(timerRunnable);

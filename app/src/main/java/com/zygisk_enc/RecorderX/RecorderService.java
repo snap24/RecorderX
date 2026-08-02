@@ -126,7 +126,13 @@ public class RecorderService extends Service {
 
     private void startRecording(Intent intent) {
         if (isRecording) return;
-        
+
+        if (recordingSession != null) {
+            Log.w(TAG, "Releasing a leftover session before starting a new one");
+            recordingSession.stop();
+            recordingSession = null;
+        }
+
         int currentResultCode = intent != null ? intent.getIntExtra(EXTRA_RESULT_CODE, resultCode) : resultCode;
         Intent currentData = intent != null ? intent.getParcelableExtra(EXTRA_DATA) : null;
         if (currentData == null) currentData = projectionData;
@@ -152,39 +158,46 @@ public class RecorderService extends Service {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(this)) {
                         Log.w(TAG, "Cannot show floating control: overlay permission not granted");
                     } else {
-                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                            floatingController = new FloatingController(this);
-                            floatingController.show();
-                        });
+                        floatingController = new FloatingController(this);
+                        floatingController.show();
                     }
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error in startRecording", e);
+                if (recordingSession != null) {
+                    recordingSession.stop();
+                    recordingSession = null;
+                }
                 stopForeground(true);
                 stopSelf();
             }
+        } else {
+            Log.e(TAG, "MediaProjection unavailable, aborting");
+            stopForeground(true);
+            stopSelf();
         }
     }
 
     private void stopRecording() {
-        if (!isRecording) return;
+        if (!isRecording && recordingSession == null && floatingController == null) return;
         Log.i(TAG, "Stopping recording service...");
 
         if (floatingController != null) {
             floatingController.dismiss();
             floatingController = null;
         }
-        
+
         if (recordingSession != null) {
             String lastPath = recordingSession.getOutputFilePath();
             Uri lastUri = recordingSession.getOutputUri();
             recordingSession.stop();
-            
+            recordingSession = null;
+
             if (lastPath != null || lastUri != null) {
                 showSavedNotification(lastPath, lastUri);
             }
         }
-        
+
         isRecording = false;
         notifyStateChanged();
         stopForeground(true);
@@ -455,6 +468,23 @@ public class RecorderService extends Service {
         canvas.drawText(text, width / 2f, y, paint);
         
         return android.graphics.drawable.Icon.createWithBitmap(bitmap);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (floatingController != null) {
+            floatingController.dismiss();
+            floatingController = null;
+        }
+        if (recordingSession != null) {
+            recordingSession.stop();
+            recordingSession = null;
+        }
+        if (isRecording) {
+            isRecording = false;
+            notifyStateChanged();
+        }
+        super.onDestroy();
     }
 
     @Nullable

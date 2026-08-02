@@ -104,11 +104,19 @@ public class MainActivity extends AppCompatActivity {
         android.widget.TextView titleMain = findViewById(R.id.titleMain);
         android.widget.TextView titleX = findViewById(R.id.titleX);
         
-        boolean shown = getSharedPreferences("ui_prefs", MODE_PRIVATE).getBoolean("swipe_color_onboarding_shown", false);
+        android.content.SharedPreferences uiPrefs = getSharedPreferences("ui_prefs", MODE_PRIVATE);
+        boolean shown = uiPrefs.getBoolean("swipe_color_onboarding_shown", false);
         if (!shown) {
-            if (titleX != null) titleX.setVisibility(android.view.View.GONE);
-            
-            if (swipeHintIcon != null) {
+            int launchCount = uiPrefs.getInt("swipe_hint_launch_count", 0) + 1;
+            uiPrefs.edit().putInt("swipe_hint_launch_count", launchCount).apply();
+
+            if (launchCount >= 3) {
+                uiPrefs.edit().putBoolean("swipe_color_onboarding_shown", true).apply();
+                dismissSwipeHint();
+            } else {
+                if (titleX != null) titleX.setVisibility(android.view.View.GONE);
+                
+                if (swipeHintIcon != null) {
                 swipeHintIcon.setVisibility(android.view.View.VISIBLE);
                 swipeHintIcon.setImageTintList(android.content.res.ColorStateList.valueOf(getActiveAccentColor()));
                 
@@ -145,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
             titleToggleHandler.postDelayed(titleToggleRunnable, 1000);
+            }
         } else {
             if (swipeHintIcon != null) swipeHintIcon.setVisibility(android.view.View.GONE);
             if (titleMain != null) titleMain.setText("RECORDER");
@@ -247,32 +256,39 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnOpenRecordings).setOnClickListener(v -> {
             try {
                 java.io.File folder = new java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_MOVIES), "RecorderX");
-                if (!folder.exists()) {
-                    folder.mkdirs();
+                if (!folder.exists() || folder.listFiles() == null) {
+                    Toast.makeText(this, "No recordings found", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(this, getPackageName() + ".provider", folder);
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(uri, "resource/folder"); // Triggers third-party file managers (ZArchiver, Cx, etc.)
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(intent); // Allows user to select "Always" or "Just Once"
-            } catch (Exception e) {
-                // Fallback 1: Try system document viewer
-                try {
-                    java.io.File folder = new java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_MOVIES), "RecorderX");
-                    android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(this, getPackageName() + ".provider", folder);
-                    Intent systemIntent = new Intent(Intent.ACTION_VIEW);
-                    systemIntent.setDataAndType(uri, "vnd.android.document/directory");
-                    systemIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(systemIntent);
-                } catch (Exception ex) {
-                    // Fallback 2: General document tree picker
-                    try {
-                        Intent fallback = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                        startActivity(fallback);
-                    } catch (Exception fatal) {
-                        Toast.makeText(this, "Could not open File Manager", Toast.LENGTH_SHORT).show();
+
+                java.io.File[] files = folder.listFiles((dir, name) -> {
+                    String lower = name.toLowerCase();
+                    return lower.endsWith(".mp4") || lower.endsWith(".mkv") || lower.endsWith(".webm") || lower.endsWith(".ts");
+                });
+
+                if (files == null || files.length == 0) {
+                    Toast.makeText(this, "No recordings found", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Find the latest recorded file by lastModified timestamp
+                java.io.File lastFile = files[0];
+                for (int i = 1; i < files.length; i++) {
+                    if (files[i].lastModified() > lastFile.lastModified()) {
+                        lastFile = files[i];
                     }
                 }
+
+                android.net.Uri fileUri = androidx.core.content.FileProvider.getUriForFile(this, getPackageName() + ".provider", lastFile);
+
+                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                viewIntent.setDataAndType(fileUri, "video/*");
+                viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                Intent chooserIntent = Intent.createChooser(viewIntent, "Open Last Recording with...");
+                startActivity(chooserIntent);
+            } catch (Exception e) {
+                Toast.makeText(this, "No recordings found", Toast.LENGTH_SHORT).show();
             }
         });
             
@@ -444,7 +460,7 @@ public class MainActivity extends AppCompatActivity {
                     warningDialog.show();
 
                     // Timer only updates text and re-enables — never touches click listener
-                    new android.os.CountDownTimer(5000, 1000) {
+                    new android.os.CountDownTimer(3000, 1000) {
                         @Override public void onTick(long ms) {
                             btnOk.setText("I Understand (" + (ms / 1000 + 1) + ")");
                         }
@@ -716,8 +732,18 @@ public class MainActivity extends AppCompatActivity {
         // 6. TextInputLayout
         com.google.android.material.textfield.TextInputLayout layoutTemplate = findViewById(R.id.namingTemplateLayout);
         if (layoutTemplate != null) {
-            layoutTemplate.setHintTextColor(android.content.res.ColorStateList.valueOf(color));
+            int[][] states = new int[][] {
+                new int[] { android.R.attr.state_focused },
+                new int[] { android.R.attr.state_enabled },
+                new int[] {}
+            };
+            int[] colors = new int[] { color, color, color };
+            android.content.res.ColorStateList stateList = new android.content.res.ColorStateList(states, colors);
+
+            layoutTemplate.setHintTextColor(stateList);
+            layoutTemplate.setDefaultHintTextColor(stateList);
             layoutTemplate.setBoxStrokeColor(color);
+            layoutTemplate.setBoxStrokeColorStateList(stateList);
         }
 
         // 7. Dynamic text spans

@@ -172,7 +172,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="OPEN\nRECORDINGS"
+                android:text="OPEN LAST\nRECORDING"
                 android:textColor="@color/text_secondary"
                 android:textSize="9sp"
                 android:fontFamily="sans-serif-black"
@@ -307,7 +307,7 @@
 
             <!-- Custom Naming -->
 
-            <com.google.android.material.textfield.TextInputLayout android:id="@+id/namingTemplateLayout" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColorHint="@color/text_secondary" app:boxStrokeColor="@color/box_stroke_color" app:boxStrokeWidth="2dp" app:boxStrokeWidthFocused="2dp" app:hintTextColor="@color/accent_lavender" android:hint="OUTPUT TEMPLATE">
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/namingTemplateLayout" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColorHint="@color/text_secondary" app:boxStrokeWidth="2dp" app:boxStrokeWidthFocused="2dp" android:hint="OUTPUT TEMPLATE">
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/namingTemplateEditText" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="text" android:fontFamily="monospace" android:textSize="12sp" android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
 

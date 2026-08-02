@@ -4,7 +4,7 @@
   <img src=".github/assets/iconz.png" width="256" height="256" />
   <br>
 
-  [![Latest Version](https://img.shields.io/badge/Version-v3.0.0-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/RecorderX/releases)
+  [![Latest Version](https://img.shields.io/badge/Version-v3.0.1-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/RecorderX/releases)
   ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)
   ![Android](https://img.shields.io/badge/API-29%2B-3DDC84?style=flat&logo=android&logoColor=white)
   [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat&logo=apache&logoColor=white)](LICENSE)
@@ -15,7 +15,8 @@
 
 ## Versions
 
-- v3.0.0 (Latest): Title Bar Swipe Gesture Theme Customizer (with custom onboarding and pulsing logo), Floating overlay controls, real-time screen brush tools, compact MediaStyle notification buttons, and compilation transition to Java 21.
+- v3.0.1 (Latest): Individual shape move tool, compact 2-row/3-row brush toolbar grid, dedicated drag handle, dynamic orientation adaptation, notification hide/show bubble button, open last recording, and 3-launch onboarding auto-dismiss.
+- v3.0.0: Title Bar Swipe Gesture Theme Customizer (with custom onboarding and pulsing logo), Floating overlay controls, real-time screen brush tools, compact MediaStyle notification buttons, and compilation transition to Java 21.
 - v2.0.1: Android 14 background activity compliance fixes.
 - v2.0.0: Live-Reboot Watchdog, Encoder Fallback Mechanism, and System + Mic Audio Recording.
 - v1.1.0: 4K/120FPS Support, AMOLED Lavender UI, and Live Thumbnail Notifications.

@@ -13,7 +13,7 @@ import java.util.List;
 
 public class DrawingOverlayView extends View {
     public enum Mode {
-        FREEHAND, RECTANGLE, CIRCLE, ARROW, LINE
+        FREEHAND, RECTANGLE, CIRCLE, ARROW, LINE, MOVE
     }
 
     private Mode currentMode = Mode.FREEHAND;
@@ -28,6 +28,9 @@ public class DrawingOverlayView extends View {
     private float currentX, currentY;
     private boolean isDrawing = false;
 
+    private DrawnItem selectedItem = null;
+    private float lastTouchX, lastTouchY;
+
     public DrawingOverlayView(Context context) {
         super(context);
         paint.setAntiAlias(true);
@@ -37,6 +40,7 @@ public class DrawingOverlayView extends View {
 
     public void setMode(Mode mode) {
         this.currentMode = mode;
+        this.selectedItem = null;
     }
 
     public Mode getMode() {
@@ -60,6 +64,7 @@ public class DrawingOverlayView extends View {
 
     public void clear() {
         drawnItems.clear();
+        selectedItem = null;
         invalidate();
     }
 
@@ -71,7 +76,7 @@ public class DrawingOverlayView extends View {
             item.draw(canvas, paint);
         }
 
-        if (isDrawing) {
+        if (isDrawing && currentMode != Mode.MOVE) {
             paint.setColor(brushColor);
             paint.setStrokeWidth(strokeWidth);
             paint.setStyle(Paint.Style.STROKE);
@@ -122,6 +127,41 @@ public class DrawingOverlayView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
+
+        if (currentMode == Mode.MOVE) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    selectedItem = null;
+                    for (int i = drawnItems.size() - 1; i >= 0; i--) {
+                        DrawnItem item = drawnItems.get(i);
+                        if (item.contains(x, y)) {
+                            selectedItem = item;
+                            lastTouchX = x;
+                            lastTouchY = y;
+                            break;
+                        }
+                    }
+                    return true;
+
+                case MotionEvent.ACTION_MOVE:
+                    if (selectedItem != null) {
+                        float dx = x - lastTouchX;
+                        float dy = y - lastTouchY;
+                        selectedItem.translate(dx, dy);
+                        lastTouchX = x;
+                        lastTouchY = y;
+                        invalidate();
+                    }
+                    return true;
+
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    selectedItem = null;
+                    invalidate();
+                    return true;
+            }
+            return super.onTouchEvent(event);
+        }
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -214,12 +254,16 @@ public class DrawingOverlayView extends View {
 
     public interface DrawnItem {
         void draw(Canvas canvas, Paint paint);
+        boolean contains(float x, float y);
+        void translate(float dx, float dy);
     }
 
     public static class FreehandItem implements DrawnItem {
         public Path path;
         public int color;
         public float strokeWidth;
+        private final RectF bounds = new RectF();
+
         @Override
         public void draw(Canvas canvas, Paint paint) {
             paint.setColor(color);
@@ -227,12 +271,30 @@ public class DrawingOverlayView extends View {
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawPath(path, paint);
         }
+
+        @Override
+        public boolean contains(float x, float y) {
+            if (path == null) return false;
+            path.computeBounds(bounds, true);
+            float pad = Math.max(30f, strokeWidth);
+            bounds.inset(-pad, -pad);
+            return bounds.contains(x, y);
+        }
+
+        @Override
+        public void translate(float dx, float dy) {
+            if (path != null) {
+                path.offset(dx, dy);
+            }
+        }
     }
 
     public static class RectangleItem implements DrawnItem {
         public float left, top, right, bottom;
         public int color;
         public float strokeWidth;
+        private final RectF bounds = new RectF();
+
         @Override
         public void draw(Canvas canvas, Paint paint) {
             paint.setColor(color);
@@ -240,12 +302,29 @@ public class DrawingOverlayView extends View {
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawRect(left, top, right, bottom, paint);
         }
+
+        @Override
+        public boolean contains(float x, float y) {
+            float pad = Math.max(30f, strokeWidth);
+            bounds.set(left - pad, top - pad, right + pad, bottom + pad);
+            return bounds.contains(x, y);
+        }
+
+        @Override
+        public void translate(float dx, float dy) {
+            left += dx;
+            right += dx;
+            top += dy;
+            bottom += dy;
+        }
     }
 
     public static class CircleItem implements DrawnItem {
         public float left, top, right, bottom;
         public int color;
         public float strokeWidth;
+        private final RectF bounds = new RectF();
+
         @Override
         public void draw(Canvas canvas, Paint paint) {
             paint.setColor(color);
@@ -253,12 +332,29 @@ public class DrawingOverlayView extends View {
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawOval(new RectF(left, top, right, bottom), paint);
         }
+
+        @Override
+        public boolean contains(float x, float y) {
+            float pad = Math.max(30f, strokeWidth);
+            bounds.set(left - pad, top - pad, right + pad, bottom + pad);
+            return bounds.contains(x, y);
+        }
+
+        @Override
+        public void translate(float dx, float dy) {
+            left += dx;
+            right += dx;
+            top += dy;
+            bottom += dy;
+        }
     }
 
     public static class LineItem implements DrawnItem {
         public float x1, y1, x2, y2;
         public int color;
         public float strokeWidth;
+        private final RectF bounds = new RectF();
+
         @Override
         public void draw(Canvas canvas, Paint paint) {
             paint.setColor(color);
@@ -266,12 +362,29 @@ public class DrawingOverlayView extends View {
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawLine(x1, y1, x2, y2, paint);
         }
+
+        @Override
+        public boolean contains(float x, float y) {
+            float pad = Math.max(30f, strokeWidth);
+            bounds.set(Math.min(x1, x2) - pad, Math.min(y1, y2) - pad, Math.max(x1, x2) + pad, Math.max(y1, y2) + pad);
+            return bounds.contains(x, y);
+        }
+
+        @Override
+        public void translate(float dx, float dy) {
+            x1 += dx;
+            x2 += dx;
+            y1 += dy;
+            y2 += dy;
+        }
     }
 
     public static class ArrowItem implements DrawnItem {
         public float x1, y1, x2, y2;
         public int color;
         public float strokeWidth;
+        private final RectF bounds = new RectF();
+
         @Override
         public void draw(Canvas canvas, Paint paint) {
             paint.setColor(color);
@@ -288,6 +401,21 @@ public class DrawingOverlayView extends View {
             float y4 = y2 - arrowLength * (float) Math.sin(angle - arrowAngle);
             canvas.drawLine(x2, y2, x3, y3, paint);
             canvas.drawLine(x2, y2, x4, y4, paint);
+        }
+
+        @Override
+        public boolean contains(float x, float y) {
+            float pad = Math.max(30f, strokeWidth);
+            bounds.set(Math.min(x1, x2) - pad, Math.min(y1, y2) - pad, Math.max(x1, x2) + pad, Math.max(y1, y2) + pad);
+            return bounds.contains(x, y);
+        }
+
+        @Override
+        public void translate(float dx, float dy) {
+            x1 += dx;
+            x2 += dx;
+            y1 += dy;
+            y2 += dy;
         }
     }
 }

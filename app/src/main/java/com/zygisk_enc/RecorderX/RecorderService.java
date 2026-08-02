@@ -32,6 +32,7 @@ public class RecorderService extends Service {
     public static final String ACTION_PAUSE = "ACTION_PAUSE";
     public static final String ACTION_RESUME = "ACTION_RESUME";
     public static final String ACTION_DELETE = "ACTION_DELETE";
+    public static final String ACTION_TOGGLE_BUBBLE = "ACTION_TOGGLE_BUBBLE";
     public static final String EXTRA_RESULT_CODE = "EXTRA_RESULT_CODE";
     public static final String EXTRA_DATA = "EXTRA_DATA";
 
@@ -41,6 +42,7 @@ public class RecorderService extends Service {
 
     private RecordingSession recordingSession;
     private FloatingController floatingController;
+    private boolean isBubbleHidden = false;
 
     public interface RecordingStateListener {
         void onStateChanged(boolean isRecording);
@@ -111,6 +113,8 @@ public class RecorderService extends Service {
             pauseRecording();
         } else if (ACTION_RESUME.equals(action)) {
             resumeRecording();
+        } else if (ACTION_TOGGLE_BUBBLE.equals(action)) {
+            toggleBubbleVisibility();
         } else if (ACTION_DELETE.equals(action)) {
             String deleteUriStr = intent.getStringExtra("delete_uri");
             String deletePath = intent.getStringExtra("delete_path");
@@ -122,6 +126,18 @@ public class RecorderService extends Service {
         }
 
         return START_NOT_STICKY;
+    }
+
+    private void toggleBubbleVisibility() {
+        if (floatingController != null) {
+            isBubbleHidden = !isBubbleHidden;
+            if (isBubbleHidden) {
+                floatingController.hide();
+            } else {
+                floatingController.show();
+            }
+            updateNotificationPaused(recordingSession != null && recordingSession.isPaused());
+        }
     }
 
     private void startRecording(Intent intent) {
@@ -427,7 +443,7 @@ public class RecorderService extends Service {
         android.graphics.drawable.Icon pauseIcon = createTextIcon(paused ? "RESUME" : "PAUSE");
         android.graphics.drawable.Icon stopIcon = createTextIcon("STOP");
 
-        return new Notification.Builder(this, CHANNEL_ID)
+        Notification.Builder builder = new Notification.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setSmallIcon(R.drawable.ic_record)
             .setOngoing(true)
@@ -436,10 +452,33 @@ public class RecorderService extends Service {
             ).build())
             .addAction(new Notification.Action.Builder(
                 stopIcon, "Stop Recording", stopPendingIntent
-            ).build())
-            .setStyle(new Notification.MediaStyle()
-                .setShowActionsInCompactView(0, 1))
-            .build();
+            ).build());
+
+        SettingsManager settings = new SettingsManager(this);
+        if (settings.isFloatingControlEnabled()) {
+            Intent bubbleIntent = new Intent(this, RecorderService.class);
+            bubbleIntent.setAction(ACTION_TOGGLE_BUBBLE);
+            PendingIntent bubblePendingIntent = PendingIntent.getService(
+                this, 
+                1, 
+                bubbleIntent, 
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+            );
+
+            String bubbleLabel = isBubbleHidden ? "Show Bubble" : "Hide Bubble";
+            android.graphics.drawable.Icon bubbleIcon = createTextIcon(isBubbleHidden ? "SHOW" : "HIDE");
+
+            builder.addAction(new Notification.Action.Builder(
+                bubbleIcon, bubbleLabel, bubblePendingIntent
+            ).build());
+            builder.setStyle(new Notification.MediaStyle()
+                .setShowActionsInCompactView(0, 1, 2));
+        } else {
+            builder.setStyle(new Notification.MediaStyle()
+                .setShowActionsInCompactView(0, 1));
+        }
+
+        return builder.build();
     }
 
     private android.graphics.drawable.Icon createTextIcon(String text) {

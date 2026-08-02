@@ -41,6 +41,7 @@ public class BrushController {
     private ImageView btnCircle;
     private ImageView btnArrow;
     private ImageView btnLine;
+    private ImageView btnMove;
 
     public BrushController(Context context, Runnable onDismissCallback) {
         this.context = context;
@@ -90,14 +91,14 @@ public class BrushController {
         }
 
         toolbarView = new LinearLayout(context);
-        toolbarView.setOrientation(LinearLayout.HORIZONTAL);
+        toolbarView.setOrientation(LinearLayout.VERTICAL);
         
         GradientDrawable toolbarBg = new GradientDrawable();
-        toolbarBg.setCornerRadius(dpToPx(24));
+        toolbarBg.setCornerRadius(dpToPx(18));
         toolbarBg.setColor(Color.parseColor("#E61F1F1F")); // Glassmorphic translucent dark grey
         toolbarBg.setStroke(dpToPx(1.5f), Color.parseColor("#66FFFFFF")); // Frosted white stroke
         toolbarView.setBackground(toolbarBg);
-        toolbarView.setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4));
+        toolbarView.setPadding(dpToPx(6), dpToPx(6), dpToPx(6), dpToPx(6));
 
         // Create buttons
         btnBrush = createToolbarButton(new BrushIconDrawable(), v -> selectMode(DrawingOverlayView.Mode.FREEHAND, btnBrush));
@@ -105,6 +106,7 @@ public class BrushController {
         btnCircle = createToolbarButton(new CircleIconDrawable(), v -> selectMode(DrawingOverlayView.Mode.CIRCLE, btnCircle));
         btnArrow = createToolbarButton(new ArrowIconDrawable(), v -> selectMode(DrawingOverlayView.Mode.ARROW, btnArrow));
         btnLine = createToolbarButton(new LineIconDrawable(), v -> selectMode(DrawingOverlayView.Mode.LINE, btnLine));
+        btnMove = createToolbarButton(new MoveIconDrawable(), v -> selectMode(DrawingOverlayView.Mode.MOVE, btnMove));
         
         shapeButtons.clear();
         shapeButtons.add(btnBrush);
@@ -112,25 +114,86 @@ public class BrushController {
         shapeButtons.add(btnCircle);
         shapeButtons.add(btnArrow);
         shapeButtons.add(btnLine);
+        shapeButtons.add(btnMove);
 
         // Set default selection state visually
         highlightButton(btnBrush);
 
         ImageView btnUndo = createToolbarButton(new UndoIconDrawable(), v -> drawingView.undo());
-        ImageView btnClear = createToolbarButton(new ClearIconDrawable(), v -> drawingView.clear());
-        ImageView btnExit = createToolbarButton(new ExitIconDrawable(), v -> minimise());
+        ImageView btnClear = createToolbarButton(new ClearIconDrawable(), v -> minimise());
+        ImageView btnExit = createToolbarButton(new ExitIconDrawable(), v -> clearAndDismiss());
 
-        toolbarView.addView(btnBrush);
-        toolbarView.addView(btnRect);
-        toolbarView.addView(btnCircle);
-        toolbarView.addView(btnArrow);
-        toolbarView.addView(btnLine);
-        toolbarView.addView(btnUndo);
-        toolbarView.addView(btnClear);
-        toolbarView.addView(btnExit);
+        // Sleek top drag header (Generous touch target area, small visual pill)
+        LinearLayout dragHeader = new LinearLayout(context);
+        dragHeader.setOrientation(LinearLayout.HORIZONTAL);
+        dragHeader.setGravity(Gravity.CENTER);
+        dragHeader.setPadding(0, dpToPx(8), 0, dpToPx(8)); // Generous touch target area for easy finger drag
 
-        // Make the toolbar draggable
-        toolbarView.setOnTouchListener(new View.OnTouchListener() {
+        ImageView dragHandle = new ImageView(context);
+        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams(dpToPx(36), dpToPx(4)); // Visually sleek small pill
+        handleParams.gravity = Gravity.CENTER;
+        dragHandle.setLayoutParams(handleParams);
+
+        GradientDrawable handleDrawable = new GradientDrawable();
+        handleDrawable.setCornerRadius(dpToPx(2));
+        handleDrawable.setColor(Color.parseColor("#B3FFFFFF")); // Translucent frosted white pill
+        dragHandle.setImageDrawable(handleDrawable);
+        dragHeader.addView(dragHandle);
+
+        boolean isLandscape = isLandscapeMode();
+        toolbarView.addView(dragHeader);
+
+        if (isLandscape) {
+            // Landscape layout (2 wide horizontal rows: 5 top, 4 bottom)
+            LinearLayout row1 = new LinearLayout(context);
+            row1.setOrientation(LinearLayout.HORIZONTAL);
+            row1.setGravity(Gravity.CENTER);
+            row1.addView(btnBrush);
+            row1.addView(btnRect);
+            row1.addView(btnCircle);
+            row1.addView(btnArrow);
+            row1.addView(btnLine);
+
+            LinearLayout row2 = new LinearLayout(context);
+            row2.setOrientation(LinearLayout.HORIZONTAL);
+            row2.setGravity(Gravity.CENTER);
+            row2.addView(btnMove);
+            row2.addView(btnUndo);
+            row2.addView(btnClear);
+            row2.addView(btnExit);
+
+            toolbarView.addView(row1);
+            toolbarView.addView(row2);
+        } else {
+            // Portrait layout (3 compact square rows: 3 per row)
+            LinearLayout row1 = new LinearLayout(context);
+            row1.setOrientation(LinearLayout.HORIZONTAL);
+            row1.setGravity(Gravity.CENTER);
+            row1.addView(btnBrush);
+            row1.addView(btnRect);
+            row1.addView(btnCircle);
+
+            LinearLayout row2 = new LinearLayout(context);
+            row2.setOrientation(LinearLayout.HORIZONTAL);
+            row2.setGravity(Gravity.CENTER);
+            row2.addView(btnArrow);
+            row2.addView(btnLine);
+            row2.addView(btnMove);
+
+            LinearLayout row3 = new LinearLayout(context);
+            row3.setOrientation(LinearLayout.HORIZONTAL);
+            row3.setGravity(Gravity.CENTER);
+            row3.addView(btnUndo);
+            row3.addView(btnClear);
+            row3.addView(btnExit);
+
+            toolbarView.addView(row1);
+            toolbarView.addView(row2);
+            toolbarView.addView(row3);
+        }
+
+        // Make ONLY the drag header handle move the box (prevents accidental button clicks)
+        dragHeader.setOnTouchListener(new View.OnTouchListener() {
             private int initialX;
             private int initialY;
             private float initialTouchX;
@@ -180,7 +243,15 @@ public class BrushController {
         }
     }
 
-    // Red exit puts the toolbar away but leaves the strokes on screen; only Clear erases them
+    // Red exit erases all strokes on screen and closes drawing overlay completely
+    public void clearAndDismiss() {
+        if (drawingView != null) {
+            drawingView.clear();
+        }
+        dismiss();
+    }
+
+    // White X puts the toolbar away but leaves the strokes on screen
     public void minimise() {
         if (!isShowing) return;
 
@@ -195,6 +266,18 @@ public class BrushController {
         if (onDismissCallback != null) {
             onDismissCallback.run();
         }
+    }
+
+    public boolean isMinimised() {
+        return !isShowing && drawingView != null;
+    }
+
+    private boolean isLandscapeMode() {
+        SettingsManager settings = new SettingsManager(context);
+        int orientPref = settings.getOrientation(); // 0=Auto, 1=Portrait, 2=Landscape
+        if (orientPref == 1) return false;
+        if (orientPref == 2) return true;
+        return context.getResources().getConfiguration().orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE;
     }
 
     private void setDrawingTouchable(boolean touchable) {
@@ -230,11 +313,11 @@ public class BrushController {
 
     private ImageView createToolbarButton(Drawable iconDrawable, View.OnClickListener listener) {
         ImageView button = new ImageView(context);
-        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(dpToPx(40), dpToPx(40));
-        btnParams.setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
+        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(dpToPx(34), dpToPx(34));
+        btnParams.setMargins(dpToPx(3), dpToPx(2), dpToPx(3), dpToPx(2));
         button.setLayoutParams(btnParams);
         button.setImageDrawable(iconDrawable);
-        button.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
+        button.setPadding(dpToPx(6), dpToPx(6), dpToPx(6), dpToPx(6));
         button.setOnClickListener(listener);
         return button;
     }
@@ -414,6 +497,40 @@ public class BrushController {
             int h = getBounds().height();
             canvas.drawLine(w * 0.3f, h * 0.3f, w * 0.7f, h * 0.7f, paint);
             canvas.drawLine(w * 0.7f, h * 0.3f, w * 0.3f, h * 0.7f, paint);
+        }
+        @Override public void setAlpha(int alpha) {}
+        @Override public void setColorFilter(ColorFilter cf) {}
+        @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
+    }
+
+    private static class MoveIconDrawable extends Drawable {
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        public MoveIconDrawable() {
+            paint.setColor(Color.WHITE);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(4.5f);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+        }
+        @Override
+        public void draw(Canvas canvas) {
+            int w = getBounds().width();
+            int h = getBounds().height();
+            float cx = w / 2f;
+            float cy = h / 2f;
+            float len = w * 0.22f;
+
+            canvas.drawLine(cx - len, cy, cx + len, cy, paint);
+            canvas.drawLine(cx, cy - len, cx, cy + len, paint);
+
+            float arr = w * 0.08f;
+            canvas.drawLine(cx - len, cy, cx - len + arr, cy - arr, paint);
+            canvas.drawLine(cx - len, cy, cx - len + arr, cy + arr, paint);
+            canvas.drawLine(cx + len, cy, cx + len - arr, cy - arr, paint);
+            canvas.drawLine(cx + len, cy, cx + len - arr, cy + arr, paint);
+            canvas.drawLine(cx, cy - len, cx - arr, cy - len + arr, paint);
+            canvas.drawLine(cx, cy - len, cx + arr, cy - len + arr, paint);
+            canvas.drawLine(cx, cy + len, cx - arr, cy + len - arr, paint);
+            canvas.drawLine(cx, cy + len, cx + arr, cy + len - arr, paint);
         }
         @Override public void setAlpha(int alpha) {}
         @Override public void setColorFilter(ColorFilter cf) {}

@@ -69,6 +69,9 @@ public class FloatingController {
     
     @SuppressLint("ClickableViewAccessibility")
     public void show() {
+        if (rootLayout != null) {
+            rootLayout.setVisibility(View.VISIBLE);
+        }
         if (isShowing) return;
         
         if (rootLayout == null) {
@@ -329,7 +332,12 @@ public class FloatingController {
                                 .apply();
                             
                             if (duration < 200 && diffX < 10 && diffY < 10) {
-                                expand();
+                                if (brushController != null && brushController.isMinimised()) {
+                                    bubbleView.setVisibility(View.GONE);
+                                    brushController.show();
+                                } else {
+                                    expand();
+                                }
                             }
                             return true;
                     }
@@ -361,10 +369,24 @@ public class FloatingController {
         return button;
     }
     
+    private boolean isLandscapeMode() {
+        SettingsManager settings = new SettingsManager(context);
+        int orientPref = settings.getOrientation(); // 0=Auto, 1=Portrait, 2=Landscape
+        if (orientPref == 1) return false;
+        if (orientPref == 2) return true;
+        return context.getResources().getConfiguration().orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+    }
+
     private void expand() {
         if (isExpanded) return;
         
         boolean showMic = service.isAudioSourceSystem();
+        
+        if (menuView != null) {
+            menuView.setOrientation(LinearLayout.HORIZONTAL);
+            menuView.setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4));
+        }
+
         int menuWidth = showMic ? dpToPx(304) : dpToPx(256);
         int menuHeight = dpToPx(56);
         
@@ -452,6 +474,12 @@ public class FloatingController {
                 windowManager.removeView(rootLayout);
             } catch (Exception ignored) {}
             isShowing = false;
+        }
+    }
+
+    public void hide() {
+        if (rootLayout != null) {
+            rootLayout.setVisibility(View.GONE);
         }
     }
 

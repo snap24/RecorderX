@@ -1,6 +1,6 @@
 <div align="center">
   <h1>RecorderX</h1>
-  <p>A resilient, open-source recording solution featuring automated codec recovery and offline processing.</p>
+  <p>A resilient, open-source screen recorder featuring hardware-accelerated encoding, zero telemetry, and automated fallback protection.</p>
   <img src=".github/assets/iconz.png" width="256" height="256" />
   <br>
 
@@ -15,7 +15,25 @@
 
 ## Versions
 
-- v3.0.1 (Latest): Individual shape move tool, compact 2-row/3-row brush toolbar grid, dedicated drag handle, dynamic orientation adaptation, notification hide/show bubble button, open last recording, and 3-launch onboarding auto-dismiss.
+- v3.0.1 (Latest): 
+  - Performance & Core Fixes (Merged PR #8):
+    - Fixed Android 14/15/16 and OnePlus recording failure by removing incompatible VirtualDisplay presentation flags.
+    - Fixed 1 FPS AV1 encoding lag by enforcing hardware-accelerated MediaCodec selection.
+    - Eliminated microphone audio stutter via PCM buffer allocation pooling.
+    - Fixed blurry 4K/1080p video outputs with dynamic BPP minimum bitrate calculation.
+    - Fixed video player start delay by zeroing CODEC_CONFIG buffer sizes.
+    - Fixed service memory leaks during lifecycle teardown (onDestroy).
+  - Floating Controls & Brush Tools:
+    - Added Independent Move Tool to select and drag individual drawn shapes around the screen.
+    - Reorganized Brush Toolbar into a compact 2-row/3-row grid with a dedicated frosted drag handle.
+    - Improved White 'X' (minimises toolbar, keeps drawings locked on screen) and Red 'X' (clears drawings & exits).
+    - Tapping floating bubble while minimised directly re-opens the Brush Toolbar.
+  - Notification Panel & System Integration:
+    - Added Hide / Show Floating Bubble action button directly in the active recording notification panel.
+    - Replaced generic open folder with "Open Last Recording", launching the system chooser for ZArchiver, VLC, Gallery, etc.
+  - UI & Quality-of-Life:
+    - Auto-dismissed "Swipe Here" tutorial hint on the 3rd app launch.
+    - Fixed Output Template Box border color to dynamically match the active accent theme across all states.
 - v3.0.0: Title Bar Swipe Gesture Theme Customizer (with custom onboarding and pulsing logo), Floating overlay controls, real-time screen brush tools, compact MediaStyle notification buttons, and compilation transition to Java 21.
 - v2.0.1: Android 14 background activity compliance fixes.
 - v2.0.0: Live-Reboot Watchdog, Encoder Fallback Mechanism, and System + Mic Audio Recording.
@@ -67,6 +85,10 @@
 2. Environment: Android Studio Koala+, JDK 21.
 3. Target: Minimum SDK 29 (Android 10), Target SDK 34 (Android 14).
 4. Execution: Run `./gradlew assembleRelease` for optimized production binaries.
+
+## Acknowledgements & Credits
+
+Special thanks to [@Xnick417x](https://github.com/Xnick417x) for their valuable performance optimizations, MediaCodec hardware fixes, and audio buffer stability improvements merged in PR #8.
 
 ## Available On
 

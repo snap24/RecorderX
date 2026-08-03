@@ -29,13 +29,27 @@ public class FloatingController {
     private WindowManager.LayoutParams params;
     
     private FrameLayout bubbleView;
-    private LinearLayout menuView;
+    private DraggableMenu menuView;
     private android.widget.TextView tvTimer;
     private ImageView btnMic;
     private ImageView btnPause;
+    private ImageView btnRecordStop;
+    private ImageView btnScreenshot;
+    private ImageView btnLayout;
+    private ImageView btnGear;
     private BrushController brushController;
     private boolean isExpanded = false;
     private boolean isShowing = false;
+    private boolean isRecordingActive = false;
+
+    private final SettingsManager settings;
+    private View dismissTargetView;
+    private final int dismissSize;
+
+    private static final int BUTTON_DP = 40;
+    private static final int GLYPH_DP = 24;
+    private static final int MIN_BUTTON_DP = 28;
+    private final java.util.List<ImageView> menuButtons = new java.util.ArrayList<>();
 
     private final android.os.Handler timerHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private final Runnable timerRunnable = new Runnable() {
@@ -64,14 +78,13 @@ public class FloatingController {
         this.service = service;
         this.context = service;
         this.windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        this.bubbleSize = dpToPx(48); // Reduced size from 56dp to 48dp
+        this.bubbleSize = dpToPx(42);
+        this.settings = new SettingsManager(service);
+        this.dismissSize = dpToPx(64);
     }
     
     @SuppressLint("ClickableViewAccessibility")
     public void show() {
-        if (rootLayout != null) {
-            rootLayout.setVisibility(View.VISIBLE);
-        }
         if (isShowing) return;
         
         if (rootLayout == null) {
@@ -133,19 +146,19 @@ public class FloatingController {
             icon.setLayoutParams(iconParams);
             icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
             icon.setImageResource(R.mipmap.ic_launcher);
+            icon.setAlpha(0.8f);
             bubbleView.addView(icon);
             
             // 2. Menu View (Controls)
-            menuView = new LinearLayout(context);
+            menuView = new DraggableMenu(context);
             menuView.setOrientation(LinearLayout.HORIZONTAL);
             menuView.setVisibility(View.GONE);
             
             GradientDrawable menuBg = new GradientDrawable();
             menuBg.setCornerRadius(dpToPx(28));
-            menuBg.setColor(Color.parseColor("#B31F1F1F")); // 70% transparent dark grey
-            menuBg.setStroke(dpToPx(1.5f), Color.parseColor("#66FFFFFF")); // 40% transparent white border
+            menuBg.setColor(Color.parseColor("#991F1F1F"));
             menuView.setBackground(menuBg);
-            menuView.setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4));
+            menuView.setPadding(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
             
             // Create Timer TextView
             tvTimer = new android.widget.TextView(context);
@@ -156,11 +169,13 @@ public class FloatingController {
             timerParams.gravity = Gravity.CENTER_VERTICAL;
             timerParams.setMargins(dpToPx(8), 0, dpToPx(8), 0);
             tvTimer.setLayoutParams(timerParams);
-            tvTimer.setTextColor(Color.WHITE);
+            tvTimer.setTextColor(Color.parseColor("#C2FFFFFF"));
             tvTimer.setTextSize(14f);
             tvTimer.setGravity(Gravity.CENTER);
             tvTimer.setTypeface(android.graphics.Typeface.MONOSPACE);
             tvTimer.setText("00:00");
+
+            menuButtons.clear();
             
             btnPause = createMenuButton(new PauseIconDrawable(service.isPaused()), v -> {
                 if (service.isPaused()) {
@@ -172,11 +187,16 @@ public class FloatingController {
                 }
             });
             
-            ImageView btnStop = createMenuButton(new StopIconDrawable(), v -> {
-                service.stopRecordingExternally();
+            btnRecordStop = createMenuButton(new RecordIconDrawable(), v -> {
+                if (isRecordingActive) {
+                    service.stopRecordingExternally();
+                } else {
+                    collapse();
+                    service.requestStartRecording();
+                }
             });
-            
-            ImageView btnScreenshot = createMenuButton(new ScreenshotIconDrawable(), v -> {
+
+            btnScreenshot = createMenuButton(new ScreenshotIconDrawable(), v -> {
                 collapse();
                 if (rootLayout != null) {
                     rootLayout.setVisibility(View.GONE);
@@ -212,7 +232,7 @@ public class FloatingController {
                     // Accessibility service not enabled — guide user to enable it
                     android.widget.Toast.makeText(context,
                             "Please enable Accessibility permission for RecorderX to control mic",
-                            android.widget.Toast.LENGTH_LONG).show();
+                            android.widget.Toast.LENGTH_SHORT).show();
                     try {
                         android.content.Intent intent = new android.content.Intent(
                                 android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
@@ -246,17 +266,34 @@ public class FloatingController {
                 brushController.show();
             });
 
+            btnLayout = createMenuButton(new RotateIconDrawable(settings.isBubbleMenuVertical()), v -> {
+                boolean nextVertical = !settings.isBubbleMenuVertical();
+                settings.setBubbleMenuVertical(nextVertical);
+                ((ImageView) v).setImageDrawable(new RotateIconDrawable(nextVertical));
+                applyMenuOrientation();
+                windowManager.updateViewLayout(rootLayout, params);
+            });
+
+            btnGear = createMenuButton(new GearIconDrawable(), v -> {
+                collapse();
+                service.openMainApp();
+            });
+
             ImageView btnCollapse = createMenuButton(new CloseIconDrawable(), v -> {
                 collapse();
             });
-            
+
             menuView.addView(tvTimer);
+            menuView.addView(btnRecordStop);
             menuView.addView(btnPause);
-            menuView.addView(btnStop);
             menuView.addView(btnMic);
             menuView.addView(btnScreenshot);
             menuView.addView(btnBrush);
+            menuView.addView(btnLayout);
+            menuView.addView(btnGear);
             menuView.addView(btnCollapse);
+
+            applyMenuOrientation();
             
             rootLayout.addView(bubbleView);
             rootLayout.addView(menuView);
@@ -278,7 +315,8 @@ public class FloatingController {
                 private float initialTouchX;
                 private float initialTouchY;
                 private long touchStartTime;
-                
+                private boolean isDragging;
+
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     switch (event.getAction()) {
@@ -295,17 +333,37 @@ public class FloatingController {
                             initialTouchX = event.getRawX();
                             initialTouchY = event.getRawY();
                             touchStartTime = System.currentTimeMillis();
+                            isDragging = false;
                             return true;
-                            
+
                         case MotionEvent.ACTION_MOVE:
                             int targetX = initialX + (int) (event.getRawX() - initialTouchX);
                             int targetY = initialY + (int) (event.getRawY() - initialTouchY);
+                            if (!isDragging
+                                    && (Math.abs(event.getRawX() - initialTouchX) > dpToPx(6)
+                                     || Math.abs(event.getRawY() - initialTouchY) > dpToPx(6))) {
+                                isDragging = true;
+                                showDismissTarget();
+                            }
                             params.x = clampX(targetX, bubbleSize);
                             params.y = clampY(targetY, bubbleSize);
                             windowManager.updateViewLayout(rootLayout, params);
                             return true;
-                            
+
+                        case MotionEvent.ACTION_CANCEL:
+                            isDragging = false;
+                            hideDismissTarget();
+                            return true;
+
                         case MotionEvent.ACTION_UP:
+                            if (isDragging && isOverDismissTarget(event.getRawX(), event.getRawY())) {
+                                isDragging = false;
+                                hideDismissTarget();
+                                service.dismissBubble();
+                                return true;
+                            }
+                            isDragging = false;
+                            hideDismissTarget();
                             long duration = System.currentTimeMillis() - touchStartTime;
                             float diffX = Math.abs(event.getRawX() - initialTouchX);
                             float diffY = Math.abs(event.getRawY() - initialTouchY);
@@ -321,23 +379,10 @@ public class FloatingController {
                                 params.gravity = Gravity.TOP | Gravity.START;
                             }
                             windowManager.updateViewLayout(rootLayout, params);
-                            
-                            // Persist bubble coordinates and gravity
-                            context.getSharedPreferences("floating_bubble_prefs", Context.MODE_PRIVATE)
-                                .edit()
-                                .putInt("bubble_x", params.x)
-                                .putInt("bubble_y", params.y)
-                                .putInt("bubble_gravity", params.gravity)
-                                .putBoolean("bubble_has_saved", true)
-                                .apply();
-                            
+                            persistBubblePosition();
+
                             if (duration < 200 && diffX < 10 && diffY < 10) {
-                                if (brushController != null && brushController.isMinimised()) {
-                                    bubbleView.setVisibility(View.GONE);
-                                    brushController.show();
-                                } else {
-                                    expand();
-                                }
+                                expand();
                             }
                             return true;
                     }
@@ -360,41 +405,62 @@ public class FloatingController {
     
     private ImageView createMenuButton(Drawable iconDrawable, View.OnClickListener listener) {
         ImageView button = new ImageView(context);
-        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(dpToPx(40), dpToPx(40));
-        btnParams.setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
-        button.setLayoutParams(btnParams);
+        button.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(BUTTON_DP), dpToPx(BUTTON_DP)));
         button.setImageDrawable(iconDrawable);
-        button.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
+        button.setAlpha(0.72f);
         button.setOnClickListener(listener);
+        menuButtons.add(button);
         return button;
     }
-    
-    private boolean isLandscapeMode() {
-        SettingsManager settings = new SettingsManager(context);
-        int orientPref = settings.getOrientation(); // 0=Auto, 1=Portrait, 2=Landscape
-        if (orientPref == 1) return false;
-        if (orientPref == 2) return true;
-        return context.getResources().getConfiguration().orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE;
-    }
 
+    // Button and glyph sizes are fixed; only the gap along the axis flexes
+    private void applyButtonSizing(boolean vertical) {
+        int count = 0;
+        for (ImageView button : menuButtons) {
+            if (button.getVisibility() != View.GONE) count++;
+        }
+        count = Math.max(count, 1);
+        Point screen = getScreenSize();
+        int available = (vertical ? screen.y : screen.x) - dpToPx(8);
+        int reserved = vertical ? dpToPx(20) : dpToPx(50); // timer, worst case 00:00:00
+        int chrome = dpToPx(8);                            // menu padding along the axis
+
+        int room = available - reserved - chrome;
+        int size = Math.min(dpToPx(BUTTON_DP), room / count);
+        size = Math.max(dpToPx(MIN_BUTTON_DP), size);
+
+        int spare = room - size * count;
+        int gap = Math.max(dpToPx(1), Math.min(spare / (count * 2), dpToPx(4)));
+        int across = dpToPx(2);
+        int padding = Math.max(0, (size - dpToPx(GLYPH_DP)) / 2);
+
+        for (ImageView button : menuButtons) {
+            LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) button.getLayoutParams();
+            p.width = size;
+            p.height = size;
+            if (vertical) {
+                p.setMargins(across, gap, across, gap);
+            } else {
+                p.setMargins(gap, across, gap, across);
+            }
+            button.setLayoutParams(p);
+            button.setPadding(padding, padding, padding, padding);
+        }
+    }
+    
     private void expand() {
         if (isExpanded) return;
-        
-        boolean showMic = service.isAudioSourceSystem();
-        
-        if (menuView != null) {
-            menuView.setOrientation(LinearLayout.HORIZONTAL);
-            menuView.setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4));
-        }
 
-        int menuWidth = showMic ? dpToPx(304) : dpToPx(256);
-        int menuHeight = dpToPx(56);
-        
-        if (btnMic != null) {
-            btnMic.setVisibility(showMic ? View.VISIBLE : View.GONE);
-            btnMic.setImageDrawable(new MicIconDrawable(service.isMicMuted()));
-        }
-        
+        // Visibility first: the sizing divides the strip between the buttons that are actually shown
+        applyRecordingVisibility();
+        applyMenuOrientation();
+
+        // Measure instead of assuming: the menu changes size with orientation and with what is visible
+        int unspecified = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        menuView.measure(unspecified, unspecified);
+        int menuWidth = menuView.getMeasuredWidth();
+        int menuHeight = menuView.getMeasuredHeight();
+
         // Adjust coordinate so the expanded menu stays completely on screen
         params.x = clampX(params.x, menuWidth);
         params.y = clampY(params.y, menuHeight);
@@ -463,8 +529,217 @@ public class FloatingController {
         windowManager.updateViewLayout(rootLayout, params);
     }
     
+    private void persistBubblePosition() {
+        context.getSharedPreferences("floating_bubble_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .putInt("bubble_x", params.x)
+            .putInt("bubble_y", params.y)
+            .putInt("bubble_gravity", params.gravity)
+            .putBoolean("bubble_has_saved", true)
+            .apply();
+    }
+
+    // Steals the gesture from the buttons only past slop, so taps still land on them
+    private class DraggableMenu extends LinearLayout {
+        private int startX;
+        private int startY;
+        private float downRawX;
+        private float downRawY;
+        private boolean dragging;
+
+        DraggableMenu(Context context) {
+            super(context);
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(MotionEvent ev) {
+            if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                downRawX = ev.getRawX();
+                downRawY = ev.getRawY();
+                dragging = false;
+            } else if (ev.getActionMasked() == MotionEvent.ACTION_MOVE && !dragging && movedPastSlop(ev)) {
+                beginDrag(ev);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent ev) {
+            switch (ev.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    downRawX = ev.getRawX();
+                    downRawY = ev.getRawY();
+                    dragging = false;
+                    return true;
+
+                case MotionEvent.ACTION_MOVE:
+                    if (!dragging) {
+                        if (!movedPastSlop(ev)) return true;
+                        beginDrag(ev);
+                    }
+                    params.x = clampX(startX + (int) (ev.getRawX() - downRawX), menuWidth());
+                    params.y = clampY(startY + (int) (ev.getRawY() - downRawY), menuHeight());
+                    windowManager.updateViewLayout(rootLayout, params);
+                    return true;
+
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    if (dragging) persistBubblePosition();
+                    dragging = false;
+                    return true;
+            }
+            return super.onTouchEvent(ev);
+        }
+
+        private int menuWidth() { return getWidth() > 0 ? getWidth() : bubbleSize; }
+
+        private int menuHeight() { return getHeight() > 0 ? getHeight() : bubbleSize; }
+
+        private boolean movedPastSlop(MotionEvent ev) {
+            return Math.abs(ev.getRawX() - downRawX) > dpToPx(6)
+                || Math.abs(ev.getRawY() - downRawY) > dpToPx(6);
+        }
+
+        // Re-anchor as the drag starts, so normalising away END gravity cannot jump the menu
+        private void beginDrag(MotionEvent ev) {
+            dragging = true;
+            if (params.gravity == (Gravity.TOP | Gravity.END)) {
+                params.x = getScreenSize().x - params.x - menuWidth();
+                params.gravity = Gravity.TOP | Gravity.START;
+            }
+            startX = params.x;
+            startY = params.y;
+            downRawX = ev.getRawX();
+            downRawY = ev.getRawY();
+        }
+    }
+
+    private void applyMenuOrientation() {
+        if (menuView == null) return;
+
+        // The setting means along the phone's long edge, so it flips with the device
+        boolean deviceLandscape = context.getResources().getConfiguration().orientation
+                == android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+        boolean vertical = settings.isBubbleMenuVertical() ^ deviceLandscape;
+        menuView.setOrientation(vertical ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+
+        menuView.setGravity(Gravity.CENTER);
+
+        // A vertical column is one button wide, so the timer sheds its margins and shrinks
+        LinearLayout.LayoutParams timerParams = (LinearLayout.LayoutParams) tvTimer.getLayoutParams();
+        timerParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        timerParams.height = vertical ? LinearLayout.LayoutParams.WRAP_CONTENT : LinearLayout.LayoutParams.MATCH_PARENT;
+        timerParams.gravity = Gravity.CENTER;
+        int side = vertical ? 0 : dpToPx(8);
+        timerParams.setMargins(side, vertical ? dpToPx(2) : 0, side, vertical ? dpToPx(2) : 0);
+        tvTimer.setLayoutParams(timerParams);
+        tvTimer.setTextSize(11f);
+        applyButtonSizing(vertical);
+    }
+
+    public void onRecordingStateChanged(boolean recording) {
+        isRecordingActive = recording;
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(this::applyRecordingVisibility);
+    }
+
+    // Record is only meaningful when idle; the transport controls only when a capture is running
+    private void applyRecordingVisibility() {
+        if (menuView == null) return;
+        if (btnRecordStop != null) {
+            btnRecordStop.setImageDrawable(isRecordingActive ? new StopIconDrawable() : new RecordIconDrawable());
+        }
+        if (btnPause != null) {
+            btnPause.setVisibility(isRecordingActive ? View.VISIBLE : View.GONE);
+            btnPause.setImageDrawable(new PauseIconDrawable(service.isPaused()));
+        }
+        // On 14+ the shot goes through accessibility and needs no capture session
+        if (btnScreenshot != null) btnScreenshot.setVisibility(View.VISIBLE);
+        if (btnGear != null) {
+            btnGear.setVisibility(settings.isBubbleGearEnabled() ? View.VISIBLE : View.GONE);
+        }
+        if (tvTimer != null) tvTimer.setVisibility(isRecordingActive ? View.VISIBLE : View.GONE);
+        if (btnMic != null) {
+            boolean showMic = isRecordingActive && service.isAudioSourceSystem();
+            btnMic.setVisibility(showMic ? View.VISIBLE : View.GONE);
+            btnMic.setImageDrawable(new MicIconDrawable(service.isMicMuted()));
+        }
+    }
+
+    // Overlay windows keep their old coordinates through a rotation, so re-fit them to the new screen
+    public void onConfigurationChanged() {
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+            if (!isShowing || rootLayout == null) return;
+
+            if (isExpanded) collapse();
+
+            params.x = clampX(params.x, bubbleSize);
+            params.y = clampY(params.y, bubbleSize);
+            try {
+                windowManager.updateViewLayout(rootLayout, params);
+            } catch (Exception ignored) {}
+
+            if (dismissTargetView != null) {
+                hideDismissTarget();
+                showDismissTarget();
+            }
+
+            if (brushController != null) {
+                brushController.onConfigurationChanged();
+            }
+        });
+    }
+
+    private void showDismissTarget() {
+        if (dismissTargetView != null) return;
+
+        WindowManager.LayoutParams dismissParams = new WindowManager.LayoutParams(
+            dismissSize,
+            dismissSize,
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                : WindowManager.LayoutParams.TYPE_PHONE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            PixelFormat.TRANSLUCENT
+        );
+
+        // Bottom centre tracks rotation on its own, since overlay coordinates turn with the display
+        dismissParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+        dismissParams.y = dismissOffset();
+
+        ImageView target = new ImageView(context);
+        target.setImageDrawable(new DismissTargetDrawable());
+        try {
+            windowManager.addView(target, dismissParams);
+            dismissTargetView = target;
+        } catch (Exception e) {
+            android.util.Log.e("FloatingController", "Dismiss target rejected by the system", e);
+        }
+    }
+
+    private void hideDismissTarget() {
+        if (dismissTargetView == null) return;
+        try { windowManager.removeView(dismissTargetView); } catch (Exception ignored) {}
+        dismissTargetView = null;
+    }
+
+
+    // Hold the target at the same fraction of the screen either way, clear of the very bottom edge
+    private int dismissOffset() {
+        return Math.max(dpToPx(24), (int) (getScreenSize().y * 0.11f) - dismissSize / 2);
+    }
+
+    private boolean isOverDismissTarget(float rawX, float rawY) {
+        if (dismissTargetView == null) return false;
+        Point screen = getScreenSize();
+        float cx = screen.x / 2f;
+        float cy = screen.y - dismissOffset() - dismissSize / 2f;
+        return Math.hypot(rawX - cx, rawY - cy) < dismissSize;
+    }
+
     public void dismiss() {
         timerHandler.removeCallbacks(timerRunnable);
+        hideDismissTarget();
         if (brushController != null) {
             brushController.dismiss();
             brushController = null;
@@ -726,6 +1001,144 @@ public class FloatingController {
             // 3. Stand stem & base plate
             canvas.drawLine(w * 0.5f, uBottom, w * 0.5f, h * 0.78f, paint);
             canvas.drawLine(w * 0.38f, h * 0.78f, w * 0.62f, h * 0.78f, paint);
+        }
+
+        @Override public void setAlpha(int alpha) {}
+        @Override public void setColorFilter(android.graphics.ColorFilter filter) {}
+        @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
+    }
+
+    private static class RecordIconDrawable extends Drawable {
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        public RecordIconDrawable() {
+            paint.setColor(Color.parseColor("#EF4444"));
+            paint.setStyle(Paint.Style.FILL);
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            int w = getBounds().width();
+            int h = getBounds().height();
+            canvas.drawCircle(w * 0.5f, h * 0.5f, Math.min(w, h) * 0.28f, paint);
+        }
+
+        @Override public void setAlpha(int alpha) {}
+        @Override public void setColorFilter(android.graphics.ColorFilter filter) {}
+        @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
+    }
+
+    private static class GearIconDrawable extends Drawable {
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        public GearIconDrawable() {
+            paint.setColor(Color.WHITE);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(4f);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            int w = getBounds().width();
+            int h = getBounds().height();
+            float cx = w * 0.5f;
+            float cy = h * 0.5f;
+            float size = Math.min(w, h);
+            float radius = size * 0.22f;
+
+            canvas.drawCircle(cx, cy, radius, paint);
+
+            for (int i = 0; i < 8; i++) {
+                double angle = Math.toRadians(i * 45);
+                float cos = (float) Math.cos(angle);
+                float sin = (float) Math.sin(angle);
+                canvas.drawLine(
+                    cx + cos * radius, cy + sin * radius,
+                    cx + cos * (radius + size * 0.13f), cy + sin * (radius + size * 0.13f),
+                    paint
+                );
+            }
+        }
+
+        @Override public void setAlpha(int alpha) {}
+        @Override public void setColorFilter(android.graphics.ColorFilter filter) {}
+        @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
+    }
+
+    private static class RotateIconDrawable extends Drawable {
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final boolean isVertical;
+
+        public RotateIconDrawable(boolean isVertical) {
+            this.isVertical = isVertical;
+            paint.setColor(Color.WHITE);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            int w = getBounds().width();
+            int h = getBounds().height();
+            float size = Math.min(w, h);
+            float cx = w * 0.5f;
+            float cy = h * 0.5f;
+
+            // the slab in the middle still shows which way the menu will sit
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(size * 0.085f);
+            float shortHalf = size * 0.12f;
+            float longHalf = size * 0.19f;
+            android.graphics.RectF body = isVertical
+                ? new android.graphics.RectF(cx - shortHalf, cy - longHalf, cx + shortHalf, cy + longHalf)
+                : new android.graphics.RectF(cx - longHalf, cy - shortHalf, cx + longHalf, cy + shortHalf);
+            canvas.drawRoundRect(body, size * 0.05f, size * 0.05f, paint);
+
+            float r = size * 0.37f;
+            android.graphics.RectF oval = new android.graphics.RectF(cx - r, cy - r, cx + r, cy + r);
+            paint.setStrokeWidth(size * 0.075f);
+            canvas.drawArc(oval, 150, 110, false, paint);
+            canvas.drawArc(oval, -30, 110, false, paint);
+
+            paint.setStyle(Paint.Style.FILL);
+            arrowHead(canvas, cx, cy - r, 1f, 0f, size * 0.13f);
+            arrowHead(canvas, cx, cy + r, -1f, 0f, size * 0.13f);
+        }
+
+        private void arrowHead(Canvas canvas, float x, float y, float dx, float dy, float s) {
+            Path p = new Path();
+            p.moveTo(x + dx * s, y + dy * s);
+            p.lineTo(x - dy * s * 0.75f, y + dx * s * 0.75f);
+            p.lineTo(x + dy * s * 0.75f, y - dx * s * 0.75f);
+            p.close();
+            canvas.drawPath(p, paint);
+        }
+
+        @Override public void setAlpha(int alpha) {}
+        @Override public void setColorFilter(android.graphics.ColorFilter filter) {}
+        @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
+    }
+
+    private static class DismissTargetDrawable extends Drawable {
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        @Override
+        public void draw(Canvas canvas) {
+            int w = getBounds().width();
+            int h = getBounds().height();
+            float radius = Math.min(w, h) * 0.5f;
+
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.parseColor("#CCEF4444"));
+            canvas.drawCircle(w * 0.5f, h * 0.5f, radius, paint);
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.WHITE);
+            paint.setStrokeWidth(radius * 0.16f);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            canvas.drawLine(w * 0.36f, h * 0.36f, w * 0.64f, h * 0.64f, paint);
+            canvas.drawLine(w * 0.64f, h * 0.36f, w * 0.36f, h * 0.64f, paint);
         }
 
         @Override public void setAlpha(int alpha) {}

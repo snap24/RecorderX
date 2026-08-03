@@ -237,6 +237,10 @@ public class RecordingSession {
 
     private boolean tryConfigureVideoEncoder(String mime, int width, int height, int fps, int bitrate, int bitrateMode, boolean useHighProfile, boolean requireHardware) {
         try {
+            int[] fitted = fitToEncoder(mime, width, height);
+            width = fitted[0];
+            height = fitted[1];
+
             MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
             format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
@@ -254,8 +258,7 @@ public class RecordingSession {
 
             videoEncoder = MediaCodec.createEncoderByType(mime);
 
-            // A CPU encoder cannot sustain screen capture. AV1 has no hardware encoder on most
-            // devices, so createEncoderByType silently hands back libaom and the capture crawls
+            // Most devices have no hardware AV1 encoder, so createEncoderByType hands back libaom
             if (requireHardware && !videoEncoder.getCodecInfo().isHardwareAccelerated()) {
                 Log.w(TAG, "Rejecting software encoder " + videoEncoder.getCodecInfo().getName() + " for " + mime);
                 throw new IllegalStateException("no hardware encoder for " + mime);
@@ -311,6 +314,53 @@ public class RecordingSession {
                 android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show());
     }
 
+    // A preset that follows a tall screen can outrun the encoder, so fit into its range and keep the shape
+    private int[] fitToEncoder(String mime, int width, int height) {
+        MediaCodecInfo.VideoCapabilities caps = videoCapabilitiesFor(mime);
+        if (caps == null) return new int[]{width, height};
+
+        width = alignDown(width, caps.getWidthAlignment());
+        height = alignDown(height, caps.getHeightAlignment());
+        if (caps.isSizeSupported(width, height)) return new int[]{width, height};
+
+        float k = Math.min((float) caps.getSupportedWidths().getUpper() / width,
+                (float) caps.getSupportedHeights().getUpper() / height);
+        if (k >= 1f) return new int[]{width, height};
+
+        int fittedWidth = alignDown((int) (width * k), Math.max(2, caps.getWidthAlignment()));
+        int fittedHeight = alignDown((int) (height * k), Math.max(2, caps.getHeightAlignment()));
+        if (!caps.isSizeSupported(fittedWidth, fittedHeight)) return new int[]{width, height};
+
+        Log.i(TAG, "Encoder tops out below " + width + "x" + height
+                + ", fitting to " + fittedWidth + "x" + fittedHeight);
+        return new int[]{fittedWidth, fittedHeight};
+    }
+
+    private MediaCodecInfo.VideoCapabilities videoCapabilitiesFor(String mime) {
+        android.media.MediaCodecList list = new android.media.MediaCodecList(android.media.MediaCodecList.REGULAR_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            if (!info.isEncoder()) continue;
+            for (String type : info.getSupportedTypes()) {
+                if (!type.equalsIgnoreCase(mime)) continue;
+                MediaCodecInfo.CodecCapabilities caps = info.getCapabilitiesForType(mime);
+                return caps != null ? caps.getVideoCapabilities() : null;
+            }
+        }
+        return null;
+    }
+
+    private int alignDown(int value, int alignment) {
+        return alignment <= 1 ? value : (value / alignment) * alignment;
+    }
+
+    // Fallback rungs have to keep the screen's shape too, or a rejection reintroduces the bars
+    private int[] scaleToShortEdge(int width, int height, int shortEdge) {
+        int shortSide = Math.min(width, height);
+        if (shortSide <= shortEdge) return new int[]{width & ~1, height & ~1};
+        float k = (float) shortEdge / shortSide;
+        return new int[]{((int) (width * k)) & ~1, ((int) (height * k)) & ~1};
+    }
+
     // A flat bitrate starves high-resolution captures, so scale a floor from pixels per second
     private int minimumBitrate(int width, int height, int fps, String mime) {
         double bitsPerPixel = MediaFormat.MIMETYPE_VIDEO_AVC.equals(mime) ? 0.10 : 0.07;
@@ -344,13 +394,11 @@ public class RecordingSession {
                 return;
             }
 
-            boolean isLandscape = originalWidth > originalHeight;
-
-            // Dimensions for 1080p and 720p
-            int w1080 = isLandscape ? 1920 : 1080;
-            int h1080 = isLandscape ? 1080 : 1920;
-            int w720 = isLandscape ? 1280 : 720;
-            int h720 = isLandscape ? 720 : 1280;
+            // Dimensions for 1080p and 720p, kept in the screen's shape
+            int[] r1080 = scaleToShortEdge(originalWidth, originalHeight, 1080);
+            int[] r720 = scaleToShortEdge(originalWidth, originalHeight, 720);
+            int w1080 = r1080[0], h1080 = r1080[1];
+            int w720 = r720[0], h720 = r720[1];
 
             // Step 2: 1080p @ Max 60 FPS (12 Mbps)
             if (tryConfigureVideoEncoder(mime, w1080, h1080, Math.min(originalFps, 60), 12000000, mode, false, true)) {
@@ -374,8 +422,8 @@ public class RecordingSession {
         }
 
         // Rock Bottom (720p 30fps safe fallback with safeMime)
-        int safeWidth = originalWidth > originalHeight ? 1280 : 720;
-        int safeHeight = originalWidth > originalHeight ? 720 : 1280;
+        int[] safe = scaleToShortEdge(originalWidth, originalHeight, 720);
+        int safeWidth = safe[0], safeHeight = safe[1];
         // Last resort only: accept a software encoder rather than fail to record at all
         if (tryConfigureVideoEncoder(safeMime, safeWidth, safeHeight, 30, 4000000, originalBitrateMode, false, false)) {
             return;

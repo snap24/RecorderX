@@ -40,6 +40,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RecordingSession {
     private static final String TAG = "RecorderX_Session";
+    private static final int SOFTWARE_SHORT_EDGE = 1080;
+    private static final int SOFTWARE_FPS = 60;
     
     private final Context context;
     private final MediaProjection mediaProjection;
@@ -312,6 +314,17 @@ public class RecordingSession {
     }
 
     // A flat bitrate starves high-resolution captures, so scale a floor from pixels per second
+    private boolean hasHardwareEncoder(String mime) {
+        android.media.MediaCodecList list = new android.media.MediaCodecList(android.media.MediaCodecList.REGULAR_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            if (!info.isEncoder()) continue;
+            for (String type : info.getSupportedTypes()) {
+                if (type.equalsIgnoreCase(mime) && info.isHardwareAccelerated()) return true;
+            }
+        }
+        return false;
+    }
+
     private int minimumBitrate(int width, int height, int fps, String mime) {
         double bitsPerPixel = MediaFormat.MIMETYPE_VIDEO_AVC.equals(mime) ? 0.10 : 0.07;
         long floor = (long) ((long) width * height * fps * bitsPerPixel);
@@ -323,6 +336,19 @@ public class RecordingSession {
         int originalWidth = settings.getResolutionWidth();
         int originalHeight = settings.getResolutionHeight();
         int originalFps = settings.getFpsValue();
+
+        // A CPU encoder cannot sustain full resolution, so cap what it is asked for
+        boolean allowSoftware = settings.isSoftwareCodecAllowed() && !hasHardwareEncoder(originalMime);
+        if (allowSoftware) {
+            int shortSide = Math.min(originalWidth, originalHeight);
+            if (shortSide > SOFTWARE_SHORT_EDGE) {
+                float k = (float) SOFTWARE_SHORT_EDGE / shortSide;
+                originalWidth = ((int) (originalWidth * k)) & ~1;
+                originalHeight = ((int) (originalHeight * k)) & ~1;
+            }
+            originalFps = Math.min(originalFps, SOFTWARE_FPS);
+        }
+
         int originalBitrate = Math.max(settings.getBitrateValue(),
                 minimumBitrate(originalWidth, originalHeight, originalFps, originalMime));
         int originalBitrateMode = settings.getBitrateMode() == 0 ? 
@@ -340,7 +366,9 @@ public class RecordingSession {
             int mode = originalBitrateMode; // Always keep user's VBR/CBR preference
 
             // Step 1: Request with requested/safe settings
-            if (tryConfigureVideoEncoder(mime, originalWidth, originalHeight, originalFps, originalBitrate, mode, isOriginal, true)) {
+            boolean needHardware = !(allowSoftware && isOriginal);
+
+            if (tryConfigureVideoEncoder(mime, originalWidth, originalHeight, originalFps, originalBitrate, mode, isOriginal, needHardware)) {
                 return;
             }
 
@@ -705,6 +733,7 @@ public class RecordingSession {
         }
 
         try { if (videoEncoder != null) { videoEncoder.stop(); videoEncoder.release(); } } catch (Exception ignored) {}
+        try { if (inputSurface != null) { inputSurface.release(); inputSurface = null; } } catch (Exception ignored) {}
         try { if (audioEncoder != null) { audioEncoder.stop(); audioEncoder.release(); } } catch (Exception ignored) {}
         try { if (audioRecord != null) { audioRecord.stop(); audioRecord.release(); } } catch (Exception ignored) {}
         try { if (audioRecordSecondary != null) { audioRecordSecondary.stop(); audioRecordSecondary.release(); } } catch (Exception ignored) {}

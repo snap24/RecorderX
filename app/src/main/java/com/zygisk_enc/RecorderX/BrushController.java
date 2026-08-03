@@ -223,6 +223,14 @@ public class BrushController {
         isShowing = true;
     }
 
+    // A toolbar position dragged in one orientation lands off-screen in the other, so re-seat it
+    public void onConfigurationChanged() {
+        if (toolbarView == null || toolbarParams == null) return;
+        toolbarParams.x = 0;
+        toolbarParams.y = dpToPx(80);
+        try { windowManager.updateViewLayout(toolbarView, toolbarParams); } catch (Exception ignored) {}
+    }
+
     public void dismiss() {
         if (!isShowing && drawingView == null) return;
 

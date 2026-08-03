@@ -1,0 +1,6 @@
+- Merged PR #8: Fixed Android 14/15/16 + OnePlus recording failure, AV1 encoding lag, audio stutter, and blurry video output.
+- Added Independent Move Tool to select and drag drawn shapes on screen.
+- Reorganized Brush Toolbar into a compact grid with a dedicated drag handle.
+- Added Hide/Show Floating Bubble button in the active recording notification panel.
+- Replaced open folder with "Open Last Recording" system chooser (ZArchiver, VLC, Gallery).
+- Auto-dismissed onboarding title hint on 3rd app launch.

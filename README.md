@@ -16,7 +16,7 @@
 ## Versions
 
 - v3.0.1 (Latest): 
-  - Performance & Core Fixes (Merged PR #8):
+  - Performance & Core Fixes (Merged [#8](https://github.com/snap24/RecorderX/pull/8)):
     - Fixed Android 14/15/16 and OnePlus recording failure by removing incompatible VirtualDisplay presentation flags.
     - Fixed 1 FPS AV1 encoding lag by enforcing hardware-accelerated MediaCodec selection.
     - Eliminated microphone audio stutter via PCM buffer allocation pooling.
@@ -88,7 +88,7 @@
 
 ## Acknowledgements & Credits
 
-Special thanks to [@Xnick417x](https://github.com/Xnick417x) for their valuable performance optimizations, MediaCodec hardware fixes, and audio buffer stability improvements merged in PR #8.
+Special thanks to [@Xnick417x](https://github.com/Xnick417x) for their valuable performance optimizations, MediaCodec hardware fixes, and audio buffer stability improvements merged in [#8](https://github.com/snap24/RecorderX/pull/8).
 
 ## Available On
 

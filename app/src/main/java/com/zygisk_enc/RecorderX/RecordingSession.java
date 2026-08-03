@@ -705,6 +705,7 @@ public class RecordingSession {
         }
 
         try { if (videoEncoder != null) { videoEncoder.stop(); videoEncoder.release(); } } catch (Exception ignored) {}
+        try { if (inputSurface != null) { inputSurface.release(); inputSurface = null; } } catch (Exception ignored) {}
         try { if (audioEncoder != null) { audioEncoder.stop(); audioEncoder.release(); } } catch (Exception ignored) {}
         try { if (audioRecord != null) { audioRecord.stop(); audioRecord.release(); } } catch (Exception ignored) {}
         try { if (audioRecordSecondary != null) { audioRecordSecondary.stop(); audioRecordSecondary.release(); } } catch (Exception ignored) {}

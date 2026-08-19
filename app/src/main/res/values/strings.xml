@@ -35,8 +35,8 @@
         <item>4M</item>
         <item>8M</item>
         <item>12M</item>
-        <item>20M</item>
-        <item>40M</item>
+        <item>16M</item>
+        <item>18M</item>
     </string-array>
     
     <string-array name="fps_options">

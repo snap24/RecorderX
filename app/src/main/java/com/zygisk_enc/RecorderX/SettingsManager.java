@@ -127,7 +127,7 @@ public class SettingsManager {
     }
 
     public int getBitrateValue() {
-        int[] bitrates = {2000000, 4000000, 8000000, 12000000, 20000000, 40000000};
+        int[] bitrates = {2000000, 4000000, 8000000, 12000000, 16000000, 18000000};
         int idx = getBitrate();
         return (idx >= 0 && idx < bitrates.length) ? bitrates[idx] : 8000000;
     }

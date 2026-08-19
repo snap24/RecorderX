@@ -237,6 +237,8 @@ public class RecordingSession {
 
     private boolean tryConfigureVideoEncoder(String mime, int width, int height, int fps, int bitrate, int bitrateMode, boolean useHighProfile, boolean requireHardware) {
         try {
+            int maxCodecCap = MediaFormat.MIMETYPE_VIDEO_HEVC.equals(mime) ? 18000000 : 24000000;
+            bitrate = Math.min(bitrate, maxCodecCap);
             MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
             format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
@@ -244,12 +246,17 @@ public class RecordingSession {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 format.setFloat(MediaFormat.KEY_MAX_FPS_TO_ENCODER, (float) fps);
             }
-            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
+            int iFrameInterval = MediaFormat.MIMETYPE_VIDEO_HEVC.equals(mime) ? 3 : 2;
+            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
             format.setLong(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER, 1000000L / fps);
             format.setInteger(MediaFormat.KEY_BITRATE_MODE, bitrateMode);
 
-            if (useHighProfile && MediaFormat.MIMETYPE_VIDEO_AVC.equals(mime)) {
-                format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+            if (useHighProfile) {
+                if (MediaFormat.MIMETYPE_VIDEO_AVC.equals(mime)) {
+                    format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+                } else if (MediaFormat.MIMETYPE_VIDEO_HEVC.equals(mime)) {
+                    format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.HEVCProfileMain);
+                }
             }
 
             videoEncoder = MediaCodec.createEncoderByType(mime);
@@ -323,8 +330,10 @@ public class RecordingSession {
         int originalWidth = settings.getResolutionWidth();
         int originalHeight = settings.getResolutionHeight();
         int originalFps = settings.getFpsValue();
-        int originalBitrate = Math.max(settings.getBitrateValue(),
+        int calculatedBitrate = Math.max(settings.getBitrateValue(),
                 minimumBitrate(originalWidth, originalHeight, originalFps, originalMime));
+        int maxAllowedBitrate = MediaFormat.MIMETYPE_VIDEO_HEVC.equals(originalMime) ? 18000000 : 24000000;
+        int originalBitrate = Math.min(calculatedBitrate, maxAllowedBitrate);
         int originalBitrateMode = settings.getBitrateMode() == 0 ? 
                 MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR : 
                 MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR;

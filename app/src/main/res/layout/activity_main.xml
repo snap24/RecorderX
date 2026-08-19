@@ -268,8 +268,8 @@
                 <TextView android:id="@+id/b2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4M" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
                 <TextView android:id="@+id/b3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8M" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
                 <TextView android:id="@+id/b4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12M" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
-                <TextView android:id="@+id/b5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20M" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
-                <TextView android:id="@+id/b6" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="40M" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
+                <TextView android:id="@+id/b5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="16M" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
+                <TextView android:id="@+id/b6" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="18M" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
                 <androidx.constraintlayout.helper.widget.Flow android:layout_width="match_parent" android:layout_height="wrap_content" app:constraint_referenced_ids="b1,b2,b3,b4,b5,b6" app:flow_horizontalStyle="spread_inside" app:layout_constraintTop_toTopOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 

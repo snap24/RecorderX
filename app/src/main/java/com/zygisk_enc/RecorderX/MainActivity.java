@@ -954,14 +954,22 @@ public class MainActivity extends AppCompatActivity {
             warnPrefs.edit().putBoolean("av1_sw_warned", true).apply();
             warningDialog.dismiss();
         });
-        android.widget.LinearLayout.LayoutParams btnParams = new android.widget.LinearLayout.LayoutParams(
+        layout.addView(btnOk, new android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
-        layout.addView(btnOk, btnParams);
+                (int)(48 * getResources().getDisplayMetrics().density)));
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        int margin = (int)(16 * getResources().getDisplayMetrics().density);
+        container.setPadding(margin, margin, margin, margin);
+        container.addView(layout);
 
-        warningDialog.setContentView(layout);
+        warningDialog.setContentView(container);
         if (warningDialog.getWindow() != null) {
             warningDialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+            lp.copyFrom(warningDialog.getWindow().getAttributes());
+            lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = android.view.WindowManager.LayoutParams.WRAP_CONTENT;
+            warningDialog.getWindow().setAttributes(lp);
         }
         warningDialog.show();
     }

@@ -510,19 +510,24 @@ public class RecorderService extends Service {
     }
 
     private android.graphics.drawable.Icon createTextIcon(String text) {
-        int sizePx = 100; // Fixed 100px canvas at 100 DPI target
+        float density = getResources().getDisplayMetrics().density;
+        int sizePx = Math.max(144, (int) (36 * density));
         Bitmap bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888);
-        bitmap.setDensity(100);
         android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
         
         android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
         paint.setColor(android.graphics.Color.WHITE);
-        
-        float textSize = text.length() > 5 ? sizePx * 0.22f : sizePx * 0.27f;
-        paint.setTextSize(textSize);
-        
         paint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.SANS_SERIF, android.graphics.Typeface.BOLD));
         paint.setTextAlign(android.graphics.Paint.Align.CENTER);
+        
+        // Dynamically scale text size so words like RESUME/PAUSE fit with 15% padding on both sides
+        float maxTextWidth = sizePx * 0.70f;
+        float textSize = sizePx * 0.22f;
+        paint.setTextSize(textSize);
+        while (paint.measureText(text) > maxTextWidth && textSize > 6f) {
+            textSize -= 0.5f;
+            paint.setTextSize(textSize);
+        }
         
         android.graphics.Paint.FontMetrics fontMetrics = paint.getFontMetrics();
         float fontHeight = fontMetrics.descent - fontMetrics.ascent;

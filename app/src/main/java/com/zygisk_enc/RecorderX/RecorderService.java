@@ -510,9 +510,9 @@ public class RecorderService extends Service {
     }
 
     private android.graphics.drawable.Icon createTextIcon(String text) {
-        int sizePx = 280; // Fixed 280px canvas at 280 DPI target
+        int sizePx = 100; // Fixed 100px canvas at 100 DPI target
         Bitmap bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888);
-        bitmap.setDensity(280);
+        bitmap.setDensity(100);
         android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
         
         android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);

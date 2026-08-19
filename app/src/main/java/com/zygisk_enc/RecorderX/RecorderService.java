@@ -440,8 +440,8 @@ public class RecorderService extends Service {
         String title = paused ? "RecorderX is paused" : "RecorderX is active";
         String actionLabel = paused ? "Resume Recording" : "Pause Recording";
 
-        android.graphics.drawable.Icon pauseIcon = createTextIcon(paused ? "RESUME" : "PAUSE");
-        android.graphics.drawable.Icon stopIcon = createTextIcon("STOP");
+        android.graphics.drawable.Icon pauseIcon = getOrCreateTextIcon(paused ? "RESUME" : "PAUSE");
+        android.graphics.drawable.Icon stopIcon = getOrCreateTextIcon("STOP");
 
         Notification.Builder builder = new Notification.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
@@ -466,7 +466,7 @@ public class RecorderService extends Service {
             );
 
             String bubbleLabel = isBubbleHidden ? "Show Bubble" : "Hide Bubble";
-            android.graphics.drawable.Icon bubbleIcon = createTextIcon(isBubbleHidden ? "SHOW" : "HIDE");
+            android.graphics.drawable.Icon bubbleIcon = getOrCreateTextIcon(isBubbleHidden ? "SHOW" : "HIDE");
 
             builder.addAction(new Notification.Action.Builder(
                 bubbleIcon, bubbleLabel, bubblePendingIntent
@@ -481,20 +481,44 @@ public class RecorderService extends Service {
         return builder.build();
     }
 
+    private android.graphics.drawable.Icon cachedPauseIcon;
+    private android.graphics.drawable.Icon cachedResumeIcon;
+    private android.graphics.drawable.Icon cachedStopIcon;
+    private android.graphics.drawable.Icon cachedShowIcon;
+    private android.graphics.drawable.Icon cachedHideIcon;
+
+    private android.graphics.drawable.Icon getOrCreateTextIcon(String text) {
+        switch (text) {
+            case "PAUSE":
+                if (cachedPauseIcon == null) cachedPauseIcon = createTextIcon("PAUSE");
+                return cachedPauseIcon;
+            case "RESUME":
+                if (cachedResumeIcon == null) cachedResumeIcon = createTextIcon("RESUME");
+                return cachedResumeIcon;
+            case "STOP":
+                if (cachedStopIcon == null) cachedStopIcon = createTextIcon("STOP");
+                return cachedStopIcon;
+            case "SHOW":
+                if (cachedShowIcon == null) cachedShowIcon = createTextIcon("SHOW");
+                return cachedShowIcon;
+            case "HIDE":
+                if (cachedHideIcon == null) cachedHideIcon = createTextIcon("HIDE");
+                return cachedHideIcon;
+            default:
+                return createTextIcon(text);
+        }
+    }
+
     private android.graphics.drawable.Icon createTextIcon(String text) {
-        int width = 96;
-        int height = 96;
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        float density = getResources().getDisplayMetrics().density;
+        int sizePx = Math.max(192, (int) (48 * density));
+        Bitmap bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888);
         android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
         
         android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
         paint.setColor(android.graphics.Color.WHITE);
         
-        // Dynamically adjust text size based on length to prevent horizontal clipping
-        float textSize = 26f;
-        if (text.length() > 5) {
-            textSize = 21f; // Scaled down for longer words like "RESUME"
-        }
+        float textSize = text.length() > 5 ? sizePx * 0.22f : sizePx * 0.27f;
         paint.setTextSize(textSize);
         
         paint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.SANS_SERIF, android.graphics.Typeface.BOLD));
@@ -502,9 +526,9 @@ public class RecorderService extends Service {
         
         android.graphics.Paint.FontMetrics fontMetrics = paint.getFontMetrics();
         float fontHeight = fontMetrics.descent - fontMetrics.ascent;
-        float y = (height - fontHeight) / 2f - fontMetrics.ascent;
+        float y = (sizePx - fontHeight) / 2f - fontMetrics.ascent;
         
-        canvas.drawText(text, width / 2f, y, paint);
+        canvas.drawText(text, sizePx / 2f, y, paint);
         
         return android.graphics.drawable.Icon.createWithBitmap(bitmap);
     }

@@ -469,10 +469,13 @@ public class FloatingController {
             brushController.dismiss();
             brushController = null;
         }
-        if (isShowing && rootLayout != null) {
+        if (rootLayout != null) {
             try {
-                windowManager.removeView(rootLayout);
+                if (rootLayout.isAttachedToWindow()) {
+                    windowManager.removeViewImmediate(rootLayout);
+                }
             } catch (Exception ignored) {}
+            rootLayout = null;
             isShowing = false;
         }
     }

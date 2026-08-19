@@ -261,9 +261,15 @@ public class RecordingSession {
 
             videoEncoder = MediaCodec.createEncoderByType(mime);
 
-            // A CPU encoder cannot sustain screen capture. AV1 has no hardware encoder on most
-            // devices, so createEncoderByType silently hands back libaom and the capture crawls
-            if (requireHardware && !videoEncoder.getCodecInfo().isHardwareAccelerated()) {
+            // Handle AV1 Software Encoding (v3.0.0 behavior + Toast warning) vs hardware requirement
+            boolean isAv1 = MediaFormat.MIMETYPE_VIDEO_AV1.equals(mime);
+            boolean isSwEncoder = !videoEncoder.getCodecInfo().isHardwareAccelerated();
+
+            if (isAv1 && isSwEncoder) {
+                Log.i(TAG, "Hardware AV1 not found. Operating in Software AV1 mode (" + videoEncoder.getCodecInfo().getName() + ")");
+                new Handler(Looper.getMainLooper()).post(() ->
+                        android.widget.Toast.makeText(context, "Hardware AV1 not found. Recording in Software AV1 mode...", android.widget.Toast.LENGTH_LONG).show());
+            } else if (requireHardware && isSwEncoder) {
                 Log.w(TAG, "Rejecting software encoder " + videoEncoder.getCodecInfo().getName() + " for " + mime);
                 throw new IllegalStateException("no hardware encoder for " + mime);
             }

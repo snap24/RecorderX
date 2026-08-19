@@ -347,8 +347,27 @@ public class MainActivity extends AppCompatActivity {
         applyAccentColor(ACCENT_COLORS[savedColorIndex]);
 
         // Video Settings
-        setupSlider(R.id.codecSlider, R.array.codec_options, settingsManager.getCodec(), 
-            index -> settingsManager.setCodec(index));
+        Slider codecSlider = findViewById(R.id.codecSlider);
+        String[] codecOptions = getResources().getStringArray(R.array.codec_options);
+        codecSlider.setValue(settingsManager.getCodec());
+        codecSlider.setLabelFormatter(value -> {
+            int idx = (int) value;
+            return (idx >= 0 && idx < codecOptions.length) ? codecOptions[idx] : String.valueOf(value);
+        });
+        codecSlider.addOnChangeListener((sl, value, fromUser) -> {
+            if (!fromUser) return;
+            int selected = (int) value;
+            settingsManager.setCodec(selected);
+            if (selected == 2) { // AV1
+                if (!isHardwareAv1EncoderAvailable()) {
+                    android.content.SharedPreferences warnPrefs = getSharedPreferences("ui_prefs", MODE_PRIVATE);
+                    boolean warned = warnPrefs.getBoolean("av1_sw_warned", false);
+                    if (!warned && !isWarningDialogShowing) {
+                        showAv1SoftwareWarningDialog(warnPrefs);
+                    }
+                }
+            }
+        });
         // Orientation slider — with first-time AUTO mode warning
         Slider orientationSlider = findViewById(R.id.orientationSlider);
         String[] orientOptions = getResources().getStringArray(R.array.orientation_options);
@@ -864,6 +883,87 @@ public class MainActivity extends AppCompatActivity {
             pulse.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
             titleX.startAnimation(pulse);
         }
+    }
+
+    private boolean isHardwareAv1EncoderAvailable() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return false;
+        try {
+            android.media.MediaCodecList list = new android.media.MediaCodecList(android.media.MediaCodecList.REGULAR_CODECS);
+            for (android.media.MediaCodecInfo info : list.getCodecInfos()) {
+                if (!info.isEncoder()) continue;
+                for (String type : info.getSupportedTypes()) {
+                    if (android.media.MediaFormat.MIMETYPE_VIDEO_AV1.equalsIgnoreCase(type)) {
+                        if (info.isHardwareAccelerated()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
+    }
+
+    private void showAv1SoftwareWarningDialog(android.content.SharedPreferences warnPrefs) {
+        isWarningDialogShowing = true;
+        android.app.Dialog warningDialog = new android.app.Dialog(this);
+        warningDialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        warningDialog.setCancelable(false);
+        warningDialog.setCanceledOnTouchOutside(false);
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int pad = (int)(24 * getResources().getDisplayMetrics().density);
+        layout.setPadding(pad, pad, pad, pad);
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(getResources().getColor(R.color.bg_main, getTheme()));
+        bg.setCornerRadius(12 * getResources().getDisplayMetrics().density);
+        bg.setStroke((int)(2 * getResources().getDisplayMetrics().density), getActiveAccentColor());
+        layout.setBackground(bg);
+
+        android.widget.TextView tvTitle = new android.widget.TextView(this);
+        tvTitle.setText("⚠  AV1 Software Encoding");
+        tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 16);
+        tvTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(getActiveAccentColor());
+        android.widget.LinearLayout.LayoutParams titleParams = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        titleParams.bottomMargin = (int)(12 * getResources().getDisplayMetrics().density);
+        layout.addView(tvTitle, titleParams);
+
+        android.widget.TextView tvMsg = new android.widget.TextView(this);
+        tvMsg.setText("Hardware AV1 encoding is not supported on this device.\n\nRecording will be performed using Software AV1 (CPU encoding). This may cause increased CPU usage, higher battery consumption, and potential frame drops on higher resolutions.");
+        tvMsg.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
+        tvMsg.setTextColor(getResources().getColor(R.color.text_primary, getTheme()));
+        android.widget.LinearLayout.LayoutParams msgParams = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        msgParams.bottomMargin = (int)(20 * getResources().getDisplayMetrics().density);
+        layout.addView(tvMsg, msgParams);
+
+        android.widget.Button btnOk = new android.widget.Button(this);
+        btnOk.setText("I UNDERSTAND");
+        android.graphics.drawable.GradientDrawable btnBg = new android.graphics.drawable.GradientDrawable();
+        btnBg.setColor(getActiveAccentColor());
+        btnBg.setCornerRadius(4 * getResources().getDisplayMetrics().density);
+        btnOk.setBackground(btnBg);
+        btnOk.setTextColor(android.graphics.Color.BLACK);
+        btnOk.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        btnOk.setOnClickListener(v -> {
+            isWarningDialogShowing = false;
+            warnPrefs.edit().putBoolean("av1_sw_warned", true).apply();
+            warningDialog.dismiss();
+        });
+        android.widget.LinearLayout.LayoutParams btnParams = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        layout.addView(btnOk, btnParams);
+
+        warningDialog.setContentView(layout);
+        if (warningDialog.getWindow() != null) {
+            warningDialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+        warningDialog.show();
     }
 
     interface OnSelectionChanged {

@@ -520,11 +520,11 @@ public class RecorderService extends Service {
         paint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.SANS_SERIF, android.graphics.Typeface.BOLD));
         paint.setTextAlign(android.graphics.Paint.Align.CENTER);
         
-        // Dynamically scale text size so words like RESUME/PAUSE fit with 15% padding on both sides
-        float maxTextWidth = sizePx * 0.70f;
-        float textSize = sizePx * 0.22f;
+        // Dynamically scale text size so words like RESUME/PAUSE fit with 25% padding on both sides
+        float maxTextWidth = sizePx * 0.50f;
+        float textSize = sizePx * 0.16f;
         paint.setTextSize(textSize);
-        while (paint.measureText(text) > maxTextWidth && textSize > 6f) {
+        while (paint.measureText(text) > maxTextWidth && textSize > 4f) {
             textSize -= 0.5f;
             paint.setTextSize(textSize);
         }

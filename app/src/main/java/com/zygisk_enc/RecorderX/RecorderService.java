@@ -45,17 +45,18 @@ public class RecorderService extends Service {
     private boolean isBubbleHidden = false;
     private android.os.PowerManager.WakeLock wakeLock;
 
+    @SuppressWarnings("deprecation")
     private void acquireWakeLock() {
         if (wakeLock == null) {
             try {
                 android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
                 if (pm != null) {
-                    wakeLock = pm.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK | android.os.PowerManager.ON_AFTER_RELEASE, "RecorderX:RecordingWakeLock");
+                    wakeLock = pm.newWakeLock(android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK | android.os.PowerManager.ON_AFTER_RELEASE, "RecorderX:ScreenWakeLock");
                     wakeLock.acquire(10 * 60 * 60 * 1000L);
-                    Log.d(TAG, "WakeLock acquired successfully.");
+                    Log.d(TAG, "Screen WakeLock acquired successfully.");
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Failed to acquire WakeLock", e);
+                Log.e(TAG, "Failed to acquire Screen WakeLock", e);
             }
         }
     }

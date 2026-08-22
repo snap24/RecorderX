@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">பதிவைத் தொடங்கு</string>
+    <string name="stop_recording">பதிவை நிறுத்து</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">வழிகாட்டி</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">மூலக் குறியீடு</string>
+    <string name="btn_guide">வழிகாட்டி</string>
+    <string name="btn_open_recordings">கடைசிப் பதிவை\nதிற</string>
+    <string name="floating_controls_label">மிதக்கும் பட்டன்கள்</string>
+    <string name="header_video_subsystem">வீடியோ உட்சርዓமைப்பு</string>
+    <string name="header_audio_subsystem">ஆடியோ உட்சርዓமைப்பு</string>
+
+    <string name="resolution_label">தெளிவுத்திறன்</string>
+    <string name="bitrate_label">பிட்ரேட்</string>
+    <string name="fps_label">ஃபிரேம் ரேட் (FPS)</string>
+    <string name="video_codec_label">வீடியோ கோடெக்</string>
+    <string name="bitrate_mode_label">பிட்ரேட் பயன்முறை</string>
+    <string name="orientation_label">திரைத் திசை</string>
+
+    <string name="audio_source_label">ஆடியோ மூலம்</string>
+    <string name="audio_quality_label">ஆடியோ தரம்</string>
+    
+    <string name="naming_template_label">வெளியீட்டு வார்ப்புரு</string>
+
+    <string-array name="resolution_options">
+        <item>சுயவிவரம்</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>தானியங்கு</item>
+        <item>செங்குத்து</item>
+        <item>கிடைமட்டம்</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>ஆஃப்</item>
+        <item>மைக்</item>
+        <item>சிஸ்டம்</item>
+        <item>சிஸ்டம்+மைக்</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>குறைந்த</item>
+        <item>நடுத்தர</item>
+        <item>அதிகபட்சம்</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

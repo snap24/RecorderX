@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">စတင် အသံဖမ်းမည်</string>
+    <string name="stop_recording">ရပ်တန့်မည်</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">လမ်းညွှန်</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">ရင်းမြစ်</string>
+    <string name="btn_guide">လမ်းညွှန်</string>
+    <string name="btn_open_recordings">နောက်ဆုံးဖမ်းယူမှု\nဖွင့်မည်</string>
+    <string name="floating_controls_label">ပေါလောပေါ်ခလုတ်များ</string>
+    <string name="header_video_subsystem">ဗီဒီယို စနစ်ခွဲ</string>
+    <string name="header_audio_subsystem">အသံ စနစ်ခွဲ</string>
+
+    <string name="resolution_label">ပြတ်သားမှု</string>
+    <string name="bitrate_label">ဘစ်နှုန်း</string>
+    <string name="fps_label">ဖရိန်နှုန်း (FPS)</string>
+    <string name="video_codec_label">ဗီဒီယို ကိုဒက်</string>
+    <string name="bitrate_mode_label">ဘစ်နှုန်း မုဒ်</string>
+    <string name="orientation_label">မျက်နှာပြင် အနေအထား</string>
+
+    <string name="audio_source_label">အသံ ရင်းမြစ်</string>
+    <string name="audio_quality_label">အသံ အရည်အသွေး</string>
+    
+    <string name="naming_template_label">အမည် ပုံစံ</string>
+
+    <string-array name="resolution_options">
+        <item>မူလ</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>အလိုအလျောက်</item>
+        <item>ဒေါင်လိုက်</item>
+        <item>ပြင်ညီ</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>ပိတ်မည်</item>
+        <item>မိုက်</item>
+        <item>စနစ်</item>
+        <item>စနစ်+မိုက်</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>နိမ့်</item>
+        <item>အလယ်အလတ်</item>
+        <item>အမြင့်ဆုံး</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

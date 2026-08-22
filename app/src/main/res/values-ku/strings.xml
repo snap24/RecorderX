@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RecorderX</string>
-    <string name="start_recording">INICIAR GRABACIÓN</string>
-    <string name="stop_recording">DETENER GRABACIÓN</string>
+    <string name="start_recording">DEST PÊKIRINA TOMARKIRINÊ</string>
+    <string name="stop_recording">WESTANDINA TOMARKIRINÊ</string>
     <string name="settings_title">SYSTEM CONFIGURATION</string>
     
-    <string name="guide_title">GUÍA</string>
+    <string name="guide_title">RÊBER</string>
     <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
     <string name="guide_understood">OK</string>
 
-    <string name="btn_view_source">CÓDIGO</string>
-    <string name="btn_guide">GUÍA</string>
-    <string name="btn_open_recordings">ÚLTIMA\nGRABACIÓN</string>
-    <string name="floating_controls_label">CONTROLES FLOTANTES</string>
-    <string name="header_video_subsystem">SUBSISTEMA DE VIDEO</string>
-    <string name="header_audio_subsystem">SUBSISTEMA DE AUDIO</string>
+    <string name="btn_view_source">ÇAVKANÎ</string>
+    <string name="btn_guide">RÊBER</string>
+    <string name="btn_open_recordings">VEKIRINA TOMARA\nDAWÎ</string>
+    <string name="floating_controls_label">KONTROLÊN ANÎN</string>
+    <string name="header_video_subsystem">SUBSÎSTEMA VÎDEO</string>
+    <string name="header_audio_subsystem">SUBSÎSTEMA DENGÊ</string>
 
-    <string name="resolution_label">RESOLUCIÓN</string>
-    <string name="bitrate_label">TASA DE BITS</string>
-    <string name="fps_label">FOTOGRAMAS (FPS)</string>
-    <string name="video_codec_label">CÓDEC DE VIDEO</string>
-    <string name="bitrate_mode_label">MODO DE BITS</string>
-    <string name="orientation_label">ORIENTACIÓN</string>
+    <string name="resolution_label">ÇARESERÎ</string>
+    <string name="bitrate_label">RÊJEYA BÎTAN</string>
+    <string name="fps_label">RÊJEYA ÇARÇOVEYÊ (FPS)</string>
+    <string name="video_codec_label">KODEKA VÎDEO</string>
+    <string name="bitrate_mode_label">MODA BÎTRATE</string>
+    <string name="orientation_label">HÊL</string>
 
-    <string name="audio_source_label">FUENTE DE AUDIO</string>
-    <string name="audio_quality_label">CALIDAD DE AUDIO</string>
+    <string name="audio_source_label">ÇAVKANÎYA DENGÊ</string>
+    <string name="audio_quality_label">ASETÊN DENGÊ</string>
     
-    <string name="naming_template_label">PLANTILLA DE NOMBRE</string>
+    <string name="naming_template_label">ŞABLONA NAVÊ</string>
 
     <string-array name="resolution_options">
-        <item>NATIVA</item>
+        <item>XWESER</item>
         <item>4K</item>
         <item>2K</item>
         <item>FHD</item>
@@ -39,21 +39,21 @@
     
     <string-array name="orientation_options">
         <item>AUTO</item>
-        <item>VERT</item>
-        <item>HORIZ</item>
+        <item>RAWESTA</item>
+        <item>DIRÊJÎ</item>
     </string-array>
 
     <string-array name="audio_options">
-        <item>APAGADO</item>
-        <item>MIC</item>
-        <item>SIS</item>
-        <item>SIS+MIC</item>
+        <item>GIRTÎ</item>
+        <item>MÎK</item>
+        <item>SÎST</item>
+        <item>SÎST+MÎK</item>
     </string-array>
 
     <string-array name="audio_quality_options">
-        <item>BAJA</item>
-        <item>MEDIA</item>
-        <item>MÁX</item>
+        <item>NIZM</item>
+        <item>NAVENDÎ</item>
+        <item>MAKS</item>
     </string-array>
 
     <string-array name="bitrate_mode_options">

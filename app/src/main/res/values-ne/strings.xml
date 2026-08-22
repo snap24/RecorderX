@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RecorderX</string>
-    <string name="start_recording">रिकॉर्डिंग शुरू करें</string>
-    <string name="stop_recording">रिकॉर्डिंग बंद करें</string>
+    <string name="start_recording">रेकर्डिङ सुरु गर्नुहोस्</string>
+    <string name="stop_recording">रेकर्डिङ रोक्नुहोस्</string>
     <string name="settings_title">SYSTEM CONFIGURATION</string>
     
-    <string name="guide_title">गाइड</string>
+    <string name="guide_title">मार्गदर्शिका</string>
     <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
     <string name="guide_understood">OK</string>
 
-    <string name="btn_view_source">सोर्स</string>
-    <string name="btn_guide">गाइड</string>
-    <string name="btn_open_recordings">अंतिम\nरिकॉर्डिंग</string>
-    <string name="floating_controls_label">फ्लोटिंग बबल कंट्रोल</string>
-    <string name="header_video_subsystem">वीडियो सबसिस्टम</string>
-    <string name="header_audio_subsystem">ऑडियो सबसिस्टम</string>
+    <string name="btn_view_source">स्रोत</string>
+    <string name="btn_guide">मार्गदर्शिका</string>
+    <string name="btn_open_recordings">अन्तिम रेकर्डिङ\nखोल्नुहोस्</string>
+    <string name="floating_controls_label">फ्लोटिंग बटनहरू</string>
+    <string name="header_video_subsystem">भिडियो सबसिस्टम</string>
+    <string name="header_audio_subsystem">अडियो सबसिस्टम</string>
 
-    <string name="resolution_label">रिज़ॉल्यूशन</string>
+    <string name="resolution_label">रिजोल्युसन</string>
     <string name="bitrate_label">बिटरेट</string>
-    <string name="fps_label">फ्रेम रेट (FPS)</string>
-    <string name="video_codec_label">वीडियो कोडेक</string>
+    <string name="fps_label">फ्रेम दर (FPS)</string>
+    <string name="video_codec_label">भिडियो कोडेक</string>
     <string name="bitrate_mode_label">बिटरेट मोड</string>
-    <string name="orientation_label">ओरिएंटेशन</string>
+    <string name="orientation_label">ओरिएन्टेसन</string>
 
-    <string name="audio_source_label">ऑडियो स्रोत</string>
-    <string name="audio_quality_label">ऑडियो गुणवत्ता</string>
+    <string name="audio_source_label">अडियो स्रोत</string>
+    <string name="audio_quality_label">अडियो गुणस्तर</string>
     
-    <string name="naming_template_label">आउटपुट टेम्पलेट</string>
+    <string name="naming_template_label">ढाँचा नाम</string>
 
     <string-array name="resolution_options">
-        <item>नेटिव</item>
+        <item>मूल</item>
         <item>4K</item>
         <item>2K</item>
         <item>FHD</item>
@@ -38,22 +38,22 @@
     </string-array>
     
     <string-array name="orientation_options">
-        <item>ऑटो</item>
-        <item>पोर्ट</item>
-        <item>लैंड</item>
+        <item>अटो</item>
+        <item>पोर्ट्रेट</item>
+        <item>ल्याण्डस्केप</item>
     </string-array>
 
     <string-array name="audio_options">
-        <item>बंद</item>
+        <item>बन्द</item>
         <item>माइक</item>
         <item>सिस्टम</item>
         <item>सिस्टम+माइक</item>
     </string-array>
 
     <string-array name="audio_quality_options">
-        <item>निम्न</item>
+        <item>कम</item>
         <item>मध्यम</item>
-        <item>उच्चतम</item>
+        <item>अधिकतम</item>
     </string-array>
 
     <string-array name="bitrate_mode_options">

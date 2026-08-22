@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">РОЗПОЧАТИ ЗАПИС</string>
+    <string name="stop_recording">ЗУПИНИТИ ЗАПИС</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">ІНСТРУКЦІЯ</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">КОД</string>
+    <string name="btn_guide">ІНСТРУКЦІЯ</string>
+    <string name="btn_open_recordings">ОСТАННІЙ\nЗАПИС</string>
+    <string name="floating_controls_label">ПЛАВАЮЧІ КНОПКИ</string>
+    <string name="header_video_subsystem">ПІДСИСТЕМА ВІДЕО</string>
+    <string name="header_audio_subsystem">ПІДСИСТЕМА АУДІО</string>
+
+    <string name="resolution_label">РОЗДІЛЬНА ЗДАТНІСТЬ</string>
+    <string name="bitrate_label">БІТРЕЙТ</string>
+    <string name="fps_label">ЧАСТОТА КАДРІВ (FPS)</string>
+    <string name="video_codec_label">ВІДЕОКОДЕК</string>
+    <string name="bitrate_mode_label">РЕЖИМ БІТРЕЙТУ</string>
+    <string name="orientation_label">ОРІЄНТАЦІЯ</string>
+
+    <string name="audio_source_label">ДЖЕРЕЛО ЗВУКУ</string>
+    <string name="audio_quality_label">ЯКІСТЬ ЗВУКУ</string>
+    
+    <string name="naming_template_label">ШАБЛОН НАЗВИ</string>
+
+    <string-array name="resolution_options">
+        <item>РІДНА</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>АВТО</item>
+        <item>ПОРТРЕТ</item>
+        <item>АЛЬБОМ</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>ВИМК</item>
+        <item>МІКР</item>
+        <item>СИСТ</item>
+        <item>СИСТ+МІКР</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>НИЗЬКА</item>
+        <item>СЕРЕДНЯ</item>
+        <item>МАКС</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

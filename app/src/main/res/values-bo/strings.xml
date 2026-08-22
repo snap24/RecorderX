@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">སྒྲ་ཕབ་འགོ་བརྩམས།</string>
+    <string name="stop_recording">སྒྲ་ཕབ་མཚམས་འཇོག</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">ལམ་སྟོན།</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">ཁུངས།</string>
+    <string name="btn_guide">ལམ་སྟོན།</string>
+    <string name="btn_open_recordings">རྗེས་མའི་སྒྲ་ཕབ་ཁེར་འབྱེད།</string>
+    <string name="floating_controls_label">ལྡིང་ཚད་མཐེབ་གནོན།</string>
+    <string name="header_video_subsystem">བརྙན་རིས་ཡན་ལག་མ་ལག</string>
+    <string name="header_audio_subsystem">སྒྲ་དབྱངས་ཡན་ལག་མ་ལག</string>
+
+    <string name="resolution_label">གསལ་ཚད།</string>
+    <string name="bitrate_label">བེ་ཁྱོན།</string>
+    <string name="fps_label">སྐར་ཆའི་གཟུགས་བརྙན། (FPS)</string>
+    <string name="video_codec_label">བརྙན་རིས་སྒྲིག་ཆས།</string>
+    <string name="bitrate_mode_label">བེ་ཁྱོན་ལམ་བུ།</string>
+    <string name="orientation_label">ཕྱོགས་མཚམས།</string>
+
+    <string name="audio_source_label">སྒྲ་དབྱངས་ཁུངས།</string>
+    <string name="audio_quality_label">སྒྲ་དབྱངས་སྤུས་ཚད།</string>
+    
+    <string name="naming_template_label">མིང་གི་དཔེ་བཟོ།</string>
+
+    <string-array name="resolution_options">
+        <item>རྩ་བའི།</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>རང་འགུལ།</item>
+        <item>གཞུང་འཁོར།</item>
+        <item>ཕྲེད་འཁོར།</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>ཁ་བརྒྱབ།</item>
+        <item>མིག</item>
+        <item>མ་ལག</item>
+        <item>མ་ལག+མིག</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>དམའ་བ།</item>
+        <item>འབྲིང་པོ།</item>
+        <item>མཐོ་ཤོས།</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

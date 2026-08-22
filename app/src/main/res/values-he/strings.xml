@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">התחל הקלטה</string>
+    <string name="stop_recording">הפסק הקלטה</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">מדריך</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">קוד מקור</string>
+    <string name="btn_guide">מדריך</string>
+    <string name="btn_open_recordings">פתח הקלטה\nאחרונה</string>
+    <string name="floating_controls_label">פקדים צפים</string>
+    <string name="header_video_subsystem">תת-מערכת וידאו</string>
+    <string name="header_audio_subsystem">תת-מערכת שמע</string>
+
+    <string name="resolution_label">רזולוציה</string>
+    <string name="bitrate_label">קצב סיביות</string>
+    <string name="fps_label">קצב פריימים (FPS)</string>
+    <string name="video_codec_label">מפענח וידאו</string>
+    <string name="bitrate_mode_label">מצב קצב סיביות</string>
+    <string name="orientation_label">כיוון מסך</string>
+
+    <string name="audio_source_label">מקור שמע</string>
+    <string name="audio_quality_label">איכות שמע</string>
+    
+    <string name="naming_template_label">תבנית שם</string>
+
+    <string-array name="resolution_options">
+        <item>מקורי</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>אוטומטי</item>
+        <item>לאורך</item>
+        <item>לרוחב</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>כבוי</item>
+        <item>מיקרופון</item>
+        <item>מערכת</item>
+        <item>מערכת+מיקרופון</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>נמוכה</item>
+        <item>בינונית</item>
+        <item>מקסימלית</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

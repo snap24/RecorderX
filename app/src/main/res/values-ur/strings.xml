@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">ریکارڈنگ شروع کریں</string>
+    <string name="stop_recording">ریکارڈنگ روکیں</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">رہنما</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">سورس</string>
+    <string name="btn_guide">رہنما</string>
+    <string name="btn_open_recordings">آخری ریکارڈنگ\nکھولیں</string>
+    <string name="floating_controls_label">فلوٹنگ کنٹرولز</string>
+    <string name="header_video_subsystem">ویڈیو سب سسٹم</string>
+    <string name="header_audio_subsystem">آڈیو سب سسٹم</string>
+
+    <string name="resolution_label">ریزولیوشن</string>
+    <string name="bitrate_label">بٹ ریٹ</string>
+    <string name="fps_label">فریم ریٹ (FPS)</string>
+    <string name="video_codec_label">ویڈیو کوڈیک</string>
+    <string name="bitrate_mode_label">بٹ ریٹ موڈ</string>
+    <string name="orientation_label">سمت</string>
+
+    <string name="audio_source_label">آڈیو سورس</string>
+    <string name="audio_quality_label">آڈیو کوالٹی</string>
+    
+    <string name="naming_template_label">آؤٹ پٹ ٹیمپلیٹ</string>
+
+    <string-array name="resolution_options">
+        <item>اصلی</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>خودکار</item>
+        <item>عمودی</item>
+        <item>افقی</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>بند</item>
+        <item>مائیک</item>
+        <item>سسٹم</item>
+        <item>سسٹم+مائیک</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>کم</item>
+        <item>درمیانہ</item>
+        <item>زیادہ سے زیادہ</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

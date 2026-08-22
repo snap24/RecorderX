@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">録画開始</string>
+    <string name="stop_recording">録画停止</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">ガイド</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">ソース</string>
+    <string name="btn_guide">ガイド</string>
+    <string name="btn_open_recordings">最新録画を\n開く</string>
+    <string name="floating_controls_label">フローティング操作</string>
+    <string name="header_video_subsystem">ビデオサブシステム</string>
+    <string name="header_audio_subsystem">オーディオサブシステム</string>
+
+    <string name="resolution_label">解像度</string>
+    <string name="bitrate_label">ビットレート</string>
+    <string name="fps_label">フレームレート (FPS)</string>
+    <string name="video_codec_label">ビデオコーデック</string>
+    <string name="bitrate_mode_label">ビットレートモード</string>
+    <string name="orientation_label">画面の向き</string>
+
+    <string name="audio_source_label">音源ソース</string>
+    <string name="audio_quality_label">音質設定</string>
+    
+    <string name="naming_template_label">出力ファイル名テンプレート</string>
+
+    <string-array name="resolution_options">
+        <item>ネイティブ</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>自動</item>
+        <item>縦向き</item>
+        <item>横向き</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>オフ</item>
+        <item>マイク</item>
+        <item>システム</item>
+        <item>システム+マイク</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>低画質</item>
+        <item>中画質</item>
+        <item>最高画質</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

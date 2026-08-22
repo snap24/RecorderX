@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">БИЧЛЭГ ЭХЛҮҮЛЭХ</string>
+    <string name="stop_recording">БИЧЛЭГ ЗОГСООХ</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">ЗААВАР</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">ЭХ СУРВАЛЖ</string>
+    <string name="btn_guide">ЗААВАР</string>
+    <string name="btn_open_recordings">СҮҮЛИЙН БИЧЛЭГ\nНЭЭХ</string>
+    <string name="floating_controls_label">ХӨВӨГЧ ТОВЧЛУУРҮҮД</string>
+    <string name="header_video_subsystem">ВИДЕО ДЭД СИСТЕМ</string>
+    <string name="header_audio_subsystem">АУДИО ДЭД СИСТЕМ</string>
+
+    <string name="resolution_label">НҮҮРНИЙ ПИКСЕЛ</string>
+    <string name="bitrate_label">БИТРЕЙТ</string>
+    <string name="fps_label">КАДРЫН ХУРД (FPS)</string>
+    <string name="video_codec_label">ВИДЕО КОДЕК</string>
+    <string name="bitrate_mode_label">БИТРЕЙТ РЕЖИМ</string>
+    <string name="orientation_label">БАЙРЛАЛ</string>
+
+    <string name="audio_source_label">АУДИО ЭХ СУРВАЛЖ</string>
+    <string name="audio_quality_label">АУДИО ЧАНАР</string>
+    
+    <string name="naming_template_label">НЭРИЙН ЗАНГИЛАА</string>
+
+    <string-array name="resolution_options">
+        <item>АНХНЫ</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>АВТО</item>
+        <item>БОСОО</item>
+        <item>ХЭВТЭЭ</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>ХААХ</item>
+        <item>МИК</item>
+        <item>СИСТЕМ</item>
+        <item>СИСТЕМ+МИК</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>БАГА</item>
+        <item>ДУНД</item>
+        <item>ХАМГИЙН ИХ</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

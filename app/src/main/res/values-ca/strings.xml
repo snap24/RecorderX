@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RecorderX</string>
-    <string name="start_recording">INICIAR GRABACIÓN</string>
-    <string name="stop_recording">DETENER GRABACIÓN</string>
+    <string name="start_recording">INICIA GRAVACIÓ</string>
+    <string name="stop_recording">ATURA GRAVACIÓ</string>
     <string name="settings_title">SYSTEM CONFIGURATION</string>
     
-    <string name="guide_title">GUÍA</string>
+    <string name="guide_title">GUIA</string>
     <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
     <string name="guide_understood">OK</string>
 
-    <string name="btn_view_source">CÓDIGO</string>
-    <string name="btn_guide">GUÍA</string>
-    <string name="btn_open_recordings">ÚLTIMA\nGRABACIÓN</string>
-    <string name="floating_controls_label">CONTROLES FLOTANTES</string>
-    <string name="header_video_subsystem">SUBSISTEMA DE VIDEO</string>
-    <string name="header_audio_subsystem">SUBSISTEMA DE AUDIO</string>
+    <string name="btn_view_source">FONT</string>
+    <string name="btn_guide">GUIA</string>
+    <string name="btn_open_recordings">OBRE ÚLTIMA\nGRAVACIÓ</string>
+    <string name="floating_controls_label">CONTROLS FLOTANTS</string>
+    <string name="header_video_subsystem">SUBSISTEMA DE VÍDEO</string>
+    <string name="header_audio_subsystem">SUBSISTEMA D\'ÀUDIO</string>
 
-    <string name="resolution_label">RESOLUCIÓN</string>
-    <string name="bitrate_label">TASA DE BITS</string>
-    <string name="fps_label">FOTOGRAMAS (FPS)</string>
-    <string name="video_codec_label">CÓDEC DE VIDEO</string>
-    <string name="bitrate_mode_label">MODO DE BITS</string>
-    <string name="orientation_label">ORIENTACIÓN</string>
+    <string name="resolution_label">RESOLUCIÓ</string>
+    <string name="bitrate_label">TAXA DE BITS</string>
+    <string name="fps_label">FOTOGRAMES PER SEGON (FPS)</string>
+    <string name="video_codec_label">CÒDEC DE VÍDEO</string>
+    <string name="bitrate_mode_label">MODE DE BITS</string>
+    <string name="orientation_label">ORIENTACIÓ</string>
 
-    <string name="audio_source_label">FUENTE DE AUDIO</string>
-    <string name="audio_quality_label">CALIDAD DE AUDIO</string>
+    <string name="audio_source_label">FONT D\'ÀUDIO</string>
+    <string name="audio_quality_label">QUALITAT D\'ÀUDIO</string>
     
-    <string name="naming_template_label">PLANTILLA DE NOMBRE</string>
+    <string name="naming_template_label">PLANTILLA DE NOM</string>
 
     <string-array name="resolution_options">
         <item>NATIVA</item>
@@ -44,16 +44,16 @@
     </string-array>
 
     <string-array name="audio_options">
-        <item>APAGADO</item>
+        <item>APAGAT</item>
         <item>MIC</item>
         <item>SIS</item>
         <item>SIS+MIC</item>
     </string-array>
 
     <string-array name="audio_quality_options">
-        <item>BAJA</item>
-        <item>MEDIA</item>
-        <item>MÁX</item>
+        <item>BAIXA</item>
+        <item>MITJANA</item>
+        <item>MÀX</item>
     </string-array>
 
     <string-array name="bitrate_mode_options">

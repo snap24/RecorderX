@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">ចាប់ផ្តើមថត</string>
+    <string name="stop_recording">បញ្ឈប់ការថត</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">មគ្គុទ្ទេសក៍</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">ប្រភព</string>
+    <string name="btn_guide">មគ្គុទ្ទេសក៍</string>
+    <string name="btn_open_recordings">បើកការថតចុងក្រោយ</string>
+    <string name="floating_controls_label">ប៊ូតុងអណ្តែត</string>
+    <string name="header_video_subsystem">ប្រព័ន្ធរងវីដេអូ</string>
+    <string name="header_audio_subsystem">ប្រព័ន្ធរងសំឡេង</string>
+
+    <string name="resolution_label">កម្រិតច្បាស់</string>
+    <string name="bitrate_label">ប៊ីត្រែត</string>
+    <string name="fps_label">ល្បឿនហ្វ្រែម (FPS)</string>
+    <string name="video_codec_label">កូដិកវីដេអូ</string>
+    <string name="bitrate_mode_label">ម៉ូដប៊ីត្រែត</string>
+    <string name="orientation_label">ទិសដៅអេក្រង់</string>
+
+    <string name="audio_source_label">ប្រភពសំឡេង</string>
+    <string name="audio_quality_label">គុណភាពសំឡេង</string>
+    
+    <string name="naming_template_label">ទម្រង់ឈ្មោះ</string>
+
+    <string-array name="resolution_options">
+        <item>ដើម</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>ស្វ័យប្រវត្តិ</item>
+        <item>បញ្ឈរ</item>
+        <item>ផ្ដេក</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>បិទ</item>
+        <item>ម៉ៃ</item>
+        <item>ប្រព័ន្ធ</item>
+        <item>ប្រព័ន្ធ+ម៉ៃ</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>ទាប</item>
+        <item>មធ្យម</item>
+        <item>អតិបរមា</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">రికార్డింగ్ ప్రారంభించు</string>
+    <string name="stop_recording">రికార్డింగ్ ఆపు</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">గైడ్</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">మూలం</string>
+    <string name="btn_guide">గైడ్</string>
+    <string name="btn_open_recordings">చివరి రికార్డింగ్\nఓపెన్ చేయి</string>
+    <string name="floating_controls_label">ఫ్లోటింగ్ బటన్లు</string>
+    <string name="header_video_subsystem">వీడియో సబ్‌సిస్టమ్</string>
+    <string name="header_audio_subsystem">ఆడియో సబ్‌సిస్టమ్</string>
+
+    <string name="resolution_label">రిజల్యూషన్</string>
+    <string name="bitrate_label">బిట్‌రేట్</string>
+    <string name="fps_label">ఫ్రేమ్ రేట్ (FPS)</string>
+    <string name="video_codec_label">వీడియో కోడెక్</string>
+    <string name="bitrate_mode_label">బిట్‌రేట్ మోడ్</string>
+    <string name="orientation_label">స్క్రీన్ దిశ</string>
+
+    <string name="audio_source_label">ఆడియో మూలం</string>
+    <string name="audio_quality_label">ఆడియో నాణ్యత</string>
+    
+    <string name="naming_template_label">అవుట్‌పుట్ టెంప్లేట్</string>
+
+    <string-array name="resolution_options">
+        <item>నేటివ్</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>ఆటో</item>
+        <item>పోర్ట్రెయిట్</item>
+        <item>ల్యాండ్‌స్కేప్</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>ఆఫ్</item>
+        <item>మైక్</item>
+        <item>సిస్టమ్</item>
+        <item>సిస్టమ్+మైక్</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>తక్కువ</item>
+        <item>మధ్యస్థం</item>
+        <item>గరిష్టం</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

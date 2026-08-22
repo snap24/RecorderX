@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">ОҒОЗИ НАВИШТАН</string>
+    <string name="stop_recording">КАТЪИ НАВИШТАН</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">РАҲНАМО</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">САРЧАШМА</string>
+    <string name="btn_guide">РАҲНАМО</string>
+    <string name="btn_open_recordings">КУШОДАНИ НАВИШТИ\nОХИРИН</string>
+    <string name="floating_controls_label">ТУГМАҲОИ СУЗОН</string>
+    <string name="header_video_subsystem">ЗЕРСИСТЕМАИ ВИДЕО</string>
+    <string name="header_audio_subsystem">ЗЕРСИСТЕМАИ АУДИО</string>
+
+    <string name="resolution_label">КАФОЛАТИ РАСМ</string>
+    <string name="bitrate_label">БИТРЕЙТ</string>
+    <string name="fps_label">СУРЪАТИ КАДР (FPS)</string>
+    <string name="video_codec_label">ВИДЕО КОДЕК</string>
+    <string name="bitrate_mode_label">РЕЖИМИ БИТРЕЙТ</string>
+    <string name="orientation_label">МУВАФИҚАТ</string>
+
+    <string name="audio_source_label">САРЧАШМАИ САТО</string>
+    <string name="audio_quality_label">СИФАТИ САДО</string>
+    
+    <string name="naming_template_label">ШАБЛОНИ НОМ</string>
+
+    <string-array name="resolution_options">
+        <item>АСЛӢ</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>АВТО</item>
+        <item>ТИРӢ</item>
+        <item>ХАБАРӢ</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>ХОМӮШ</item>
+        <item>МИКР</item>
+        <item>СИСТЕМА</item>
+        <item>СИС+МИКР</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>ПАСТ</item>
+        <item>МИЁНА</item>
+        <item>МАКС</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

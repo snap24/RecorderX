@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">ರೆಕಾರ್ಡಿಂಗ್ ಪ್ರಾರಂಭಿಸಿ</string>
+    <string name="stop_recording">ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ</string>
+    <string name="settings_title">SYSTEM CONFIGURATION</string>
+    
+    <string name="guide_title">ಮಾರ್ಗದರ್ಶಿ</string>
+    <string name="guide_message">• CODEC: H.264 (Compatible), H.265 (Efficient), AV1 (Next-Gen quality).\n\n• ORIENTATION: Lock video to Auto, Portrait, or Landscape aspect ratios.\n\n• RESOLUTION: NATIVE uses screen size; 4K/2K/FHD set exact pixel dimensions.\n\n• FRAME RATE: 24-60 (Standard), 90-120 (Ultra smooth for gaming).\n\n• BITRATE: Higher Mbps means sharper details but larger file sizes.\n\n• BITRATE MODE: VBR saves space; CBR maintains constant high quality.\n\n• AUDIO SOURCE: Silence, Microphone, System Internal, or MIX (Sys+Mic).\n\n• AUDIO QUALITY: Adjust sample rate and bitrate for audio fidelity.</string>
+    <string name="guide_understood">OK</string>
+
+    <string name="btn_view_source">ಮೂಲ</string>
+    <string name="btn_guide">ಮಾರ್ಗದರ್ಶಿ</string>
+    <string name="btn_open_recordings">ಕೊನೆಯ ರೆಕಾರ್ಡಿಂಗ್\nతెರೆಯಿರಿ</string>
+    <string name="floating_controls_label">ಫ್ಲೋಟಿಂಗ್ ಬಟನ್‌ಗಳು</string>
+    <string name="header_video_subsystem">ವೀಡಿಯೊ ಸಬ್‌ಸಿಸ್ಟಮ್</string>
+    <string name="header_audio_subsystem">ಆಡಿಯೊ ಸಬ್‌ಸಿಸ್ಟಮ್</string>
+
+    <string name="resolution_label">ರೆಸಲ್ಯೂಶನ್</string>
+    <string name="bitrate_label">ಬಿಟ್‌ರೇಟ್</string>
+    <string name="fps_label">ಫ್ರೇಮ್ ದರ (FPS)</string>
+    <string name="video_codec_label">ವೀಡಿಯೊ ಕೋಡೆಕ್</string>
+    <string name="bitrate_mode_label">ಬಿಟ್‌ರೇಟ್ ಮೋಡ್</string>
+    <string name="orientation_label">ದಿಕ್ಕು</string>
+
+    <string name="audio_source_label">ಆಡಿಯೊ ಮೂಲ</string>
+    <string name="audio_quality_label">ಆಡಿಯೊ ಗುಣಮಟ್ಟ</string>
+    
+    <string name="naming_template_label">ಔಟ್‌ಪುಟ್ ಟೆಂಪ್ಲೇಟ್</string>
+
+    <string-array name="resolution_options">
+        <item>ಮೂಲ</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>ಆಟೋ</item>
+        <item>ಲಂಬ</item>
+        <item>షిಫ್ಟ್</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>ಆಫ್</item>
+        <item>ಮೈಕ್</item>
+        <item>ಸಿಸ್ಟಮ್</item>
+        <item>ಸಿಸ್ಟಮ್+ಮೈಕ್</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>ಕಡಿಮೆ</item>
+        <item>ಮಧ್ಯಮ</item>
+        <item>ಗರಿಷ್ಠ</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Saved automatically.</string>
+</resources>

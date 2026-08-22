@@ -43,6 +43,36 @@ public class RecorderService extends Service {
     private RecordingSession recordingSession;
     private FloatingController floatingController;
     private boolean isBubbleHidden = false;
+    private android.os.PowerManager.WakeLock wakeLock;
+
+    private void acquireWakeLock() {
+        if (wakeLock == null) {
+            try {
+                android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
+                if (pm != null) {
+                    wakeLock = pm.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK | android.os.PowerManager.ON_AFTER_RELEASE, "RecorderX:RecordingWakeLock");
+                    wakeLock.acquire(10 * 60 * 60 * 1000L);
+                    Log.d(TAG, "WakeLock acquired successfully.");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to acquire WakeLock", e);
+            }
+        }
+    }
+
+    private void releaseWakeLock() {
+        if (wakeLock != null) {
+            try {
+                if (wakeLock.isHeld()) {
+                    wakeLock.release();
+                    Log.d(TAG, "WakeLock released.");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to release WakeLock", e);
+            }
+            wakeLock = null;
+        }
+    }
 
     public interface RecordingStateListener {
         void onStateChanged(boolean isRecording);
@@ -167,6 +197,7 @@ public class RecorderService extends Service {
             });
             try {
                 recordingSession.start();
+                acquireWakeLock();
                 isRecording = true;
                 notifyStateChanged();
 
@@ -216,6 +247,7 @@ public class RecorderService extends Service {
 
         isRecording = false;
         notifyStateChanged();
+        releaseWakeLock();
         stopForeground(true);
         stopSelf();
     }
@@ -552,6 +584,7 @@ public class RecorderService extends Service {
             isRecording = false;
             notifyStateChanged();
         }
+        releaseWakeLock();
         super.onDestroy();
     }
 

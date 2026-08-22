@@ -353,6 +353,45 @@ public class MainActivity extends AppCompatActivity {
         int savedColorIndex = themePrefs.getInt("accent_color_index", 1);
         applyAccentColor(ACCENT_COLORS[savedColorIndex]);
 
+        // Localize option tick labels dynamically from string arrays
+        String[] orientOpts = getResources().getStringArray(R.array.orientation_options);
+        if (orientOpts.length >= 3) {
+            ((android.widget.TextView) findViewById(R.id.o1)).setText(orientOpts[0]);
+            ((android.widget.TextView) findViewById(R.id.o2)).setText(orientOpts[1]);
+            ((android.widget.TextView) findViewById(R.id.o3)).setText(orientOpts[2]);
+        }
+
+        String[] resOpts = getResources().getStringArray(R.array.resolution_options);
+        if (resOpts.length >= 6) {
+            ((android.widget.TextView) findViewById(R.id.r1)).setText(resOpts[0]);
+            ((android.widget.TextView) findViewById(R.id.r2)).setText(resOpts[1]);
+            ((android.widget.TextView) findViewById(R.id.r3)).setText(resOpts[2]);
+            ((android.widget.TextView) findViewById(R.id.r4)).setText(resOpts[3]);
+            ((android.widget.TextView) findViewById(R.id.r5)).setText(resOpts[4]);
+            ((android.widget.TextView) findViewById(R.id.r6)).setText(resOpts[5]);
+        }
+
+        String[] audioOpts = getResources().getStringArray(R.array.audio_options);
+        if (audioOpts.length >= 4) {
+            ((android.widget.TextView) findViewById(R.id.a1)).setText(audioOpts[0]);
+            ((android.widget.TextView) findViewById(R.id.a2)).setText(audioOpts[1]);
+            ((android.widget.TextView) findViewById(R.id.a3)).setText(audioOpts[2]);
+            ((android.widget.TextView) findViewById(R.id.a4)).setText(audioOpts[3]);
+        }
+
+        String[] qualityOpts = getResources().getStringArray(R.array.audio_quality_options);
+        if (qualityOpts.length >= 3) {
+            ((android.widget.TextView) findViewById(R.id.q1)).setText(qualityOpts[0]);
+            ((android.widget.TextView) findViewById(R.id.q2)).setText(qualityOpts[1]);
+            ((android.widget.TextView) findViewById(R.id.q3)).setText(qualityOpts[2]);
+        }
+
+        String[] bitrateModeOpts = getResources().getStringArray(R.array.bitrate_mode_options);
+        if (bitrateModeOpts.length >= 2) {
+            ((android.widget.TextView) findViewById(R.id.m1)).setText(bitrateModeOpts[0]);
+            ((android.widget.TextView) findViewById(R.id.m2)).setText(bitrateModeOpts[1]);
+        }
+
         // Video Settings
         Slider codecSlider = findViewById(R.id.codecSlider);
         String[] codecOptions = getResources().getStringArray(R.array.codec_options);

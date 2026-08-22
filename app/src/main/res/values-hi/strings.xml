@@ -27,6 +27,40 @@
     <string name="audio_quality_label">ऑडियो गुणवत्ता</string>
     
     <string name="naming_template_label">आउटपुट टेम्पलेट</string>
+
+    <string-array name="resolution_options">
+        <item>नेटिव</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>ऑटो</item>
+        <item>पोर्ट</item>
+        <item>लैंड</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>बंद</item>
+        <item>माइक</item>
+        <item>सिस्टम</item>
+        <item>सिस्टम+माइक</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>निम्न</item>
+        <item>मध्यम</item>
+        <item>उच्चतम</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
     <string name="qs_label">RecorderX</string>
     <string name="info_text">उन्नत सेटिंग्स स्वचालित रूप से सहेजी जाती हैं।</string>
 </resources>

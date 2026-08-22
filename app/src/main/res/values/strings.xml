@@ -34,7 +34,7 @@
         <item>2K</item>
         <item>FHD</item>
         <item>HD</item>
-        <item>SD</item>
+        <item>480</item>
     </string-array>
     
     <string-array name="bitrate_options">
@@ -80,8 +80,8 @@
 
     <string-array name="audio_quality_options">
         <item>LOW</item>
-        <item>HIGH</item>
-        <item>EX</item>
+        <item>MID</item>
+        <item>MAX</item>
     </string-array>
 
     <string name="qs_label">RecorderX</string>

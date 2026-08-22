@@ -27,6 +27,40 @@
     <string name="audio_quality_label">CALIDAD DE AUDIO</string>
     
     <string name="naming_template_label">PLANTILLA DE NOMBRE</string>
+
+    <string-array name="resolution_options">
+        <item>NATIVA</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>AUTO</item>
+        <item>VERT</item>
+        <item>HORIZ</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>APAGADO</item>
+        <item>MIC</item>
+        <item>SIS</item>
+        <item>SIS+MIC</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>BAJA</item>
+        <item>MEDIA</item>
+        <item>MÁX</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
     <string name="qs_label">RecorderX</string>
     <string name="info_text">Los ajustes avanzados se guardan automáticamente.</string>
 </resources>

@@ -27,6 +27,40 @@
     <string name="audio_quality_label">音质设定</string>
     
     <string name="naming_template_label">文件名模板</string>
+
+    <string-array name="resolution_options">
+        <item>原生</item>
+        <item>4K</item>
+        <item>2K</item>
+        <item>FHD</item>
+        <item>HD</item>
+        <item>480</item>
+    </string-array>
+    
+    <string-array name="orientation_options">
+        <item>自动</item>
+        <item>竖屏</item>
+        <item>横屏</item>
+    </string-array>
+
+    <string-array name="audio_options">
+        <item>关闭</item>
+        <item>麦克风</item>
+        <item>系统音</item>
+        <item>混合录制</item>
+    </string-array>
+
+    <string-array name="audio_quality_options">
+        <item>低质</item>
+        <item>中等</item>
+        <item>极高</item>
+    </string-array>
+
+    <string-array name="bitrate_mode_options">
+        <item>VBR</item>
+        <item>CBR</item>
+    </string-array>
+
     <string name="qs_label">RecorderX</string>
     <string name="info_text">高级设置会自动保存。</string>
 </resources>

@@ -17,7 +17,7 @@
 
 - v3.1.0 (Latest):
   - 80 Global Languages System: Native multi-language support across 80 locales with a searchable language selection dialog.
-  - Background Process & Memory Optimization: Resolved background process lingering by implementing smart RAM cleanup when removed from Recents.
+  - Background Process & Memory Optimization: Resolved background process lingering by implementing RAM cleanup when removed from Recents.
   - Display Keep-Awake Engine: Ensured display remains active and awake during recording sessions to prevent screen timeout.
   - Optimized Bitrate Thresholds: Capped maximum bitrate to a practical 18 Mbps threshold for improved high-frame-rate hardware encoding stability.
   - General Bug Fixes & Stability: Resolved potential memory leaks and improved native MediaCodec surface release handling.

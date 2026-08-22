@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">开始录屏</string>
+    <string name="stop_recording">停止录屏</string>
+    <string name="settings_title">系统参数配置</string>
+    
+    <string name="guide_title">录屏指南</string>
+    <string name="guide_message">• 编解码器：H.264 (高兼容), H.265 (高效压缩), AV1 (下一代画质)。\n\n• 屏幕方向：自动、竖屏或横屏。\n\n• 分辨率：原生屏幕尺寸、4K、2K、FHD、HD、SD。\n\n• 帧率：24-60 FPS (标准), 90-120 FPS (游戏极致流畅)。\n\n• 码率：越高画面越清晰，文件相应增大。\n\n• 音频源：静音、麦克风、系统内录或混合录制。</string>
+    <string name="guide_understood">我知道了</string>
+
+    <string name="resolution_label">分辨率</string>
+    <string name="bitrate_label">比特率 (码率)</string>
+    <string name="fps_label">帧率 (FPS)</string>
+    <string name="video_codec_label">视频编解码器</string>
+    <string name="bitrate_mode_label">码率模式</string>
+    <string name="orientation_label">屏幕方向</string>
+
+    <string name="audio_source_label">音频来源</string>
+    <string name="audio_quality_label">音质设定</string>
+    
+    <string name="naming_template_label">文件名模板</string>
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">高级设置会自动保存。</string>
+</resources>

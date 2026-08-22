@@ -211,7 +211,46 @@
             android:paddingTop="8dp"
             android:paddingBottom="24dp">
 
-            <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchFloatingControl" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="FLOATING BUBBLE CONTROLS" android:textColor="@color/text_primary" android:textSize="12sp" android:textStyle="bold" app:thumbTint="@color/text_primary" app:trackTint="@color/accent_lavender" android:layout_marginTop="0dp" android:layout_marginBottom="16dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLanguage"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="🌐 LANG"
+                    android:textColor="@color/text_primary"
+                    android:textSize="10sp"
+                    android:fontFamily="sans-serif-black"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:strokeColor="@color/accent_lavender"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="6dp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchFloatingControl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BUBBLE CONTROLS"
+                    android:textColor="@color/text_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:thumbTint="@color/text_primary"
+                    app:trackTint="@color/accent_lavender" />
+            </LinearLayout>
 
             <TextView android:id="@+id/headerVideoSubsystem" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="VIDEO SUBSYSTEM" android:fontFamily="sans-serif-black" android:textSize="11sp" android:textColor="@color/accent_lavender" android:letterSpacing="0.2" android:layout_marginBottom="24dp"/>
 

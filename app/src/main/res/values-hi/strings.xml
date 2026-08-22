@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">रिकॉर्डिंग शुरू करें</string>
+    <string name="stop_recording">रिकॉर्डिंग बंद करें</string>
+    <string name="settings_title">सिस्टम कॉन्फ़िगरेशन</string>
+    
+    <string name="guide_title">रिकॉर्डर गाइड</string>
+    <string name="guide_message">• कोडेक: H.264 (संगत), H.265 (कुशल), AV1 (अग्रिम गुणवत्ता)।\n\n• ओरिएंटेशन: ऑटो, पोर्ट्रेट या लैंडस्केप मोड्स।\n\n• रिज़ॉल्यूशन: नेटिव, 4K, 2K, FHD, HD, SD।\n\n• फ्रेम रेट: 24-60 FPS (मानक), 90-120 FPS (गेमिंग के लिए अत्यंत स्मूथ)।\n\n• बिटरेट: उच्च Mbps का अर्थ अधिक स्पष्टता।\n\n• ऑडियो स्रोत: मूक, माइक्रोफोन, आंतरिक या मिक्स (सिस्टम+माइक)।</string>
+    <string name="guide_understood">समझ गया</string>
+
+    <string name="resolution_label">रिज़ॉल्यूशन</string>
+    <string name="bitrate_label">बिटरेट</string>
+    <string name="fps_label">फ्रेम रेट (FPS)</string>
+    <string name="video_codec_label">वीडियो कोडेक</string>
+    <string name="bitrate_mode_label">बिटरेट मोड</string>
+    <string name="orientation_label">ओरिएंटेशन</string>
+
+    <string name="audio_source_label">ऑडियो स्रोत</string>
+    <string name="audio_quality_label">ऑडियो गुणवत्ता</string>
+    
+    <string name="naming_template_label">आउटपुट नाम टेम्पलेट</string>
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">उन्नत सेटिंग्स स्वचालित रूप से सहेजी जाती हैं।</string>
+</resources>

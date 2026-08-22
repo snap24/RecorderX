@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RecorderX</string>
+    <string name="start_recording">INICIAR GRABACIÓN</string>
+    <string name="stop_recording">DETENER GRABACIÓN</string>
+    <string name="settings_title">CONFIGURACIÓN DEL SISTEMA</string>
+    
+    <string name="guide_title">GUÍA DE GRABACIÓN</string>
+    <string name="guide_message">• CÓDEC: H.264 (Compatible), H.265 (Eficiente), AV1 (Siguiente generación).\n\n• ORIENTACIÓN: Automática, Vertical u Horizontal.\n\n• RESOLUCIÓN: NATIVA (pantalla completa), 4K, 2K, FHD, HD, SD.\n\n• TASA DE FOTOGRAMAS: 24-60 (Estándar), 90-120 (Ultra fluido para juegos).\n\n• TASA DE BITS: Mayor Mbps significa más detalle.\n\n• MODO DE BITS: VBR ahorra espacio; CBR mantiene alta calidad constante.\n\n• FUENTE DE AUDIO: Silencio, Micrófono, Sistema o MIXTO (Sistema+Micrófono).</string>
+    <string name="guide_understood">ENTENDIDO</string>
+
+    <string name="resolution_label">RESOLUCIÓN</string>
+    <string name="bitrate_label">TASA DE BITS</string>
+    <string name="fps_label">FOTOGRAMAS (FPS)</string>
+    <string name="video_codec_label">CÓDEC DE VIDEO</string>
+    <string name="bitrate_mode_label">MODO DE BITS</string>
+    <string name="orientation_label">ORIENTACIÓN</string>
+
+    <string name="audio_source_label">FUENTE DE AUDIO</string>
+    <string name="audio_quality_label">CALIDAD DE AUDIO</string>
+    
+    <string name="naming_template_label">PLANTILLA DE NOMBRE</string>
+    <string name="qs_label">RecorderX</string>
+    <string name="info_text">Los ajustes avanzados se guardan automáticamente.</string>
+</resources>

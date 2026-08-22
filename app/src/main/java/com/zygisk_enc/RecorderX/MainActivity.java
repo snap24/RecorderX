@@ -58,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(LocaleManager.updateResources(newBase));
+    }
+
+    @Override
     protected void onDestroy() {
         RecorderService.unregisterStateListener(recordingStateListener);
         super.onDestroy();
@@ -201,6 +206,8 @@ public class MainActivity extends AppCompatActivity {
             }
             recreate();
         });
+
+        findViewById(R.id.btnLanguage).setOnClickListener(v -> showLanguageSelectionDialog());
 
         findViewById(R.id.btnGuide).setOnClickListener(v -> {
             android.app.Dialog dialog = new android.app.Dialog(this);
@@ -972,6 +979,125 @@ public class MainActivity extends AppCompatActivity {
             warningDialog.getWindow().setAttributes(lp);
         }
         warningDialog.show();
+    }
+
+    private void showLanguageSelectionDialog() {
+        android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int pad = (int) (20 * getResources().getDisplayMetrics().density);
+        layout.setPadding(pad, pad, pad, pad);
+
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(getResources().getColor(R.color.bg_main, getTheme()));
+        bg.setCornerRadius(12 * getResources().getDisplayMetrics().density);
+        bg.setStroke((int) (2 * getResources().getDisplayMetrics().density), getActiveAccentColor());
+        layout.setBackground(bg);
+
+        // Header Title
+        android.widget.TextView tvTitle = new android.widget.TextView(this);
+        tvTitle.setText("🌐  SELECT LANGUAGE (80)");
+        tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+        tvTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(getActiveAccentColor());
+        android.widget.LinearLayout.LayoutParams titleParams = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        titleParams.bottomMargin = (int) (12 * getResources().getDisplayMetrics().density);
+        layout.addView(tvTitle, titleParams);
+
+        // Search Input
+        android.widget.EditText searchEdit = new android.widget.EditText(this);
+        searchEdit.setHint("Search language...");
+        searchEdit.setHintTextColor(getResources().getColor(R.color.text_secondary, getTheme()));
+        searchEdit.setTextColor(getResources().getColor(R.color.text_primary, getTheme()));
+        searchEdit.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
+        searchEdit.setPadding((int)(12*getResources().getDisplayMetrics().density), (int)(10*getResources().getDisplayMetrics().density), (int)(12*getResources().getDisplayMetrics().density), (int)(10*getResources().getDisplayMetrics().density));
+        android.graphics.drawable.GradientDrawable inputBg = new android.graphics.drawable.GradientDrawable();
+        inputBg.setColor(getResources().getColor(R.color.bg_main, getTheme()));
+        inputBg.setCornerRadius(6 * getResources().getDisplayMetrics().density);
+        inputBg.setStroke((int)(1 * getResources().getDisplayMetrics().density), getResources().getColor(R.color.slider_track_inactive, getTheme()));
+        searchEdit.setBackground(inputBg);
+        android.widget.LinearLayout.LayoutParams searchParams = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        searchParams.bottomMargin = (int) (12 * getResources().getDisplayMetrics().density);
+        layout.addView(searchEdit, searchParams);
+
+        // Scrollable Language Container
+        android.widget.ScrollView scrollView = new android.widget.ScrollView(this);
+        android.widget.LinearLayout listContainer = new android.widget.LinearLayout(this);
+        listContainer.setOrientation(android.widget.LinearLayout.VERTICAL);
+
+        java.util.List<LocaleManager.LanguageItem> languages = LocaleManager.getSupportedLanguages();
+        String currentCode = getSharedPreferences("ui_prefs", MODE_PRIVATE).getString(LocaleManager.PREF_SELECTED_LANG, "sys");
+
+        Runnable populateList = new Runnable() {
+            @Override
+            public void run() {
+                listContainer.removeAllViews();
+                String query = searchEdit.getText().toString().toLowerCase().trim();
+                for (LocaleManager.LanguageItem lang : languages) {
+                    if (!query.isEmpty() && !lang.getDisplayName().toLowerCase().contains(query)) {
+                        continue;
+                    }
+                    android.widget.TextView tvLang = new android.widget.TextView(MainActivity.this);
+                    tvLang.setText(lang.getDisplayName());
+                    tvLang.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
+                    tvLang.setPadding((int)(12*getResources().getDisplayMetrics().density), (int)(12*getResources().getDisplayMetrics().density), (int)(12*getResources().getDisplayMetrics().density), (int)(12*getResources().getDisplayMetrics().density));
+                    
+                    boolean isSelected = lang.code.equals(currentCode);
+                    if (isSelected) {
+                        tvLang.setTextColor(getActiveAccentColor());
+                        tvLang.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+                    } else {
+                        tvLang.setTextColor(getResources().getColor(R.color.text_primary, getTheme()));
+                    }
+
+                    tvLang.setOnClickListener(v -> {
+                        getSharedPreferences("ui_prefs", MODE_PRIVATE)
+                                .edit()
+                                .putString(LocaleManager.PREF_SELECTED_LANG, lang.code)
+                                .apply();
+                        dialog.dismiss();
+                        recreate();
+                    });
+                    listContainer.addView(tvLang);
+                }
+            }
+        };
+
+        populateList.run();
+
+        searchEdit.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { populateList.run(); }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
+
+        scrollView.addView(listContainer);
+        android.widget.LinearLayout.LayoutParams scrollParams = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                (int) (320 * getResources().getDisplayMetrics().density));
+        layout.addView(scrollView, scrollParams);
+
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        int margin = (int) (16 * getResources().getDisplayMetrics().density);
+        container.setPadding(margin, margin, margin, margin);
+        container.addView(layout);
+
+        dialog.setContentView(container);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = android.view.WindowManager.LayoutParams.WRAP_CONTENT;
+            dialog.getWindow().setAttributes(lp);
+        }
+        dialog.show();
     }
 
     interface OnSelectionChanged {

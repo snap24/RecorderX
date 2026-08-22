@@ -223,7 +223,7 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="34dp"
-                    android:text="🌐 LANG"
+                    android:text="🌐 LANGUAGE"
                     android:textColor="@color/text_primary"
                     android:textSize="10sp"
                     android:fontFamily="sans-serif-black"

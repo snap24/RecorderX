@@ -27,6 +27,14 @@ public class RecorderAccessibilityService extends AccessibilityService {
     }
 
     @Override
+    public boolean onUnbind(android.content.Intent intent) {
+        if (instance == this) {
+            instance = null;
+        }
+        return super.onUnbind(intent);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (instance == this) {

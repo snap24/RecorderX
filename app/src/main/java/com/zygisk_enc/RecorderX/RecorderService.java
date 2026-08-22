@@ -589,6 +589,17 @@ public class RecorderService extends Service {
         super.onDestroy();
     }
 
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        Log.d(TAG, "onTaskRemoved: Task removed from Recents.");
+        if (!isRecording) {
+            Log.i(TAG, "onTaskRemoved: Not recording, stopping service and clearing RAM.");
+            stopForeground(true);
+            stopSelf();
+        }
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) { return null; }

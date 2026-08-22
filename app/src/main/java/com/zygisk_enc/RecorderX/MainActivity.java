@@ -1148,6 +1148,14 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= TRIM_MEMORY_UI_HIDDEN) {
+            System.gc();
+        }
+    }
+
     interface OnSelectionChanged {
         void onChanged(int index);
     }

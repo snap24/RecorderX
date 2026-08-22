@@ -251,6 +251,16 @@ public class RecorderService extends Service {
         releaseWakeLock();
         stopForeground(true);
         stopSelf();
+
+        if (!MainActivity.isActivityVisible()) {
+            Log.i(TAG, "stopRecording: MainActivity is not active. Scheduling process termination...");
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (!isRecording && !MainActivity.isActivityVisible()) {
+                    Log.i(TAG, "Terminating process cleanly since UI is closed.");
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+            }, 600);
+        }
     }
 
     public boolean isPaused() {

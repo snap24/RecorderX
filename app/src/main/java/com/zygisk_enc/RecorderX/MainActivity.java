@@ -793,6 +793,12 @@ public class MainActivity extends AppCompatActivity {
         if (switchFloating != null) {
             switchFloating.setTrackTintList(android.content.res.ColorStateList.valueOf(color));
         }
+
+        // 5b. Language Button Border
+        com.google.android.material.button.MaterialButton btnLanguage = findViewById(R.id.btnLanguage);
+        if (btnLanguage != null) {
+            btnLanguage.setStrokeColor(android.content.res.ColorStateList.valueOf(color));
+        }
         
         // 6. TextInputLayout
         com.google.android.material.textfield.TextInputLayout layoutTemplate = findViewById(R.id.namingTemplateLayout);

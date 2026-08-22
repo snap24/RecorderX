@@ -1043,7 +1043,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Header Title
         android.widget.TextView tvTitle = new android.widget.TextView(this);
-        tvTitle.setText("🌐  SELECT LANGUAGE (80)");
+        tvTitle.setText("SELECT LANGUAGE (80)");
         tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
         tvTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
         tvTitle.setTextColor(getActiveAccentColor());

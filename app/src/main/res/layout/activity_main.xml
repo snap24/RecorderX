@@ -120,7 +120,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SOURCE"
+                android:text="@string/btn_view_source"
                 android:textColor="@color/text_secondary"
                 android:textSize="9sp"
                 android:fontFamily="sans-serif-black"
@@ -146,7 +146,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="GUIDE"
+                android:text="@string/btn_guide"
                 android:textColor="@color/text_secondary"
                 android:textSize="9sp"
                 android:fontFamily="sans-serif-black"
@@ -172,7 +172,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="OPEN LAST\nRECORDING"
+                android:text="@string/btn_open_recordings"
                 android:textColor="@color/text_secondary"
                 android:textSize="9sp"
                 android:fontFamily="sans-serif-black"
@@ -250,10 +250,10 @@
                     app:trackTint="@color/accent_lavender" />
             </LinearLayout>
 
-            <TextView android:id="@+id/headerVideoSubsystem" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="VIDEO SUBSYSTEM" android:fontFamily="sans-serif-black" android:textSize="11sp" android:textColor="@color/accent_lavender" android:letterSpacing="0.2" android:layout_marginBottom="24dp"/>
+            <TextView android:id="@+id/headerVideoSubsystem" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/header_video_subsystem" android:fontFamily="sans-serif-black" android:textSize="11sp" android:textColor="@color/accent_lavender" android:letterSpacing="0.2" android:layout_marginBottom="24dp"/>
 
             <!-- Video Codec -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="VIDEO CODEC" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/video_codec_label" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
             <com.google.android.material.slider.Slider android:id="@+id/codecSlider" android:layout_width="match_parent" android:layout_height="wrap_content" android:valueFrom="0" android:valueTo="2" android:stepSize="1" app:trackHeight="32dp" app:thumbRadius="10dp" app:thumbColor="@color/text_primary" app:trackColorActive="@color/accent_lavender" app:trackColorInactive="@color/slider_track_inactive" android:layout_marginBottom="4dp"/>
             <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:layout_marginBottom="32dp">
                 <TextView android:id="@+id/c1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="H.264" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
@@ -263,7 +263,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Orientation -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ORIENTATION" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/orientation_label" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
             <com.google.android.material.slider.Slider android:id="@+id/orientationSlider" android:layout_width="match_parent" android:layout_height="wrap_content" android:valueFrom="0" android:valueTo="2" android:stepSize="1" app:trackHeight="32dp" app:thumbRadius="10dp" app:thumbColor="@color/text_primary" app:trackColorActive="@color/accent_lavender" app:trackColorInactive="@color/slider_track_inactive" android:layout_marginBottom="4dp"/>
             <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:layout_marginBottom="32dp">
                 <TextView android:id="@+id/o1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="AUTO" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
@@ -273,7 +273,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Resolution -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="RESOLUTION" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/resolution_label" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
             <com.google.android.material.slider.Slider android:id="@+id/resolutionSlider" android:layout_width="match_parent" android:layout_height="wrap_content" android:valueFrom="0" android:valueTo="5" android:stepSize="1" app:trackHeight="32dp" app:thumbRadius="10dp" app:thumbColor="@color/text_primary" app:trackColorActive="@color/accent_lavender" app:trackColorInactive="@color/slider_track_inactive" android:layout_marginBottom="4dp"/>
             <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:layout_marginBottom="32dp">
                 <TextView android:id="@+id/r1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="NATIVE" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
@@ -286,7 +286,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- FPS -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="FRAME RATE" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/fps_label" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
             <com.google.android.material.slider.Slider android:id="@+id/fpsSlider" android:layout_width="match_parent" android:layout_height="wrap_content" android:valueFrom="0" android:valueTo="4" android:stepSize="1" app:trackHeight="32dp" app:thumbRadius="10dp" app:thumbColor="@color/text_primary" app:trackColorActive="@color/accent_lavender" app:trackColorInactive="@color/slider_track_inactive" android:layout_marginBottom="4dp"/>
             <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:layout_marginBottom="32dp">
                 <TextView android:id="@+id/f1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="24" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
@@ -298,7 +298,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Bitrate -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BITRATE" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/bitrate_label" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
             <com.google.android.material.slider.Slider android:id="@+id/bitrateSlider" android:layout_width="match_parent" android:layout_height="wrap_content" android:valueFrom="0" android:valueTo="5" android:stepSize="1" app:trackHeight="32dp" app:thumbRadius="10dp" app:thumbColor="@color/text_primary" app:trackColorActive="@color/accent_lavender" app:trackColorInactive="@color/slider_track_inactive" android:layout_marginBottom="4dp"/>
             <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:layout_marginBottom="32dp">
                 <TextView android:id="@+id/b1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2M" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
@@ -311,7 +311,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Bitrate Mode -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BITRATE MODE" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/bitrate_mode_label" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
             <com.google.android.material.slider.Slider android:id="@+id/bitrateModeSlider" android:layout_width="match_parent" android:layout_height="wrap_content" android:valueFrom="0" android:valueTo="1" android:stepSize="1" app:trackHeight="32dp" app:thumbRadius="10dp" app:thumbColor="@color/text_primary" app:trackColorActive="@color/accent_lavender" app:trackColorInactive="@color/slider_track_inactive" android:layout_marginBottom="4dp"/>
             <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:layout_marginBottom="48dp">
                 <TextView android:id="@+id/m1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="VBR" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
@@ -319,10 +319,10 @@
                 <androidx.constraintlayout.helper.widget.Flow android:layout_width="match_parent" android:layout_height="wrap_content" app:constraint_referenced_ids="m1,m2" app:flow_horizontalStyle="spread_inside" app:layout_constraintTop_toTopOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView android:id="@+id/headerAudioSubsystem" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="AUDIO SUBSYSTEM" android:fontFamily="sans-serif-black" android:textSize="11sp" android:textColor="@color/accent_lavender" android:letterSpacing="0.2" android:layout_marginBottom="24dp"/>
+            <TextView android:id="@+id/headerAudioSubsystem" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/header_audio_subsystem" android:fontFamily="sans-serif-black" android:textSize="11sp" android:textColor="@color/accent_lavender" android:letterSpacing="0.2" android:layout_marginBottom="24dp"/>
 
             <!-- Audio Source -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="AUDIO SOURCE" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/audio_source_label" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
             <com.google.android.material.slider.Slider android:id="@+id/audioSlider" android:layout_width="match_parent" android:layout_height="wrap_content" android:valueFrom="0" android:valueTo="3" android:stepSize="1" app:trackHeight="32dp" app:thumbRadius="10dp" app:thumbColor="@color/text_primary" app:trackColorActive="@color/accent_lavender" app:trackColorInactive="@color/slider_track_inactive" android:layout_marginBottom="4dp"/>
             <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:layout_marginBottom="32dp">
                 <TextView android:id="@+id/a1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="OFF" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
@@ -333,7 +333,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Audio Quality -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="AUDIO QUALITY" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/audio_quality_label" android:textSize="12sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_marginBottom="8dp"/>
             <com.google.android.material.slider.Slider android:id="@+id/audioQualitySlider" android:layout_width="match_parent" android:layout_height="wrap_content" android:valueFrom="0" android:valueTo="2" android:stepSize="1" app:trackHeight="32dp" app:thumbRadius="10dp" app:thumbColor="@color/text_primary" app:trackColorActive="@color/accent_lavender" app:trackColorInactive="@color/slider_track_inactive" android:layout_marginBottom="4dp"/>
             <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" android:layout_marginBottom="48dp">
                 <TextView android:id="@+id/q1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="LOW" android:textColor="@color/text_primary" android:textSize="9sp" android:fontFamily="sans-serif-black"/>
@@ -344,7 +344,7 @@
 
             <!-- Custom Naming -->
 
-            <com.google.android.material.textfield.TextInputLayout android:id="@+id/namingTemplateLayout" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColorHint="@color/text_secondary" app:boxStrokeWidth="2dp" app:boxStrokeWidthFocused="2dp" android:hint="OUTPUT TEMPLATE">
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/namingTemplateLayout" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColorHint="@color/text_secondary" app:boxStrokeWidth="2dp" app:boxStrokeWidthFocused="2dp" android:hint="@string/naming_template_label">
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/namingTemplateEditText" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="text" android:fontFamily="monospace" android:textSize="12sp" android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
 

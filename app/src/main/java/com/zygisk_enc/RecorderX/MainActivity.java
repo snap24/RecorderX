@@ -48,9 +48,6 @@ public class MainActivity extends AppCompatActivity {
         android.graphics.Color.parseColor("#F43F5E")  // 11: Rose Pink
     };
 
-    public static boolean isActivityVisible = false;
-    public static boolean isActivityVisible() { return isActivityVisible; }
-
     private final RecorderService.RecordingStateListener recordingStateListener = new RecorderService.RecordingStateListener() {
         @Override
         public void onStateChanged(boolean isRecording) {
@@ -67,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        isActivityVisible = false;
         RecorderService.unregisterStateListener(recordingStateListener);
         super.onDestroy();
     }
@@ -723,7 +719,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        isActivityVisible = true;
         btnRecord.setText(RecorderService.isRecording() ? R.string.stop_recording : R.string.start_recording);
 
         com.google.android.material.switchmaterial.SwitchMaterial switchFloating = findViewById(R.id.switchFloatingControl);
@@ -749,12 +744,6 @@ public class MainActivity extends AppCompatActivity {
                 toggleRecording();
             }
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        isActivityVisible = false;
     }
 
     private void applyAccentColor(int color) {

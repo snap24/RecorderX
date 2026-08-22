@@ -44,6 +44,7 @@ public class RecorderService extends Service {
     private FloatingController floatingController;
     private boolean isBubbleHidden = false;
     private android.os.PowerManager.WakeLock wakeLock;
+    private boolean isTaskRemovedFromRecents = false;
 
     @SuppressWarnings("deprecation")
     private void acquireWakeLock() {
@@ -200,6 +201,7 @@ public class RecorderService extends Service {
                 recordingSession.start();
                 acquireWakeLock();
                 isRecording = true;
+                isTaskRemovedFromRecents = false;
                 notifyStateChanged();
 
                 if (settings.isFloatingControlEnabled()) {
@@ -252,11 +254,12 @@ public class RecorderService extends Service {
         stopForeground(true);
         stopSelf();
 
-        if (!MainActivity.isActivityVisible()) {
-            Log.i(TAG, "stopRecording: MainActivity is not active. Scheduling process termination...");
+        if (isTaskRemovedFromRecents) {
+            Log.i(TAG, "stopRecording: Task was swiped from Recents earlier. Scheduling clean process termination...");
+            isTaskRemovedFromRecents = false;
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                if (!isRecording && !MainActivity.isActivityVisible()) {
-                    Log.i(TAG, "Terminating process cleanly since UI is closed.");
+                if (!isRecording) {
+                    Log.i(TAG, "Terminating process cleanly since task was swiped from Recents.");
                     android.os.Process.killProcess(android.os.Process.myPid());
                 }
             }, 600);
@@ -603,7 +606,10 @@ public class RecorderService extends Service {
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
         Log.d(TAG, "onTaskRemoved: Task removed from Recents.");
-        if (!isRecording) {
+        if (isRecording) {
+            isTaskRemovedFromRecents = true;
+            Log.i(TAG, "onTaskRemoved: App swiped from Recents while recording. Marked for process kill on STOP.");
+        } else {
             Log.i(TAG, "onTaskRemoved: Not recording, stopping service and clearing RAM.");
             stopForeground(true);
             stopSelf();

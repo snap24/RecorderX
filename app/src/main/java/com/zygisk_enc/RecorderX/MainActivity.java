@@ -1123,9 +1123,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         scrollView.addView(listContainer);
+        int maxScrollHeight = (int) (getResources().getDisplayMetrics().heightPixels * 0.65f);
+        int minHeightPx = (int) (460 * getResources().getDisplayMetrics().density);
+        int finalScrollHeight = Math.max(maxScrollHeight, minHeightPx);
         android.widget.LinearLayout.LayoutParams scrollParams = new android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                (int) (320 * getResources().getDisplayMetrics().density));
+                finalScrollHeight);
         layout.addView(scrollView, scrollParams);
 
         android.widget.FrameLayout container = new android.widget.FrameLayout(this);

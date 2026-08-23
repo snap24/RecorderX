@@ -3,7 +3,10 @@ RecorderX is a high-performance, privacy-focused screen recorder for Android.
 Key Features:
 - Record up to 4K (UHD) and 2K (QHD) for crystal clear video.
 - High-speed recording at 60fps, 90fps, and 120fps.
-- Custom bitrates up to 40 Mbps for professional quality.
+- Custom bitrates up to 18 Mbps for practical high-frame-rate performance.
+- Native 80 Global Languages support with a searchable language selection modal.
+- Hardware-level Display Keep-Awake engine to prevent screen dimming during recording.
+- Background RAM optimization with automatic service cleanup when removed from Recents.
 - Modern AMOLED Black base theme with a Title Bar Swipe Gesture Theme Customizer to cycle through 12 dynamic accent colors.
 - Floating control overlay panel for convenient recording management.
 - Real-time screen drawing brush tool for annotations.

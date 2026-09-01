@@ -8,6 +8,8 @@
   ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)
   ![Android](https://img.shields.io/badge/API-29%2B-3DDC84?style=flat&logo=android&logoColor=white)
   [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat&logo=apache&logoColor=white)](LICENSE)
+  <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/snap24/RecorderX/total">
+
 </div>
 
 ---

@@ -7,6 +7,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Path;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
@@ -15,6 +16,7 @@ import android.os.Build;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -28,11 +30,15 @@ public class BrushController {
     private final Runnable onDismissCallback;
 
     private DrawingOverlayView drawingView;
+    private FrameLayout rootContainer;
     private LinearLayout toolbarView;
+    private FrameLayout dockHandleView;
     private WindowManager.LayoutParams drawingParams;
     private WindowManager.LayoutParams toolbarParams;
 
     private boolean isShowing = false;
+    private boolean isDocked = false;
+    private boolean isDockedOnRight = false;
     
     // Track selected button state for visual feedback
     private final List<ImageView> shapeButtons = new ArrayList<>();
@@ -43,15 +49,29 @@ public class BrushController {
     private ImageView btnLine;
     private ImageView btnMove;
 
+    private DrawingOverlayView.CameraTouchDelegate cameraTouchDelegate;
+
     public BrushController(Context context, Runnable onDismissCallback) {
         this.context = context;
         this.windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         this.onDismissCallback = onDismissCallback;
     }
 
+    public void setCameraTouchDelegate(DrawingOverlayView.CameraTouchDelegate delegate) {
+        this.cameraTouchDelegate = delegate;
+        if (drawingView != null) {
+            drawingView.setCameraTouchDelegate(delegate);
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     public void show() {
-        if (isShowing) return;
+        if (isShowing) {
+            if (isDocked) {
+                undockToolbar();
+            }
+            return;
+        }
 
         int layoutType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? 
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : 
@@ -68,16 +88,28 @@ public class BrushController {
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 PixelFormat.TRANSLUCENT
             );
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                drawingParams.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            }
 
             drawingView = new DrawingOverlayView(context);
             drawingView.setBrushColor(Color.RED); // default red brush
             drawingView.setStrokeWidth(12f);
+            if (cameraTouchDelegate != null) {
+                drawingView.setCameraTouchDelegate(cameraTouchDelegate);
+            }
+            drawingView.setOnDrawingTouchListener(() -> {
+                if (isShowing && !isDocked) {
+                    minimise();
+                }
+            });
             windowManager.addView(drawingView, drawingParams);
         } else {
             setDrawingTouchable(true);
         }
 
         // 2. Translucent floating toolbar window
+        Point screen = getScreenSize();
         if (toolbarParams == null) {
             toolbarParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -86,9 +118,19 @@ public class BrushController {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
             );
-            toolbarParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-            toolbarParams.y = dpToPx(80); // Positioned above navigation bar
+            toolbarParams.gravity = Gravity.TOP | Gravity.START;
+            toolbarParams.x = Math.max(0, (screen.x - dpToPx(160)) / 2);
+            toolbarParams.y = Math.max(0, screen.y - dpToPx(260));
         }
+
+        rootContainer = new FrameLayout(context);
+        rootContainer.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+
+        initDockHandle();
+        dockHandleView.setVisibility(View.GONE);
 
         toolbarView = new LinearLayout(context);
         toolbarView.setOrientation(LinearLayout.VERTICAL);
@@ -120,7 +162,7 @@ public class BrushController {
         highlightButton(btnBrush);
 
         ImageView btnUndo = createToolbarButton(new UndoIconDrawable(), v -> drawingView.undo());
-        ImageView btnClear = createToolbarButton(new ClearIconDrawable(), v -> minimise());
+        ImageView btnClear = createToolbarButton(new ClearIconDrawable(), v -> clearAndDock());
         ImageView btnExit = createToolbarButton(new ExitIconDrawable(), v -> clearAndDismiss());
 
         // Sleek top drag header (Generous touch target area, small visual pill)
@@ -198,6 +240,7 @@ public class BrushController {
             private int initialY;
             private float initialTouchX;
             private float initialTouchY;
+            private boolean isMoving;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -207,20 +250,190 @@ public class BrushController {
                         initialY = toolbarParams.y;
                         initialTouchX = event.getRawX();
                         initialTouchY = event.getRawY();
+                        isMoving = false;
                         return true;
                     case MotionEvent.ACTION_MOVE:
-                        toolbarParams.x = initialX + (int) (event.getRawX() - initialTouchX);
-                        // Invert Y delta since gravity is BOTTOM
-                        toolbarParams.y = initialY - (int) (event.getRawY() - initialTouchY);
-                        windowManager.updateViewLayout(toolbarView, toolbarParams);
+                        int dx = (int) (event.getRawX() - initialTouchX);
+                        int dy = (int) (event.getRawY() - initialTouchY);
+                        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                            isMoving = true;
+                        }
+                        toolbarParams.x = initialX + dx;
+                        toolbarParams.y = initialY + dy;
+                        try {
+                            windowManager.updateViewLayout(rootContainer, toolbarParams);
+                        } catch (Exception ignored) {}
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        Point curScreen = getScreenSize();
+                        int tw = toolbarView.getWidth() > 0 ? toolbarView.getWidth() : dpToPx(160);
+                        int th = toolbarView.getHeight() > 0 ? toolbarView.getHeight() : dpToPx(180);
+
+                        int leftThreshold = dpToPx(40);
+                        int rightThreshold = curScreen.x - tw - dpToPx(40);
+
+                        if (toolbarParams.x <= leftThreshold) {
+                            dockToolbar(false);
+                        } else if (toolbarParams.x >= rightThreshold) {
+                            dockToolbar(true);
+                        } else {
+                            toolbarParams.x = clampX(toolbarParams.x, tw);
+                            toolbarParams.y = clampY(toolbarParams.y, th);
+                            try {
+                                windowManager.updateViewLayout(rootContainer, toolbarParams);
+                            } catch (Exception ignored) {}
+                        }
                         return true;
                 }
                 return false;
             }
         });
 
-        windowManager.addView(toolbarView, toolbarParams);
+        rootContainer.addView(toolbarView);
+        rootContainer.addView(dockHandleView);
+
+        toolbarView.measure(
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        );
+        int measuredW = toolbarView.getMeasuredWidth();
+        int measuredH = toolbarView.getMeasuredHeight();
+        toolbarParams.x = clampX(toolbarParams.x, measuredW);
+        toolbarParams.y = clampY(toolbarParams.y, measuredH);
+
+        windowManager.addView(rootContainer, toolbarParams);
         isShowing = true;
+        isDocked = false;
+    }
+
+    private void initDockHandle() {
+        dockHandleView = new FrameLayout(context);
+        dockHandleView.setLayoutParams(new FrameLayout.LayoutParams(dpToPx(28), dpToPx(56)));
+
+        ImageView icon = new ImageView(context);
+        FrameLayout.LayoutParams iconParams = new FrameLayout.LayoutParams(dpToPx(18), dpToPx(18));
+        iconParams.gravity = Gravity.CENTER;
+        icon.setLayoutParams(iconParams);
+        icon.setImageDrawable(new BrushIconDrawable());
+        dockHandleView.addView(icon);
+
+        updateDockHandleStyle(isDockedOnRight);
+
+        dockHandleView.setOnTouchListener(new View.OnTouchListener() {
+            private int initialY;
+            private float initialTouchX;
+            private float initialTouchY;
+            private boolean isDragging;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        initialY = toolbarParams.y;
+                        initialTouchX = event.getRawX();
+                        initialTouchY = event.getRawY();
+                        isDragging = false;
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float diffX = event.getRawX() - initialTouchX;
+                        float diffY = event.getRawY() - initialTouchY;
+                        if (Math.abs(diffX) > 8 || Math.abs(diffY) > 8) {
+                            isDragging = true;
+                        }
+
+                        // Pull inward away from edge by > 20dp triggers undock
+                        boolean pulledInward = isDockedOnRight ? (diffX < -dpToPx(20)) : (diffX > dpToPx(20));
+                        if (pulledInward) {
+                            undockToolbar();
+                            return true;
+                        }
+
+                        if (isDragging) {
+                            int handleHeight = dpToPx(56);
+                            toolbarParams.y = clampY(initialY + (int) diffY, handleHeight);
+                            try {
+                                windowManager.updateViewLayout(rootContainer, toolbarParams);
+                            } catch (Exception ignored) {}
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        if (!isDragging) {
+                            undockToolbar();
+                        }
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void updateDockHandleStyle(boolean onRight) {
+        if (dockHandleView == null) return;
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Color.parseColor("#E61F1F1F"));
+        bg.setStroke(dpToPx(1.5f), Color.parseColor("#66FFFFFF"));
+        float r = dpToPx(16);
+        if (onRight) {
+            bg.setCornerRadii(new float[]{r, r, 0, 0, 0, 0, r, r});
+        } else {
+            bg.setCornerRadii(new float[]{0, 0, r, r, r, r, 0, 0});
+        }
+        dockHandleView.setBackground(bg);
+    }
+
+    public void dockToolbar(boolean onRight) {
+        if (!isShowing || rootContainer == null || toolbarView == null) return;
+
+        isDocked = true;
+        isDockedOnRight = onRight;
+
+        toolbarView.setVisibility(View.GONE);
+        dockHandleView.setVisibility(View.VISIBLE);
+        updateDockHandleStyle(onRight);
+
+        Point screen = getScreenSize();
+        int handleWidth = dpToPx(28);
+        int handleHeight = dpToPx(56);
+
+        if (onRight) {
+            toolbarParams.x = screen.x - handleWidth;
+        } else {
+            toolbarParams.x = 0;
+        }
+
+        toolbarParams.y = clampY(toolbarParams.y, handleHeight);
+
+        try {
+            windowManager.updateViewLayout(rootContainer, toolbarParams);
+        } catch (Exception ignored) {}
+    }
+
+    public void undockToolbar() {
+        if (!isShowing || rootContainer == null || toolbarView == null) return;
+
+        isDocked = false;
+
+        dockHandleView.setVisibility(View.GONE);
+        toolbarView.setVisibility(View.VISIBLE);
+
+        Point screen = getScreenSize();
+        int tw = toolbarView.getWidth() > 0 ? toolbarView.getWidth() : dpToPx(160);
+        int th = toolbarView.getHeight() > 0 ? toolbarView.getHeight() : dpToPx(180);
+
+        if (isDockedOnRight) {
+            toolbarParams.x = screen.x - tw - dpToPx(12);
+        } else {
+            toolbarParams.x = dpToPx(12);
+        }
+
+        toolbarParams.y = clampY(toolbarParams.y, th);
+
+        try {
+            windowManager.updateViewLayout(rootContainer, toolbarParams);
+        } catch (Exception ignored) {}
     }
 
     public void dismiss() {
@@ -231,12 +444,15 @@ public class BrushController {
             drawingView = null;
         }
 
-        if (toolbarView != null) {
-            try { windowManager.removeView(toolbarView); } catch (Exception ignored) {}
+        if (rootContainer != null) {
+            try { windowManager.removeView(rootContainer); } catch (Exception ignored) {}
+            rootContainer = null;
             toolbarView = null;
+            dockHandleView = null;
         }
 
         isShowing = false;
+        isDocked = false;
 
         if (onDismissCallback != null) {
             onDismissCallback.run();
@@ -251,25 +467,43 @@ public class BrushController {
         dismiss();
     }
 
-    // White X puts the toolbar away but leaves the strokes on screen
+    // White X erases all drawings and tucks the toolbar away into the side hint tab
+    public void clearAndDock() {
+        if (drawingView != null) {
+            drawingView.clear();
+        }
+        minimise();
+    }
+
+    // Puts the toolbar away into the side hint tab
     public void minimise() {
         if (!isShowing) return;
-
-        if (toolbarView != null) {
-            try { windowManager.removeView(toolbarView); } catch (Exception ignored) {}
-            toolbarView = null;
-        }
-
-        setDrawingTouchable(false);
-        isShowing = false;
-
-        if (onDismissCallback != null) {
-            onDismissCallback.run();
-        }
+        Point screen = getScreenSize();
+        int tw = toolbarView != null && toolbarView.getWidth() > 0 ? toolbarView.getWidth() : dpToPx(160);
+        boolean closerToRight = (toolbarParams != null && (toolbarParams.x + tw / 2) > screen.x / 2);
+        dockToolbar(closerToRight);
     }
 
     public boolean isMinimised() {
-        return !isShowing && drawingView != null;
+        return isDocked || (!isShowing && drawingView != null);
+    }
+
+    private Point getScreenSize() {
+        Point size = new Point();
+        windowManager.getDefaultDisplay().getRealSize(size);
+        return size;
+    }
+
+    private int clampX(int x, int viewWidth) {
+        Point size = getScreenSize();
+        int maxX = size.x - viewWidth;
+        return Math.max(0, Math.min(x, maxX));
+    }
+
+    private int clampY(int y, int viewHeight) {
+        Point size = getScreenSize();
+        int maxY = size.y - viewHeight;
+        return Math.max(0, Math.min(y, maxY));
     }
 
     private boolean isLandscapeMode() {

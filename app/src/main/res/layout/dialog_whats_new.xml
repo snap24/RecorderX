@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:strokeWidth="0dp"
+    app:cardBackgroundColor="@color/bg_main">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header: Title + Version Badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/dialogWhatsNewTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/whats_new_title"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/accent_lavender"
+                android:textSize="17sp"
+                android:letterSpacing="0.08"/>
+
+            <TextView
+                android:id="@+id/dialogWhatsNewVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/whats_new_version"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/accent_lavender"
+                android:textSize="11sp"
+                android:background="@drawable/bg_version_pill"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"/>
+        </LinearLayout>
+
+        <!-- Feature 1: Face Cam -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="top"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/ivFeatureCam"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_widget_cam"
+                app:tint="@color/accent_lavender"
+                android:tag="dynamic_accent"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="14dp"
+                android:contentDescription="@null" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvFeatureCamTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/whats_new_facecam_title"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/accent_lavender"
+                    android:textSize="13sp"
+                    android:letterSpacing="0.03"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/whats_new_facecam_desc"
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="2dp"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Feature 2: 2 Widgets -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="top"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/ivFeatureWidgets"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_widget_app"
+                app:tint="@color/accent_lavender"
+                android:tag="dynamic_accent"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="14dp"
+                android:contentDescription="@null" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvFeatureWidgetsTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/whats_new_widgets_title"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/accent_lavender"
+                    android:textSize="13sp"
+                    android:letterSpacing="0.03"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/whats_new_widgets_desc"
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="2dp"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Feature 3: Bug Fixes -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="top"
+            android:layout_marginBottom="20dp">
+
+            <ImageView
+                android:id="@+id/ivFeatureFixes"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_whats_new_check"
+                app:tint="@color/accent_lavender"
+                android:tag="dynamic_accent"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="14dp"
+                android:contentDescription="@null" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvFeatureFixesTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/whats_new_fixes_title"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/accent_lavender"
+                    android:textSize="13sp"
+                    android:letterSpacing="0.03"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/whats_new_fixes_desc"
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="2dp"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Dismiss Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUnderstood"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="@string/whats_new_btn"
+            android:textColor="@color/black"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.05"
+            app:backgroundTint="@color/accent_lavender"
+            app:cornerRadius="4dp"
+            android:elevation="0dp" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

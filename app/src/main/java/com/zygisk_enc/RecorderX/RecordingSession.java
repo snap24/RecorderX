@@ -268,7 +268,7 @@ public class RecordingSession {
             if (isAv1 && isSwEncoder) {
                 Log.i(TAG, "Hardware AV1 not found. Operating in Software AV1 mode (" + videoEncoder.getCodecInfo().getName() + ")");
                 new Handler(Looper.getMainLooper()).post(() ->
-                        android.widget.Toast.makeText(context, "Hardware AV1 not found. Recording in Software AV1 mode...", android.widget.Toast.LENGTH_LONG).show());
+                        android.widget.Toast.makeText(context, R.string.toast_hardware_av1_not_found, android.widget.Toast.LENGTH_LONG).show());
             } else if (requireHardware && isSwEncoder) {
                 Log.w(TAG, "Rejecting software encoder " + videoEncoder.getCodecInfo().getName() + " for " + mime);
                 throw new IllegalStateException("no hardware encoder for " + mime);
@@ -317,8 +317,7 @@ public class RecordingSession {
     // Falling back silently is what makes the recorded frame rate look like a lie
     private void warnIfCodecChanged(String requestedMime) {
         if (activeMime == null || activeMime.equals(requestedMime)) return;
-        final String message = codecLabel(requestedMime) + " has no hardware encoder here, recording in "
-                + codecLabel(activeMime);
+        final String message = context.getString(R.string.toast_codec_fallback, codecLabel(requestedMime), codecLabel(activeMime));
         Log.w(TAG, message);
         new Handler(Looper.getMainLooper()).post(() ->
                 android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show());
@@ -758,7 +757,7 @@ public class RecordingSession {
         // Index 0 is Native, 1 is 4K — stepping 0->1 would raise it, so send Native straight to 1080p
         settings.setResolution(currentRes == 0 ? 3 : currentRes + 1);
         new Handler(Looper.getMainLooper()).post(() -> {
-            android.widget.Toast.makeText(context, "Hardware overloaded. Auto-downgrading...", android.widget.Toast.LENGTH_LONG).show();
+            android.widget.Toast.makeText(context, R.string.toast_hardware_overloaded, android.widget.Toast.LENGTH_LONG).show();
         });
 
         new Thread(() -> {
@@ -802,8 +801,8 @@ public class RecordingSession {
                 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "saved_channel")
                         .setSmallIcon(android.R.drawable.ic_dialog_alert)
-                        .setContentTitle("Hardware Overloaded")
-                        .setContentText("Recording failed. Tap to restart with safe settings.")
+                        .setContentTitle(context.getString(R.string.notification_overloaded_title))
+                        .setContentText(context.getString(R.string.notification_overloaded_text))
                         .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setContentIntent(pendingIntent) // Tap to open RequestCaptureActivity
                         .setAutoCancel(true);
@@ -925,7 +924,7 @@ public class RecordingSession {
                 fos.close();
                 
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    android.widget.Toast.makeText(context, "Screenshot saved to Pictures/RecorderX", android.widget.Toast.LENGTH_SHORT).show();
+                    android.widget.Toast.makeText(context, R.string.toast_screenshot_saved, android.widget.Toast.LENGTH_SHORT).show();
                 });
             }
         } catch (Exception e) {

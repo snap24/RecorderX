@@ -19,7 +19,7 @@
             android:id="@+id/dialogTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="RECORDER GUIDE"
+            android:text="@string/guide_title"
             android:fontFamily="sans-serif-black"
             android:textColor="@color/accent_lavender"
             android:textSize="18sp"
@@ -47,7 +47,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="VIDEO CODEC"
+                        android:text="@string/video_codec_label"
                         android:fontFamily="sans-serif-black"
                         android:textColor="@color/accent_lavender"
                         android:textSize="11sp"
@@ -55,7 +55,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="H.264 (Most compatible with other players), H.265 (Highly efficient compression), or AV1 (Next-generation high quality)."
+                        android:text="@string/guide_codec_desc"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif"
@@ -71,7 +71,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ORIENTATION"
+                        android:text="@string/orientation_label"
                         android:fontFamily="sans-serif-black"
                         android:textColor="@color/accent_lavender"
                         android:textSize="11sp"
@@ -79,7 +79,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Lock recorded video aspect ratios to Auto, Portrait (vertical), or Landscape (horizontal)."
+                        android:text="@string/guide_orientation_desc"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif"
@@ -95,7 +95,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="RESOLUTION"
+                        android:text="@string/resolution_label"
                         android:fontFamily="sans-serif-black"
                         android:textColor="@color/accent_lavender"
                         android:textSize="11sp"
@@ -103,7 +103,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="NATIVE captures at your screen\'s exact resolution. 4K, 2K, FHD, HD, and SD lock capture to standard dimensions."
+                        android:text="@string/guide_resolution_desc"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif"
@@ -119,7 +119,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="FRAME RATE"
+                        android:text="@string/fps_label"
                         android:fontFamily="sans-serif-black"
                         android:textColor="@color/accent_lavender"
                         android:textSize="11sp"
@@ -127,7 +127,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Range of 24-60 FPS for standard video smoothness. High refresh rate devices support 90-120 FPS for ultra-smooth gaming playback."
+                        android:text="@string/guide_fps_desc"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif"
@@ -143,7 +143,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="BITRATE"
+                        android:text="@string/bitrate_label"
                         android:fontFamily="sans-serif-black"
                         android:textColor="@color/accent_lavender"
                         android:textSize="11sp"
@@ -151,7 +151,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Specifies data speed in Mbps. Higher values capture sharper details during movement but result in larger video files."
+                        android:text="@string/guide_bitrate_desc"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif"
@@ -167,7 +167,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="BITRATE MODE"
+                        android:text="@string/bitrate_mode_label"
                         android:fontFamily="sans-serif-black"
                         android:textColor="@color/accent_lavender"
                         android:textSize="11sp"
@@ -175,7 +175,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="VBR (Variable Bitrate) dynamically scales data rate to save storage. CBR (Constant Bitrate) forces high details regardless of movement."
+                        android:text="@string/guide_bitrate_mode_desc"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif"
@@ -191,7 +191,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AUDIO SOURCE"
+                        android:text="@string/audio_source_label"
                         android:fontFamily="sans-serif-black"
                         android:textColor="@color/accent_lavender"
                         android:textSize="11sp"
@@ -199,7 +199,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Choose from Silence (OFF), Microphone (MIC), System Internal Loopback (SYS), or MIX (SYS+MIC) to record both together."
+                        android:text="@string/guide_audio_source_desc"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif"
@@ -214,7 +214,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AUDIO QUALITY"
+                        android:text="@string/audio_quality_label"
                         android:fontFamily="sans-serif-black"
                         android:textColor="@color/accent_lavender"
                         android:textSize="11sp"
@@ -222,7 +222,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Adjust audio sample rate and encoding bitrate. Higher tiers provide cleaner, noise-free sound details."
+                        android:text="@string/guide_audio_quality_desc"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif"
@@ -237,7 +237,7 @@
             android:id="@+id/btnUnderstood"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="UNDERSTOOD"
+            android:text="@string/guide_understood"
             android:textColor="@color/black"
             android:textSize="14sp"
             android:fontFamily="sans-serif-black"

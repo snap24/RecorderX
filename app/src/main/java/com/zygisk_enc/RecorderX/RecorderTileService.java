@@ -7,6 +7,11 @@ import android.service.quicksettings.TileService;
 public class RecorderTileService extends TileService {
 
     @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(LocaleManager.updateResources(newBase));
+    }
+
+    @Override
     public void onStartListening() {
         super.onStartListening();
         updateTile();
@@ -17,7 +22,7 @@ public class RecorderTileService extends TileService {
         if (tile != null) {
             boolean isRecording = RecorderService.isRecording();
             tile.setState(isRecording ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
-            tile.setLabel(isRecording ? "Stop Recording" : "Record Screen");
+            tile.setLabel(isRecording ? getString(R.string.stop_recording) : getString(R.string.qs_record_screen));
             tile.updateTile();
         }
     }
@@ -33,7 +38,7 @@ public class RecorderTileService extends TileService {
             startService(intent);
         } else {
             Intent intent = new Intent(this, RequestCaptureActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
             
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 // Android 14+ needs a PendingIntent for TileService to launch activities

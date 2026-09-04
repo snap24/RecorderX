@@ -88,4 +88,135 @@
     <string name="qs_label">RecorderX</string>
     <string name="info_text">Advanced settings are automatically saved.</string>
     <string name="accessibility_desc">Used solely to trigger native system screenshots during screen recording sessions without interrupting the video capture.</string>
+
+    <!-- Branding & Header -->
+    <string name="title_swipe_here">SWIPE HERE</string>
+    <string name="title_recorder">RECORDER</string>
+    <string name="saved_in_path">Saved in: /Movies/RecorderX</string>
+
+    <!-- Guide Dialog Descriptions -->
+    <string name="guide_codec_desc">H.264 (Most compatible with other players), H.265 (Highly efficient compression), or AV1 (Next-generation high quality).</string>
+    <string name="guide_orientation_desc">Lock recorded video aspect ratios to Auto, Portrait (vertical), or Landscape (horizontal).</string>
+    <string name="guide_resolution_desc">NATIVE captures at your screen\'s exact resolution. 4K, 2K, FHD, HD, and SD lock capture to standard dimensions.</string>
+    <string name="guide_fps_desc">Range of 24-60 FPS for standard video smoothness. High refresh rate devices support 90-120 FPS for ultra-smooth gaming playback.</string>
+    <string name="guide_bitrate_desc">Specifies data speed in Mbps. Higher values capture sharper details during movement but result in larger video files.</string>
+    <string name="guide_bitrate_mode_desc">VBR (Variable Bitrate) dynamically scales data rate to save storage. CBR (Constant Bitrate) forces high details regardless of movement.</string>
+    <string name="guide_audio_source_desc">Choose from Silence (OFF), Microphone (MIC), System Internal Loopback (SYS), or MIX (SYS+MIC) to record both together.</string>
+    <string name="guide_audio_quality_desc">Adjust audio sample rate and encoding bitrate. Higher tiers provide cleaner, noise-free sound details.</string>
+
+    <!-- Auto Orientation Warning Dialog -->
+    <string name="dialog_auto_orientation_title">⚠  Auto Orientation Warning</string>
+    <string name="dialog_auto_orientation_message">Auto Orientation is a gimmick and will degrade your recording quality.\n\nAndroid dynamically rotates the virtual display mid-recording, often causing resolution mismatches, black bars, and encoder instability.\n\nWe strongly recommend manually selecting Portrait or Landscape to match the primary orientation of the app you intend to record — this produces the best, most consistent output.</string>
+    <string name="dialog_auto_orientation_button_timer">I Understand (%d)</string>
+    <string name="dialog_auto_orientation_button">I Understand</string>
+
+    <!-- Overlay Permission Dialog -->
+    <string name="dialog_overlay_permission_title">Overlay Permission Required</string>
+    <string name="dialog_overlay_permission_message">To display the floating controller bubble, RecorderX needs permission to display over other apps. Please grant it on the next screen.</string>
+    <string name="btn_grant">Grant</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- AV1 Software Warning Dialog -->
+    <string name="dialog_av1_software_title">⚠  AV1 Software Encoding</string>
+    <string name="dialog_av1_software_message">Hardware AV1 encoding is not supported on this device.\n\nRecording will be performed using Software AV1 (CPU encoding). This may cause increased CPU usage, higher battery consumption, and potential frame drops on higher resolutions.</string>
+    <string name="dialog_av1_software_button">I UNDERSTAND</string>
+
+    <!-- Language Dialog -->
+    <string name="dialog_language_title">SELECT LANGUAGE (80)</string>
+    <string name="search_language_hint">Search language…</string>
+    <string name="lang_system_default">System Default</string>
+
+    <!-- Naming Template Helper -->
+    <string name="naming_template_helper">Type your preferred prefix in the template box to personalize your saved video titles.\nAdd the {timestamp} placeholder to ensure every file is organized sequentially by date.\nInvalid characters are stripped automatically, defaulting to a clean timestamp if empty.\nFormat: yyyyMMdd_HHmmss (e.g. 20260712_143000).</string>
+
+    <!-- Swipe Onboarding Overlay -->
+    <string name="onboarding_swipe_title">🎨 Swipe to Recolor</string>
+    <string name="onboarding_swipe_description">Swipe left or right anywhere over the RecorderX title area to cycle between 12 gorgeous theme accent colors!</string>
+    <string name="btn_got_it">Got It</string>
+
+    <!-- Floating Bubble Facecam Controls -->
+    <string name="camera_front">Front</string>
+    <string name="camera_back">Back</string>
+    <string name="toast_front_camera">Front Camera</string>
+    <string name="toast_back_camera">Back Camera</string>
+    <string name="camera_shape_circle">Circle</string>
+    <string name="camera_shape_rect">Rect</string>
+    <string name="camera_size_small">Small</string>
+    <string name="camera_size_medium">Med</string>
+    <string name="camera_size_large">Large</string>
+    <string name="camera_pos_locked">Locked</string>
+    <string name="camera_pos_move">Move</string>
+    <string name="toast_facecam_locked">Facecam Position Locked</string>
+    <string name="toast_facecam_movable">Facecam Movable</string>
+
+    <!-- Notifications -->
+    <string name="channel_recorder_service">Recorder Service</string>
+    <string name="channel_recording_saved">Recording Saved</string>
+    <string name="notification_saved_title">Recording Saved</string>
+    <string name="notification_saved_text">Tap to view your recording in /Movies/RecorderX</string>
+    <string name="notification_action_delete">Delete</string>
+    <string name="notification_active_title">RecorderX is active</string>
+    <string name="notification_paused_title">RecorderX is paused</string>
+    <string name="notification_action_pause">Pause Recording</string>
+    <string name="notification_action_resume">Resume Recording</string>
+    <string name="notification_action_show">Show</string>
+    <string name="notification_action_hide">Hide</string>
+    <string name="notification_action_bubble">Bubble</string>
+    <string name="notification_action_off">Off</string>
+    <string name="notification_overloaded_title">Hardware Overloaded</string>
+    <string name="notification_overloaded_text">Recording failed. Tap to restart with safe settings.</string>
+    <string name="qs_record_screen">Record Screen</string>
+
+    <!-- General Toasts -->
+    <string name="toast_no_recordings">No recordings found</string>
+    <string name="toast_no_video_player">No video player app found</string>
+    <string name="toast_audio_permission_required">Audio permission required for Mic</string>
+    <string name="toast_screen_capture_denied">Screen capture permission denied</string>
+    <string name="toast_start_recorder_failed">Failed to start recorder</string>
+    <string name="toast_copied_timestamp">Copied {timestamp} to clipboard</string>
+    <string name="toast_accessibility_permission_mic">Please enable Accessibility permission for RecorderX to control mic</string>
+    <string name="toast_camera_permission_required">Please grant Camera permission in RecorderX</string>
+    <string name="toast_accessibility_permission_screenshot">Please enable Accessibility permission for RecorderX to take screenshots</string>
+    <string name="toast_recording_deleted">Recording deleted</string>
+    <string name="toast_hardware_av1_not_found">Hardware AV1 not found. Recording in Software AV1 mode…</string>
+    <string name="toast_codec_fallback">%1$s has no hardware encoder here, recording in %2$s instead.</string>
+    <string name="toast_hardware_overloaded">Hardware overloaded. Auto-downgrading…</string>
+    <string name="toast_screenshot_saved">Screenshot saved to Pictures/RecorderX</string>
+
+    <!-- Widgets -->
+    <string name="widget_quick_record_title">Quick Record</string>
+    <string name="widget_control_center_title">Control Center</string>
+    <string name="widget_btn_rec">REC</string>
+    <string name="widget_btn_stop">STOP</string>
+    <string name="widget_btn_last">LAST</string>
+    <string name="widget_btn_app">APP</string>
+    <string name="widget_btn_bubble">BUBBLE</string>
+    <string name="widget_btn_cam">CAM</string>
+    <string name="widget_btn_portrait">PORT</string>
+    <string name="widget_btn_landscape">LAND</string>
+    <string name="widget_btn_audio_sys">SYS</string>
+    <string name="widget_btn_audio_mix">SYS+MIC</string>
+    <string name="widget_btn_audio_mic">MIC</string>
+    <string name="widget_btn_audio_off">OFF</string>
+    <string name="toast_audio_sys">Audio: System (SYS)</string>
+    <string name="toast_audio_sys_mic">Audio: System + Mic (SYS+MIC)</string>
+    <string name="toast_audio_mic">Audio: Microphone (MIC)</string>
+    <string name="toast_orientation_portrait">Orientation: Portrait</string>
+    <string name="toast_orientation_landscape">Orientation: Landscape</string>
+    <string name="toast_bubble_on">Floating Bubble: ON</string>
+    <string name="toast_bubble_off">Floating Bubble: OFF</string>
+    <string name="toast_camera_on">Camera Overlay: ON</string>
+    <string name="toast_camera_off">Camera Overlay: OFF</string>
+    <string name="toast_camera_armed">Camera: ON (Starts with recording)</string>
+
+    <!-- What's New Dialog (v3.1.1) -->
+    <string name="whats_new_title">WHAT\'S NEW</string>
+    <string name="whats_new_version">v3.1.1</string>
+    <string name="whats_new_facecam_title">Added Face Cam</string>
+    <string name="whats_new_facecam_desc">Hold 2 sec on camera icon in bubble for cam settings (switch front/back, resize, circle/rect shape).</string>
+    <string name="whats_new_widgets_title">Added 2 Widgets</string>
+    <string name="whats_new_widgets_desc">Added 1×1 Quick Record &amp; 1×2 Control Center widgets with live audio, camera, and orientation toggles.</string>
+    <string name="whats_new_fixes_title">Minor Bug Fixes</string>
+    <string name="whats_new_fixes_desc">Isolated screen capture dialog, synchronized live camera status, and stability improvements.</string>
+    <string name="whats_new_btn">GOT IT</string>
 </resources>

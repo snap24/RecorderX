@@ -31,6 +31,28 @@ public class DrawingOverlayView extends View {
     private DrawnItem selectedItem = null;
     private float lastTouchX, lastTouchY;
 
+    public interface OnDrawingTouchListener {
+        void onDrawingStarted();
+    }
+    private OnDrawingTouchListener drawingTouchListener;
+
+    public interface CameraTouchDelegate {
+        boolean isCameraShowing();
+        boolean isCameraHit(float rawX, float rawY);
+        Path getCameraClipPath(float drawingViewScreenX, float drawingViewScreenY);
+        boolean onCameraTouchEvent(MotionEvent event);
+    }
+    private CameraTouchDelegate cameraTouchDelegate;
+    private boolean isInteractingWithCamera = false;
+
+    public void setOnDrawingTouchListener(OnDrawingTouchListener listener) {
+        this.drawingTouchListener = listener;
+    }
+
+    public void setCameraTouchDelegate(CameraTouchDelegate delegate) {
+        this.cameraTouchDelegate = delegate;
+    }
+
     public DrawingOverlayView(Context context) {
         super(context);
         paint.setAntiAlias(true);
@@ -72,6 +94,16 @@ public class DrawingOverlayView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         
+        int saveCount = canvas.save();
+        if (cameraTouchDelegate != null && cameraTouchDelegate.isCameraShowing()) {
+            int[] drawLoc = new int[2];
+            getLocationOnScreen(drawLoc);
+            Path clipPath = cameraTouchDelegate.getCameraClipPath(drawLoc[0], drawLoc[1]);
+            if (clipPath != null) {
+                canvas.clipOutPath(clipPath);
+            }
+        }
+
         for (DrawnItem item : drawnItems) {
             item.draw(canvas, paint);
         }
@@ -108,6 +140,8 @@ public class DrawingOverlayView extends View {
                     break;
             }
         }
+
+        canvas.restoreToCount(saveCount);
     }
 
     private void drawArrow(Canvas canvas, float x1, float y1, float x2, float y2, Paint paint) {
@@ -125,8 +159,37 @@ public class DrawingOverlayView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        int action = event.getActionMasked();
+
+        // 1. If currently interacting with/dragging camera, forward all events
+        if (isInteractingWithCamera) {
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                isInteractingWithCamera = false;
+            }
+            if (cameraTouchDelegate != null) {
+                cameraTouchDelegate.onCameraTouchEvent(event);
+            }
+            invalidate();
+            return true;
+        }
+
+        // 2. On ACTION_DOWN, check if touch lands on camera overlay
+        if (action == MotionEvent.ACTION_DOWN) {
+            if (cameraTouchDelegate != null && cameraTouchDelegate.isCameraShowing()) {
+                if (cameraTouchDelegate.isCameraHit(event.getRawX(), event.getRawY())) {
+                    isInteractingWithCamera = true;
+                    cameraTouchDelegate.onCameraTouchEvent(event);
+                    return true;
+                }
+            }
+        }
+
         float x = event.getX();
         float y = event.getY();
+
+        if (action == MotionEvent.ACTION_DOWN && drawingTouchListener != null) {
+            drawingTouchListener.onDrawingStarted();
+        }
 
         if (currentMode == Mode.MOVE) {
             switch (event.getAction()) {

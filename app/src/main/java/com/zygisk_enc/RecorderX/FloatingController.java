@@ -12,12 +12,16 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.view.Gravity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class FloatingController {
     private final Context context;
@@ -33,6 +37,9 @@ public class FloatingController {
     private android.widget.TextView tvTimer;
     private ImageView btnMic;
     private ImageView btnPause;
+    private ImageView btnCamera;
+    private CameraOverlayController cameraController;
+    private View cameraPopupView;
     private BrushController brushController;
     private boolean isExpanded = false;
     private boolean isShowing = false;
@@ -211,7 +218,7 @@ public class FloatingController {
                 } else {
                     // Accessibility service not enabled — guide user to enable it
                     android.widget.Toast.makeText(context,
-                            "Please enable Accessibility permission for RecorderX to control mic",
+                            R.string.toast_accessibility_permission_mic,
                             android.widget.Toast.LENGTH_LONG).show();
                     try {
                         android.content.Intent intent = new android.content.Intent(
@@ -225,22 +232,45 @@ public class FloatingController {
             });
             
             ImageView btnBrush = createMenuButton(new BrushController.BrushIconDrawable(), v -> {
-                collapse();
-                bubbleView.setVisibility(View.GONE);
+                if (isExpanded) {
+                    dismissFacecamPopup();
+                    timerHandler.removeCallbacks(timerRunnable);
+                    isExpanded = false;
+                    menuView.setVisibility(View.GONE);
+                }
+                hide();
                 if (brushController == null) {
                     brushController = new BrushController(context, () -> {
                         new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                            bubbleView.setVisibility(View.VISIBLE);
-                            bubbleView.setScaleX(0.5f);
-                            bubbleView.setScaleY(0.5f);
-                            bubbleView.setAlpha(0f);
-                            bubbleView.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .alpha(1f)
-                                .setDuration(150)
-                                .start();
+                            if (bubbleView != null) {
+                                bubbleView.setVisibility(View.VISIBLE);
+                                bubbleView.setScaleX(1f);
+                                bubbleView.setScaleY(1f);
+                                bubbleView.setAlpha(1f);
+                            }
+                            show();
                         });
+                    });
+                    brushController.setCameraTouchDelegate(new DrawingOverlayView.CameraTouchDelegate() {
+                        @Override
+                        public boolean isCameraShowing() {
+                            return cameraController != null && cameraController.isShowing();
+                        }
+
+                        @Override
+                        public boolean isCameraHit(float rawX, float rawY) {
+                            return cameraController != null && cameraController.containsPoint(rawX, rawY);
+                        }
+
+                        @Override
+                        public Path getCameraClipPath(float drawingViewScreenX, float drawingViewScreenY) {
+                            return cameraController != null ? cameraController.getClipPath(drawingViewScreenX, drawingViewScreenY) : null;
+                        }
+
+                        @Override
+                        public boolean onCameraTouchEvent(MotionEvent event) {
+                            return cameraController != null && cameraController.handleTouchEvent(event);
+                        }
                     });
                 }
                 brushController.show();
@@ -250,10 +280,59 @@ public class FloatingController {
                 collapse();
             });
             
+            boolean initialCamActive = CameraOverlayController.isOverlayShowing() ||
+                    new SettingsManager(context).isCameraOverlayEnabled();
+            btnCamera = createMenuButton(new CameraIconDrawable(initialCamActive, getAccentColor()), v -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                    context.checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    android.widget.Toast.makeText(context, R.string.toast_camera_permission_required, android.widget.Toast.LENGTH_LONG).show();
+                    try {
+                        Intent intent = new Intent(context, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    } catch (Exception ignored) {}
+                    return;
+                }
+
+                if (cameraController == null) {
+                    cameraController = CameraOverlayController.getInstance(context);
+                }
+
+                if (cameraController.isShowing()) {
+                    cameraController.dismiss();
+                    ((ImageView) v).setImageDrawable(new CameraIconDrawable(false, getAccentColor()));
+                } else {
+                    cameraController.show();
+                    ((ImageView) v).setImageDrawable(new CameraIconDrawable(true, getAccentColor()));
+                }
+                new SettingsManager(context).setCameraOverlayEnabled(cameraController.isShowing());
+                ControlCenterWidgetProvider.updateAllWidgets(context);
+            });
+
+            btnCamera.setOnLongClickListener(v -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                    context.checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    android.widget.Toast.makeText(context, R.string.toast_camera_permission_required, android.widget.Toast.LENGTH_LONG).show();
+                    return true;
+                }
+                if (cameraController == null) {
+                    cameraController = CameraOverlayController.getInstance(context);
+                }
+                if (!cameraController.isShowing()) {
+                    cameraController.show();
+                    btnCamera.setImageDrawable(new CameraIconDrawable(true, getAccentColor()));
+                    new SettingsManager(context).setCameraOverlayEnabled(true);
+                    ControlCenterWidgetProvider.updateAllWidgets(context);
+                }
+                showFacecamPopup();
+                return true;
+            });
+
             menuView.addView(tvTimer);
             menuView.addView(btnPause);
             menuView.addView(btnStop);
             menuView.addView(btnMic);
+            menuView.addView(btnCamera);
             menuView.addView(btnScreenshot);
             menuView.addView(btnBrush);
             menuView.addView(btnCollapse);
@@ -387,12 +466,19 @@ public class FloatingController {
             menuView.setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4));
         }
 
-        int menuWidth = showMic ? dpToPx(304) : dpToPx(256);
+        int menuWidth = showMic ? dpToPx(352) : dpToPx(304);
         int menuHeight = dpToPx(56);
         
         if (btnMic != null) {
             btnMic.setVisibility(showMic ? View.VISIBLE : View.GONE);
             btnMic.setImageDrawable(new MicIconDrawable(service.isMicMuted()));
+        }
+
+        if (btnCamera != null) {
+            boolean isCamActive = CameraOverlayController.isOverlayShowing() ||
+                    (cameraController != null && cameraController.isShowing()) ||
+                    new SettingsManager(context).isCameraOverlayEnabled();
+            btnCamera.setImageDrawable(new CameraIconDrawable(isCamActive, getAccentColor()));
         }
         
         // Adjust coordinate so the expanded menu stays completely on screen
@@ -433,6 +519,7 @@ public class FloatingController {
     public void collapse() {
         if (!isExpanded) return;
         
+        dismissFacecamPopup();
         // Stop duration timer updates
         timerHandler.removeCallbacks(timerRunnable);
         isExpanded = false;
@@ -464,10 +551,15 @@ public class FloatingController {
     }
     
     public void dismiss() {
+        dismissFacecamPopup();
         timerHandler.removeCallbacks(timerRunnable);
         if (brushController != null) {
             brushController.dismiss();
             brushController = null;
+        }
+        if (cameraController != null) {
+            cameraController.dismiss();
+            cameraController = null;
         }
         if (rootLayout != null) {
             try {
@@ -490,6 +582,25 @@ public class FloatingController {
         if (btnPause != null) {
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
                 btnPause.setImageDrawable(new PauseIconDrawable(isPaused));
+            });
+        }
+    }
+
+    public void updateMicState() {
+        if (btnMic != null) {
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                btnMic.setImageDrawable(new MicIconDrawable(service.isMicMuted()));
+            });
+        }
+    }
+
+    public void updateCameraState() {
+        if (btnCamera != null) {
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                boolean isCamActive = CameraOverlayController.isOverlayShowing() ||
+                        (cameraController != null && cameraController.isShowing()) ||
+                        new SettingsManager(context).isCameraOverlayEnabled();
+                btnCamera.setImageDrawable(new CameraIconDrawable(isCamActive, getAccentColor()));
             });
         }
     }
@@ -729,6 +840,226 @@ public class FloatingController {
             // 3. Stand stem & base plate
             canvas.drawLine(w * 0.5f, uBottom, w * 0.5f, h * 0.78f, paint);
             canvas.drawLine(w * 0.38f, h * 0.78f, w * 0.62f, h * 0.78f, paint);
+        }
+
+        @Override public void setAlpha(int alpha) {}
+        @Override public void setColorFilter(android.graphics.ColorFilter filter) {}
+        @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
+    }
+
+    private int getAccentColor() {
+        SharedPreferences themePrefs = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE);
+        int index = themePrefs.getInt("accent_color_index", 1);
+        int[] colors = {
+            Color.parseColor("#9575CD"), Color.parseColor("#FBBF24"), Color.parseColor("#10B981"),
+            Color.parseColor("#EF4444"), Color.parseColor("#3B82F6"), Color.parseColor("#EC4899"),
+            Color.parseColor("#06B6D4"), Color.parseColor("#7C3AED"), Color.parseColor("#84CC16"),
+            Color.parseColor("#F97316"), Color.parseColor("#14B8A6"), Color.parseColor("#6366F1")
+        };
+        if (index < 0 || index >= colors.length) index = 1;
+        return colors[index];
+    }
+
+    private void showFacecamPopup() {
+        dismissFacecamPopup();
+
+        if (cameraController == null) {
+            cameraController = CameraOverlayController.getInstance(context);
+        }
+
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.setGravity(Gravity.CENTER);
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Color.parseColor("#E6181818"));
+        bg.setCornerRadius(dpToPx(24));
+        bg.setStroke(dpToPx(1.5f), Color.parseColor("#66FFFFFF"));
+        layout.setBackground(bg);
+        layout.setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4));
+
+        String frontStr = context.getString(R.string.camera_front);
+        String backStr = context.getString(R.string.camera_back);
+        TextView btnFlip = createPopupTextButton(cameraController.isFrontCamera() ? frontStr : backStr, v -> {
+            cameraController.switchCamera();
+            ((TextView) v).setText(cameraController.isFrontCamera() ? frontStr : backStr);
+            android.widget.Toast.makeText(context, cameraController.isFrontCamera() ? R.string.toast_front_camera : R.string.toast_back_camera, android.widget.Toast.LENGTH_SHORT).show();
+        });
+
+        String circleStr = context.getString(R.string.camera_shape_circle);
+        String rectStr = context.getString(R.string.camera_shape_rect);
+        TextView btnShape = createPopupTextButton(cameraController.getCurrentShape() == CameraOverlayController.SHAPE_CIRCLE ? circleStr : rectStr, v -> {
+            int nextShape = (cameraController.getCurrentShape() == CameraOverlayController.SHAPE_CIRCLE)
+                    ? CameraOverlayController.SHAPE_ROUNDED_RECT
+                    : CameraOverlayController.SHAPE_CIRCLE;
+            cameraController.setShape(nextShape);
+            ((TextView) v).setText(nextShape == CameraOverlayController.SHAPE_CIRCLE ? circleStr : rectStr);
+        });
+
+        String smallStr = context.getString(R.string.camera_size_small);
+        String medStr = context.getString(R.string.camera_size_medium);
+        String largeStr = context.getString(R.string.camera_size_large);
+        String sizeLabel = cameraController.getCurrentSizeDp() == CameraOverlayController.SIZE_SMALL ? smallStr
+                : (cameraController.getCurrentSizeDp() == CameraOverlayController.SIZE_MEDIUM ? medStr : largeStr);
+        TextView btnSize = createPopupTextButton(sizeLabel, v -> {
+            int nextSize = (cameraController.getCurrentSizeDp() == CameraOverlayController.SIZE_SMALL) ? CameraOverlayController.SIZE_MEDIUM
+                    : ((cameraController.getCurrentSizeDp() == CameraOverlayController.SIZE_MEDIUM) ? CameraOverlayController.SIZE_LARGE : CameraOverlayController.SIZE_SMALL);
+            cameraController.setSize(nextSize);
+            String label = nextSize == CameraOverlayController.SIZE_SMALL ? smallStr : (nextSize == CameraOverlayController.SIZE_MEDIUM ? medStr : largeStr);
+            ((TextView) v).setText(label);
+        });
+
+        String lockedStr = context.getString(R.string.camera_pos_locked);
+        String moveStr = context.getString(R.string.camera_pos_move);
+        TextView btnLock = createPopupTextButton(cameraController.isPositionLocked() ? lockedStr : moveStr, v -> {
+            boolean nextLocked = !cameraController.isPositionLocked();
+            cameraController.setPositionLocked(nextLocked);
+            ((TextView) v).setText(nextLocked ? lockedStr : moveStr);
+            android.widget.Toast.makeText(context, nextLocked ? R.string.toast_facecam_locked : R.string.toast_facecam_movable, android.widget.Toast.LENGTH_SHORT).show();
+        });
+
+        ImageView btnClosePopup = createMenuButton(new CloseIconDrawable(), v -> {
+            dismissFacecamPopup();
+        });
+
+        layout.addView(btnFlip);
+        layout.addView(btnShape);
+        layout.addView(btnSize);
+        layout.addView(btnLock);
+        layout.addView(btnClosePopup);
+
+        int layoutType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                : WindowManager.LayoutParams.TYPE_PHONE;
+
+        WindowManager.LayoutParams popupParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                layoutType,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                PixelFormat.TRANSLUCENT
+        );
+
+        layout.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        );
+        int popupWidth = layout.getMeasuredWidth();
+        int popupHeight = layout.getMeasuredHeight();
+
+        int menuWidth = (menuView != null && menuView.getWidth() > 0)
+                ? menuView.getWidth()
+                : (service.isAudioSourceSystem() ? dpToPx(352) : dpToPx(304));
+        int menuHeight = (menuView != null && menuView.getHeight() > 0)
+                ? menuView.getHeight()
+                : dpToPx(56);
+
+        // Center popup horizontally relative to the floating menu
+        int menuCenterX = params.x + (menuWidth / 2);
+        int popupX = menuCenterX - (popupWidth / 2);
+
+        // Position popup DOWN below the floating menu
+        int popupY = params.y + menuHeight + dpToPx(8);
+        Point screenSize = getScreenSize();
+        if (popupY + popupHeight > screenSize.y && params.y - popupHeight - dpToPx(8) >= 0) {
+            popupY = params.y - popupHeight - dpToPx(8);
+        }
+
+        popupParams.gravity = Gravity.TOP | Gravity.START;
+        popupParams.x = clampX(popupX, popupWidth);
+        popupParams.y = clampY(popupY, popupHeight);
+
+        layout.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+                dismissFacecamPopup();
+                return true;
+            }
+            return false;
+        });
+
+        cameraPopupView = layout;
+        try {
+            windowManager.addView(cameraPopupView, popupParams);
+        } catch (Exception e) {
+            android.util.Log.e("FloatingController", "Failed to show camera popup", e);
+        }
+    }
+
+    private void dismissFacecamPopup() {
+        if (cameraPopupView != null) {
+            try {
+                if (cameraPopupView.isAttachedToWindow()) {
+                    windowManager.removeViewImmediate(cameraPopupView);
+                }
+            } catch (Exception ignored) {}
+            cameraPopupView = null;
+        }
+    }
+
+    private TextView createPopupTextButton(String text, View.OnClickListener listener) {
+        TextView tv = new TextView(context);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                dpToPx(36)
+        );
+        lp.setMargins(dpToPx(3), dpToPx(2), dpToPx(3), dpToPx(2));
+        tv.setLayoutParams(lp);
+        tv.setText(text);
+        tv.setTextColor(Color.WHITE);
+        tv.setTextSize(12f);
+        tv.setGravity(Gravity.CENTER);
+        tv.setPadding(dpToPx(8), 0, dpToPx(8), 0);
+
+        GradientDrawable itemBg = new GradientDrawable();
+        itemBg.setColor(Color.parseColor("#33FFFFFF"));
+        itemBg.setCornerRadius(dpToPx(14));
+        tv.setBackground(itemBg);
+
+        tv.setOnClickListener(listener);
+        return tv;
+    }
+
+    private static class CameraIconDrawable extends Drawable {
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final boolean isActive;
+        private final int accentColor;
+
+        public CameraIconDrawable(boolean isActive, int accentColor) {
+            this.isActive = isActive;
+            this.accentColor = accentColor;
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            int w = getBounds().width();
+            int h = getBounds().height();
+            if (w <= 0 || h <= 0) return;
+
+            paint.setColor(isActive ? accentColor : Color.WHITE);
+
+            // Camera top viewfinder bump
+            float bumpLeft = w * 0.38f;
+            float bumpTop = h * 0.22f;
+            float bumpRight = w * 0.62f;
+            float bumpBottom = h * 0.32f;
+            RectF bumpRect = new RectF(bumpLeft, bumpTop, bumpRight, bumpBottom);
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawRoundRect(bumpRect, 4f, 4f, paint);
+
+            // Camera main body
+            float bodyLeft = w * 0.18f;
+            float bodyTop = h * 0.30f;
+            float bodyRight = w * 0.82f;
+            float bodyBottom = h * 0.78f;
+            RectF bodyRect = new RectF(bodyLeft, bodyTop, bodyRight, bodyBottom);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(3.5f);
+            canvas.drawRoundRect(bodyRect, 8f, 8f, paint);
+
+            // Lens circle
+            paint.setStyle(isActive ? Paint.Style.FILL : Paint.Style.STROKE);
+            paint.setStrokeWidth(3f);
+            canvas.drawCircle(w * 0.5f, h * 0.54f, w * 0.16f, paint);
         }
 
         @Override public void setAlpha(int alpha) {}

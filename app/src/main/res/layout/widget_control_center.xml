@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetControlCenterRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:id="@+id/widgetCardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/bg_widget_container"
+        android:padding="2.5dp">
+
+        <!-- Row 1: REC, LAST, APP -->
+        <LinearLayout
+            android:id="@+id/widgetRow1"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- 1. Start/Stop Recording -->
+            <LinearLayout
+                android:id="@+id/widgetBtnRec"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_widget_btn"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/widgetRecIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_widget_record"
+                    android:contentDescription="@string/widget_btn_rec" />
+
+                <TextView
+                    android:id="@+id/widgetRecLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1.5dp"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="@string/widget_btn_rec"
+                    android:textColor="#FF3B30"
+                    android:textSize="7.5sp" />
+            </LinearLayout>
+
+            <!-- 2. Open Last Recording -->
+            <LinearLayout
+                android:id="@+id/widgetBtnPlayLast"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_widget_btn"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/widgetPlayLastIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_widget_play"
+                    android:contentDescription="@string/widget_btn_last" />
+
+                <TextView
+                    android:id="@+id/widgetPlayLastLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1.5dp"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="@string/widget_btn_last"
+                    android:textColor="#E0E0E0"
+                    android:textSize="7.5sp" />
+            </LinearLayout>
+
+            <!-- 3. Open App -->
+            <LinearLayout
+                android:id="@+id/widgetBtnOpenApp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_widget_btn"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/widgetOpenAppIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_widget_app"
+                    android:contentDescription="@string/widget_btn_app" />
+
+                <TextView
+                    android:id="@+id/widgetOpenAppLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1.5dp"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="@string/widget_btn_app"
+                    android:textColor="#E0E0E0"
+                    android:textSize="7.5sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Row 2: AUDIO, CAM, BUBBLE, ORIENT -->
+        <LinearLayout
+            android:id="@+id/widgetRow2"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- 4. Audio Source Toggle (SYS / SYS+MIC) -->
+            <LinearLayout
+                android:id="@+id/widgetBtnAudio"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_widget_btn"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/widgetAudioIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_widget_audio_sys"
+                    android:contentDescription="@string/widget_btn_audio_sys" />
+
+                <TextView
+                    android:id="@+id/widgetAudioLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1.5dp"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="@string/widget_btn_audio_sys"
+                    android:textColor="#FFFFFF"
+                    android:textSize="7.5sp" />
+            </LinearLayout>
+
+            <!-- 5. Camera Overlay Toggle -->
+            <LinearLayout
+                android:id="@+id/widgetBtnCam"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_widget_btn"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/widgetCamIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_widget_cam"
+                    android:contentDescription="@string/widget_btn_cam" />
+
+                <TextView
+                    android:id="@+id/widgetCamLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1.5dp"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="@string/widget_btn_cam"
+                    android:textColor="#FFFFFF"
+                    android:textSize="7.5sp" />
+            </LinearLayout>
+
+            <!-- 6. Floating Bubble Toggle -->
+            <LinearLayout
+                android:id="@+id/widgetBtnBubble"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_widget_btn"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/widgetBubbleIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_widget_bubble"
+                    android:contentDescription="@string/widget_btn_bubble" />
+
+                <TextView
+                    android:id="@+id/widgetBubbleLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1.5dp"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="@string/widget_btn_bubble"
+                    android:textColor="#FFFFFF"
+                    android:textSize="7.5sp" />
+            </LinearLayout>
+
+            <!-- 7. Orientation Toggle (Portrait/Landscape) -->
+            <LinearLayout
+                android:id="@+id/widgetBtnOrient"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_widget_btn"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/widgetOrientIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_widget_portrait"
+                    android:contentDescription="@string/widget_btn_portrait" />
+
+                <TextView
+                    android:id="@+id/widgetOrientLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1.5dp"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="@string/widget_btn_portrait"
+                    android:textColor="#FFFFFF"
+                    android:textSize="7.5sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

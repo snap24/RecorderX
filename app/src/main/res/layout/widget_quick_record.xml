@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetQuickRecordRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/bg_widget_1x1"
+    android:padding="6dp">
+
+    <ImageView
+        android:id="@+id/widgetQuickRecordIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_widget_record"
+        android:contentDescription="@string/widget_quick_record_title" />
+
+    <TextView
+        android:id="@+id/widgetQuickRecordText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/widget_btn_rec"
+        android:textColor="#FF3B30"
+        android:textSize="9sp"
+        android:fontFamily="sans-serif-black"
+        android:gravity="center" />
+
+</LinearLayout>

@@ -9,5 +9,8 @@
         <item name="colorTertiary">@color/text_secondary</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="colorSurface">@color/bg_main</item>
     </style>
 </resources>

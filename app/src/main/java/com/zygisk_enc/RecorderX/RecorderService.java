@@ -39,6 +39,11 @@ public class RecorderService extends Service {
     private static boolean isRecording = false;
     private static int resultCode;
     private static Intent projectionData;
+    private static RecorderService activeInstance;
+
+    public static RecorderService getInstance() {
+        return activeInstance;
+    }
 
     private RecordingSession recordingSession;
     private FloatingController floatingController;
@@ -95,7 +100,7 @@ public class RecorderService extends Service {
         }
     }
 
-    private static void notifyStateChanged() {
+    private void notifyStateChanged() {
         synchronized (stateListeners) {
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
                 synchronized (stateListeners) {
@@ -105,6 +110,8 @@ public class RecorderService extends Service {
                 }
             });
         }
+        QuickRecordWidgetProvider.updateAllWidgets(this);
+        ControlCenterWidgetProvider.updateAllWidgets(this);
     }
 
     public static boolean isRecording() { return isRecording; }
@@ -112,6 +119,18 @@ public class RecorderService extends Service {
     public static void setProjectionData(int code, Intent data) {
         resultCode = code;
         projectionData = data;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        activeInstance = this;
+        ControlCenterWidgetProvider.cancelPendingTermination();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleManager.updateResources(newBase));
     }
 
     @Override
@@ -129,6 +148,11 @@ public class RecorderService extends Service {
                         SettingsManager settings = new SettingsManager(this);
                         if (settings.getAudioSource() == 1 || settings.getAudioSource() == 3) {
                             type |= ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE;
+                        }
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        if (checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                            type |= ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA;
                         }
                     }
                     startForeground(NOTIFICATION_ID, notification, type);
@@ -155,21 +179,40 @@ public class RecorderService extends Service {
             if (manager != null) {
                 manager.cancel(SAVED_NOTIFICATION_ID);
             }
+            if (!isRecording) {
+                stopForeground(true);
+                stopSelf();
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    if (!MainActivity.isActivityVisible() && !isRecording && !CameraOverlayController.isOverlayShowing()) {
+                        Log.i(TAG, "Terminating process after notification delete action.");
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(0);
+                    }
+                }, 500);
+            }
         }
 
         return START_NOT_STICKY;
     }
 
     private void toggleBubbleVisibility() {
-        if (floatingController != null) {
+        if (floatingController == null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(this)) {
+                Log.w(TAG, "Cannot show floating control: overlay permission not granted");
+                return;
+            }
+            floatingController = new FloatingController(this);
+            floatingController.show();
+            isBubbleHidden = false;
+        } else {
             isBubbleHidden = !isBubbleHidden;
             if (isBubbleHidden) {
                 floatingController.hide();
             } else {
                 floatingController.show();
             }
-            updateNotificationPaused(recordingSession != null && recordingSession.isPaused());
         }
+        updateNotificationPaused(recordingSession != null && recordingSession.isPaused());
     }
 
     private void startRecording(Intent intent) {
@@ -202,6 +245,7 @@ public class RecorderService extends Service {
                 acquireWakeLock();
                 isRecording = true;
                 isTaskRemovedFromRecents = false;
+                isBubbleHidden = false;
                 notifyStateChanged();
 
                 if (settings.isFloatingControlEnabled()) {
@@ -210,6 +254,14 @@ public class RecorderService extends Service {
                     } else {
                         floatingController = new FloatingController(this);
                         floatingController.show();
+                    }
+                }
+
+                if (settings.isCameraOverlayEnabled()) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || android.provider.Settings.canDrawOverlays(this)) {
+                        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                            CameraOverlayController.getInstance(this).show();
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -236,6 +288,10 @@ public class RecorderService extends Service {
             floatingController.dismiss();
             floatingController = null;
         }
+        if (CameraOverlayController.isOverlayShowing()) {
+            CameraOverlayController.getInstance(this).dismiss();
+        }
+        isBubbleHidden = false;
 
         if (recordingSession != null) {
             String lastPath = recordingSession.getOutputFilePath();
@@ -254,16 +310,14 @@ public class RecorderService extends Service {
         stopForeground(true);
         stopSelf();
 
-        if (isTaskRemovedFromRecents) {
-            Log.i(TAG, "stopRecording: Task was swiped from Recents earlier. Scheduling clean process termination...");
-            isTaskRemovedFromRecents = false;
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                if (!isRecording) {
-                    Log.i(TAG, "Terminating process cleanly since task was swiped from Recents.");
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                }
-            }, 600);
-        }
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            if (!isRecording) {
+                MainActivity.finishIfOpen();
+                Log.i(TAG, "Terminating process cleanly after recording stopped.");
+                android.os.Process.killProcess(android.os.Process.myPid());
+                System.exit(0);
+            }
+        }, 800);
     }
 
     public boolean isPaused() {
@@ -287,7 +341,7 @@ public class RecorderService extends Service {
                 if (onCompleted != null) onCompleted.run();
             } else {
                 new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                    android.widget.Toast.makeText(this, "Please enable Accessibility permission for RecorderX to take screenshots", android.widget.Toast.LENGTH_LONG).show();
+                    android.widget.Toast.makeText(this, R.string.toast_accessibility_permission_screenshot, android.widget.Toast.LENGTH_LONG).show();
                     try {
                         Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -315,6 +369,19 @@ public class RecorderService extends Service {
         if (recordingSession != null) {
             recordingSession.setMicMuted(muted);
         }
+        if (floatingController != null) {
+            floatingController.updateMicState();
+        }
+    }
+
+    public void updateCameraState() {
+        if (floatingController != null) {
+            floatingController.updateCameraState();
+        }
+    }
+
+    public FloatingController getFloatingController() {
+        return floatingController;
     }
 
     public boolean isAudioSourceSystem() {
@@ -410,12 +477,12 @@ public class RecorderService extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, SAVED_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_record)
-            .setContentTitle("Recording Saved")
-            .setContentText("Tap to view your recording in /Movies/RecorderX")
+            .setContentTitle(getString(R.string.notification_saved_title))
+            .setContentText(getString(R.string.notification_saved_text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .addAction(0, "Delete", deletePendingIntent);
+            .addAction(0, getString(R.string.notification_action_delete), deletePendingIntent);
 
         if (thumbnail != null) {
             builder.setLargeIcon(thumbnail);
@@ -441,7 +508,7 @@ public class RecorderService extends Service {
                 }
             }
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                android.widget.Toast.makeText(getApplicationContext(), "Recording deleted", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(getApplicationContext(), R.string.toast_recording_deleted, android.widget.Toast.LENGTH_SHORT).show();
             });
         } catch (Exception e) {
             Log.e(TAG, "Failed to delete recording file", e);
@@ -452,10 +519,10 @@ public class RecorderService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = getSystemService(NotificationManager.class);
             
-            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, "Recorder Service", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, getString(R.string.channel_recorder_service), NotificationManager.IMPORTANCE_DEFAULT);
             manager.createNotificationChannel(serviceChannel);
             
-            NotificationChannel savedChannel = new NotificationChannel(SAVED_CHANNEL_ID, "Recording Saved", NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel savedChannel = new NotificationChannel(SAVED_CHANNEL_ID, getString(R.string.channel_recording_saved), NotificationManager.IMPORTANCE_HIGH);
             manager.createNotificationChannel(savedChannel);
         }
     }
@@ -483,8 +550,8 @@ public class RecorderService extends Service {
             PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
 
-        String title = paused ? "RecorderX is paused" : "RecorderX is active";
-        String actionLabel = paused ? "Resume Recording" : "Pause Recording";
+        String title = paused ? getString(R.string.notification_paused_title) : getString(R.string.notification_active_title);
+        String actionLabel = paused ? getString(R.string.notification_action_resume) : getString(R.string.notification_action_pause);
 
         android.graphics.drawable.Icon pauseIcon = getOrCreateTextIcon(paused ? "RESUME" : "PAUSE");
         android.graphics.drawable.Icon stopIcon = getOrCreateTextIcon("STOP");
@@ -497,32 +564,40 @@ public class RecorderService extends Service {
                 pauseIcon, actionLabel, pausePendingIntent
             ).build())
             .addAction(new Notification.Action.Builder(
-                stopIcon, "Stop Recording", stopPendingIntent
+                stopIcon, getString(R.string.stop_recording), stopPendingIntent
             ).build());
 
         SettingsManager settings = new SettingsManager(this);
-        if (settings.isFloatingControlEnabled()) {
-            Intent bubbleIntent = new Intent(this, RecorderService.class);
-            bubbleIntent.setAction(ACTION_TOGGLE_BUBBLE);
-            PendingIntent bubblePendingIntent = PendingIntent.getService(
-                this, 
-                1, 
-                bubbleIntent, 
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
-            );
+        boolean enabledInSettings = settings.isFloatingControlEnabled();
 
-            String bubbleLabel = isBubbleHidden ? "Show Bubble" : "Hide Bubble";
-            android.graphics.drawable.Icon bubbleIcon = getOrCreateTextIcon(isBubbleHidden ? "SHOW" : "HIDE");
+        Intent bubbleIntent = new Intent(this, RecorderService.class);
+        bubbleIntent.setAction(ACTION_TOGGLE_BUBBLE);
+        PendingIntent bubblePendingIntent = PendingIntent.getService(
+            this, 
+            1, 
+            bubbleIntent, 
+            PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+        );
 
-            builder.addAction(new Notification.Action.Builder(
-                bubbleIcon, bubbleLabel, bubblePendingIntent
-            ).build());
-            builder.setStyle(new Notification.MediaStyle()
-                .setShowActionsInCompactView(0, 1, 2));
+        String bubbleLabel;
+        String iconText;
+
+        if (enabledInSettings) {
+            bubbleLabel = isBubbleHidden ? getString(R.string.notification_action_show) : getString(R.string.notification_action_hide);
+            iconText = isBubbleHidden ? "SHOW" : "HIDE";
         } else {
-            builder.setStyle(new Notification.MediaStyle()
-                .setShowActionsInCompactView(0, 1));
+            boolean isCurrentlyActive = (floatingController != null && !isBubbleHidden);
+            bubbleLabel = isCurrentlyActive ? getString(R.string.notification_action_off) : getString(R.string.notification_action_bubble);
+            iconText = isCurrentlyActive ? "OFF" : "BUBBLE";
         }
+
+        android.graphics.drawable.Icon bubbleIcon = getOrCreateTextIcon(iconText);
+
+        builder.addAction(new Notification.Action.Builder(
+            bubbleIcon, bubbleLabel, bubblePendingIntent
+        ).build());
+        builder.setStyle(new Notification.MediaStyle()
+            .setShowActionsInCompactView(0, 1, 2));
 
         return builder.build();
     }
@@ -532,6 +607,8 @@ public class RecorderService extends Service {
     private android.graphics.drawable.Icon cachedStopIcon;
     private android.graphics.drawable.Icon cachedShowIcon;
     private android.graphics.drawable.Icon cachedHideIcon;
+    private android.graphics.drawable.Icon cachedBubbleIcon;
+    private android.graphics.drawable.Icon cachedOffIcon;
 
     private android.graphics.drawable.Icon getOrCreateTextIcon(String text) {
         switch (text) {
@@ -550,6 +627,12 @@ public class RecorderService extends Service {
             case "HIDE":
                 if (cachedHideIcon == null) cachedHideIcon = createTextIcon("HIDE");
                 return cachedHideIcon;
+            case "BUBBLE":
+                if (cachedBubbleIcon == null) cachedBubbleIcon = createTextIcon("BUBBLE");
+                return cachedBubbleIcon;
+            case "OFF":
+                if (cachedOffIcon == null) cachedOffIcon = createTextIcon("OFF");
+                return cachedOffIcon;
             default:
                 return createTextIcon(text);
         }
@@ -586,9 +669,13 @@ public class RecorderService extends Service {
 
     @Override
     public void onDestroy() {
+        activeInstance = null;
         if (floatingController != null) {
             floatingController.dismiss();
             floatingController = null;
+        }
+        if (CameraOverlayController.isOverlayShowing()) {
+            CameraOverlayController.getInstance(this).dismiss();
         }
         if (recordingSession != null) {
             recordingSession.stop();
@@ -613,6 +700,8 @@ public class RecorderService extends Service {
             Log.i(TAG, "onTaskRemoved: Not recording, stopping service and clearing RAM.");
             stopForeground(true);
             stopSelf();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(0);
         }
     }
 

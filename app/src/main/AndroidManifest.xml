@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <attribution android:tag="recorder_x" android:label="@string/app_name" />
 
@@ -43,12 +47,14 @@
             android:name=".RequestCaptureActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:noHistory="true"
             android:exported="false" />
 
         <service
             android:name=".RecorderService"
             android:exported="false"
-            android:foregroundServiceType="mediaProjection|microphone" />
+            android:foregroundServiceType="mediaProjection|microphone|camera" />
 
         <service
             android:name=".RecorderTileService"
@@ -71,6 +77,44 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+
+        <activity
+            android:name=".WidgetActionActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:noHistory="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".QuickRecordWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_quick_record_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.zygisk_enc.RecorderX.ACTION_WIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_record_info" />
+        </receiver>
+
+        <receiver
+            android:name=".ControlCenterWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_control_center_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.zygisk_enc.RecorderX.ACTION_WIDGET_UPDATE" />
+                <action android:name="com.zygisk_enc.RecorderX.ACTION_TOGGLE_AUDIO" />
+                <action android:name="com.zygisk_enc.RecorderX.ACTION_TOGGLE_BUBBLE" />
+                <action android:name="com.zygisk_enc.RecorderX.ACTION_TOGGLE_CAM" />
+                <action android:name="com.zygisk_enc.RecorderX.ACTION_TOGGLE_ORIENT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_control_center_info" />
+        </receiver>
     </application>
 
 </manifest>

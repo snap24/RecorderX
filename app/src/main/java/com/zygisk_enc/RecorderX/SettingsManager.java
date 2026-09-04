@@ -53,6 +53,9 @@ public class SettingsManager {
     public void setFloatingControlEnabled(boolean enabled) { prefs.edit().putBoolean("floating_control", enabled).apply(); }
     public boolean isFloatingControlEnabled() { return prefs.getBoolean("floating_control", false); }
 
+    public void setCameraOverlayEnabled(boolean enabled) { prefs.edit().putBoolean("camera_overlay_enabled", enabled).apply(); }
+    public boolean isCameraOverlayEnabled() { return prefs.getBoolean("camera_overlay_enabled", false); }
+
     public void setNamingTemplate(String template) { prefs.edit().putString(KEY_NAMING_TEMPLATE, template).apply(); }
     
     public String getRawNamingTemplate() {

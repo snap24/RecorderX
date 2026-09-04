@@ -62,8 +62,39 @@ public class MainActivity extends AppCompatActivity {
         super.attachBaseContext(LocaleManager.updateResources(newBase));
     }
 
+    private static boolean isActivityVisible = false;
+    private static MainActivity activeInstance = null;
+
+    public static boolean isActivityVisible() {
+        return isActivityVisible;
+    }
+
+    public static void finishIfOpen() {
+        if (activeInstance != null && !activeInstance.isFinishing() && !activeInstance.isDestroyed()) {
+            activeInstance.finishAndRemoveTask();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        activeInstance = this;
+        isActivityVisible = true;
+        ControlCenterWidgetProvider.cancelPendingTermination();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isActivityVisible = false;
+    }
+
     @Override
     protected void onDestroy() {
+        isActivityVisible = false;
+        if (activeInstance == this) {
+            activeInstance = null;
+        }
         RecorderService.unregisterStateListener(recordingStateListener);
         super.onDestroy();
     }
@@ -71,17 +102,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         android.content.SharedPreferences themePrefs = getSharedPreferences("theme_prefs", MODE_PRIVATE);
-        // First launch auto-detection of system theme
-        if (!themePrefs.contains("theme_mode")) {
+        boolean isManual = themePrefs.getBoolean("is_manual_theme", false);
+        int themeMode;
+        if (isManual) {
+            themeMode = themePrefs.getInt("theme_mode", 1);
+            if (themeMode != 0 && themeMode != 1) {
+                themeMode = 1;
+            }
+        } else {
+            // Automatically follow device system theme on every launch until user manually toggles
             int currentNightMode = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
-            int defaultMode = (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) ? 1 : 0;
-            themePrefs.edit().putInt("theme_mode", defaultMode).apply();
+            themeMode = (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) ? 1 : 0;
         }
-        int themeMode = themePrefs.getInt("theme_mode", 1);
-        if (themeMode != 0 && themeMode != 1) {
-            themeMode = 1;
-            themePrefs.edit().putInt("theme_mode", 1).apply();
-        }
+
         if (themeMode == 0) {
             androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO);
         } else {
@@ -94,10 +127,14 @@ public class MainActivity extends AppCompatActivity {
         settingsManager = new SettingsManager(this);
         initUI();
         RecorderService.registerStateListener(recordingStateListener);
+        checkAndShowWhatsNew();
         
         if (!checkPermissions()) {
             java.util.ArrayList<String> permissions = new java.util.ArrayList<>();
             permissions.add(Manifest.permission.RECORD_AUDIO);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.CAMERA);
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 permissions.add(Manifest.permission.POST_NOTIFICATIONS);
             }
@@ -146,9 +183,9 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     if (titleMain != null) {
                         if (isShowingTitleText) {
-                            titleMain.setText("SWIPE HERE");
+                            titleMain.setText(R.string.title_swipe_here);
                         } else {
-                            titleMain.setText("RECORDER X");
+                            titleMain.setText(R.string.app_name);
                         }
                         isShowingTitleText = !isShowingTitleText;
                     }
@@ -161,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             if (swipeHintIcon != null) swipeHintIcon.setVisibility(android.view.View.GONE);
-            if (titleMain != null) titleMain.setText("RECORDER");
+            if (titleMain != null) titleMain.setText(R.string.title_recorder);
             if (titleX != null) {
                 titleX.setVisibility(android.view.View.VISIBLE);
                 startXPulseAnimation();
@@ -170,34 +207,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initUI() {
+        com.google.android.material.appbar.AppBarLayout appBarLayout = findViewById(R.id.appBarLayout);
+        if (appBarLayout != null) {
+            appBarLayout.setLiftOnScroll(false);
+            appBarLayout.setLiftable(false);
+            appBarLayout.setLifted(false);
+            appBarLayout.setStatusBarForeground(null);
+            appBarLayout.setOutlineProvider(null);
+        }
+
         btnRecord = findViewById(R.id.btnRecord);
         btnRecord.setOnClickListener(v -> toggleRecording());
 
         android.widget.TextView btnThemeToggle = findViewById(R.id.btnThemeToggle);
         android.content.SharedPreferences themePrefs = getSharedPreferences("theme_prefs", MODE_PRIVATE);
         
-        // Auto-detect system preference if not set
-        if (!themePrefs.contains("theme_mode")) {
+        boolean isManual = themePrefs.getBoolean("is_manual_theme", false);
+        int activeMode;
+        if (isManual) {
+            activeMode = themePrefs.getInt("theme_mode", 1);
+            if (activeMode != 0 && activeMode != 1) {
+                activeMode = 1;
+            }
+        } else {
             int currentNightMode = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
-            int defaultMode = (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) ? 1 : 0;
-            themePrefs.edit().putInt("theme_mode", defaultMode).apply();
-        }
-        
-        int initialMode = themePrefs.getInt("theme_mode", 1);
-        if (initialMode != 0 && initialMode != 1) {
-            initialMode = 1;
+            activeMode = (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) ? 1 : 0;
         }
         
         // In Light mode (0), show D. In Dark mode (1), show L.
-        btnThemeToggle.setText(initialMode == 0 ? "D" : "L");
+        btnThemeToggle.setText(activeMode == 0 ? "D" : "L");
         
         btnThemeToggle.setOnClickListener(v -> {
-            int currentMode = themePrefs.getInt("theme_mode", 1);
-            if (currentMode != 0 && currentMode != 1) {
-                currentMode = 1;
+            boolean wasManual = themePrefs.getBoolean("is_manual_theme", false);
+            int curMode;
+            if (wasManual) {
+                curMode = themePrefs.getInt("theme_mode", 1);
+                if (curMode != 0 && curMode != 1) {
+                    curMode = 1;
+                }
+            } else {
+                int currentNightMode = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+                curMode = (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) ? 1 : 0;
             }
-            int nextMode = 1 - currentMode; // Toggle directly between 0 (Light) and 1 (Dark)
-            themePrefs.edit().putInt("theme_mode", nextMode).apply();
+            int nextMode = 1 - curMode; // Toggle directly between 0 (Light) and 1 (Dark)
+            
+            themePrefs.edit()
+                .putBoolean("is_manual_theme", true)
+                .putInt("theme_mode", nextMode)
+                .apply();
             
             if (nextMode == 0) {
                 androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO);
@@ -264,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 java.io.File folder = new java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_MOVIES), "RecorderX");
                 if (!folder.exists() || folder.listFiles() == null) {
-                    Toast.makeText(this, "No recordings found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_no_recordings, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -274,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 if (files == null || files.length == 0) {
-                    Toast.makeText(this, "No recordings found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_no_recordings, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -286,16 +343,33 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                android.net.Uri fileUri = androidx.core.content.FileProvider.getUriForFile(this, getPackageName() + ".provider", lastFile);
+                android.net.Uri fileUri = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    try (android.database.Cursor cursor = getContentResolver().query(
+                            android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                            new String[]{android.provider.MediaStore.Video.Media._ID},
+                            android.provider.MediaStore.Video.Media.DATA + "=? OR " + android.provider.MediaStore.Video.Media.DISPLAY_NAME + "=?",
+                            new String[]{lastFile.getAbsolutePath(), lastFile.getName()},
+                            android.provider.MediaStore.Video.Media._ID + " DESC")) {
+                        if (cursor != null && cursor.moveToFirst()) {
+                            long id = cursor.getLong(cursor.getColumnIndexOrThrow(android.provider.MediaStore.Video.Media._ID));
+                            fileUri = android.content.ContentUris.withAppendedId(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+                        }
+                    } catch (Exception ignored) {}
+                }
+                if (fileUri == null) {
+                    fileUri = androidx.core.content.FileProvider.getUriForFile(this, getPackageName() + ".provider", lastFile);
+                }
 
                 Intent viewIntent = new Intent(Intent.ACTION_VIEW);
                 viewIntent.setDataAndType(fileUri, "video/*");
                 viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                Intent chooserIntent = Intent.createChooser(viewIntent, "Open Last Recording with...");
-                startActivity(chooserIntent);
+                startActivity(viewIntent);
+            } catch (android.content.ActivityNotFoundException e) {
+                Toast.makeText(this, R.string.toast_no_video_player, Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
-                Toast.makeText(this, "No recordings found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_no_recordings, Toast.LENGTH_SHORT).show();
             }
         });
             
@@ -448,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
                     layout.setBackground(bg);
 
                     android.widget.TextView tvTitle = new android.widget.TextView(this);
-                    tvTitle.setText("⚠  Auto Orientation Warning");
+                    tvTitle.setText(R.string.dialog_auto_orientation_title);
                     tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 16);
                     tvTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
                     tvTitle.setTextColor(getActiveAccentColor());
@@ -459,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
                     layout.addView(tvTitle, titleParams);
 
                     android.widget.TextView tvMsg = new android.widget.TextView(this);
-                    tvMsg.setText("Auto Orientation is a gimmick and will degrade your recording quality.\n\nAndroid dynamically rotates the virtual display mid-recording, often causing resolution mismatches, black bars, and encoder instability.\n\nWe strongly recommend manually selecting Portrait or Landscape to match the primary orientation of the app you intend to record — this produces the best, most consistent output.");
+                    tvMsg.setText(R.string.dialog_auto_orientation_message);
                     tvMsg.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
                     tvMsg.setTextColor(getResources().getColor(R.color.text_primary, getTheme()));
                     android.widget.LinearLayout.LayoutParams msgParams = new android.widget.LinearLayout.LayoutParams(
@@ -469,7 +543,7 @@ public class MainActivity extends AppCompatActivity {
                     layout.addView(tvMsg, msgParams);
 
                     android.widget.Button btnOk = new android.widget.Button(this);
-                    btnOk.setText("I Understand (5)");
+                    btnOk.setText(getString(R.string.dialog_auto_orientation_button_timer, 3));
                     btnOk.setEnabled(false);
                     android.graphics.drawable.GradientDrawable btnBg = new android.graphics.drawable.GradientDrawable();
                     btnBg.setColor(getActiveAccentColor());
@@ -527,10 +601,10 @@ public class MainActivity extends AppCompatActivity {
                     // Timer only updates text and re-enables — never touches click listener
                     new android.os.CountDownTimer(3000, 1000) {
                         @Override public void onTick(long ms) {
-                            btnOk.setText("I Understand (" + (ms / 1000 + 1) + ")");
+                            btnOk.setText(getString(R.string.dialog_auto_orientation_button_timer, (int)(ms / 1000 + 1)));
                         }
                         @Override public void onFinish() {
-                            btnOk.setText("I Understand");
+                            btnOk.setText(R.string.dialog_auto_orientation_button);
                             btnOk.setEnabled(true);
                         }
                     }.start();
@@ -541,6 +615,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             settingsManager.setOrientation(selected);
+            ControlCenterWidgetProvider.updateAllWidgets(MainActivity.this);
         });
         setupSlider(R.id.bitrateModeSlider, R.array.bitrate_mode_options, settingsManager.getBitrateMode(), 
             index -> settingsManager.setBitrateMode(index));
@@ -554,7 +629,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Audio Settings
         setupSlider(R.id.audioSlider, R.array.audio_options, settingsManager.getAudioSource(), 
-            index -> settingsManager.setAudioSource(index));
+            index -> {
+                settingsManager.setAudioSource(index);
+                ControlCenterWidgetProvider.updateAllWidgets(MainActivity.this);
+            });
         setupSlider(R.id.audioQualitySlider, R.array.audio_quality_options, settingsManager.getAudioQuality(), 
             index -> settingsManager.setAudioQuality(index));
 
@@ -566,15 +644,15 @@ public class MainActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(MainActivity.this)) {
                     switchFloating.setChecked(false);
                     new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Overlay Permission Required")
-                        .setMessage("To display the floating controller bubble, RecorderX needs permission to display over other apps. Please grant it on the next screen.")
-                        .setPositiveButton("Grant", (dialog, which) -> {
+                        .setTitle(R.string.dialog_overlay_permission_title)
+                        .setMessage(R.string.dialog_overlay_permission_message)
+                        .setPositiveButton(R.string.btn_grant, (dialog, which) -> {
                             settingsManager.setFloatingControlEnabled(true);
                             Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                 android.net.Uri.parse("package:" + getPackageName()));
                             startActivity(intent);
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(R.string.btn_cancel, null)
                         .show();
                 } else {
                     settingsManager.setFloatingControlEnabled(true);
@@ -582,6 +660,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 settingsManager.setFloatingControlEnabled(false);
             }
+            ControlCenterWidgetProvider.updateAllWidgets(MainActivity.this);
         });
 
         // Output Settings
@@ -652,6 +731,10 @@ public class MainActivity extends AppCompatActivity {
         
         permissions.add(Manifest.permission.RECORD_AUDIO);
         
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.CAMERA);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS);
         }
@@ -663,10 +746,11 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            boolean audioGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+            if (audioGranted) {
                 startProjectionRequest();
             } else {
-                Toast.makeText(this, "Audio permission required for Mic", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_audio_permission_required, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -685,7 +769,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK && data != null) {
                 startRecording(resultCode, data);
             } else {
-                Toast.makeText(this, "Screen capture permission denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_screen_capture_denied, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -705,7 +789,7 @@ public class MainActivity extends AppCompatActivity {
             btnRecord.setText(R.string.stop_recording);
         } catch (Exception e) {
             android.util.Log.e("RecorderX_Main", "Failed to start service", e);
-            Toast.makeText(this, "Failed to start recorder", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_start_recorder_failed, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -744,6 +828,9 @@ public class MainActivity extends AppCompatActivity {
                 toggleRecording();
             }
         }
+
+        QuickRecordWidgetProvider.updateAllWidgets(this);
+        ControlCenterWidgetProvider.updateAllWidgets(this);
     }
 
     private void applyAccentColor(int color) {
@@ -833,7 +920,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupNamingTemplateHelper() {
         android.widget.TextView tvHelper = findViewById(R.id.tvNamingTemplateHelper);
         if (tvHelper != null) {
-            String text = "Type your preferred prefix in the template box to personalize your saved video titles.\nAdd the {timestamp} placeholder to ensure every file is organized sequentially by date.\nInvalid characters are stripped automatically, defaulting to a clean timestamp if empty.\nFormat: yyyyMMdd_HHmmss (e.g. 20260712_143000).";
+            String text = getString(R.string.naming_template_helper);
             android.text.SpannableString spannable = new android.text.SpannableString(text);
             String target = "{timestamp}";
             int startIdx = text.indexOf(target);
@@ -846,7 +933,7 @@ public class MainActivity extends AppCompatActivity {
                         android.content.ClipData clip = android.content.ClipData.newPlainText("timestamp_placeholder", "{timestamp}");
                         if (clipboard != null) {
                             clipboard.setPrimaryClip(clip);
-                            Toast.makeText(MainActivity.this, "Copied {timestamp} to clipboard", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, R.string.toast_copied_timestamp, Toast.LENGTH_SHORT).show();
                         }
                     }
                     
@@ -875,6 +962,17 @@ public class MainActivity extends AppCompatActivity {
             // If the text color matches the default accent_lavender, recolor it!
             if (tv.getCurrentTextColor() == getResources().getColor(R.color.accent_lavender, getTheme())) {
                 tv.setTextColor(color);
+            }
+            if (view.getId() == R.id.dialogWhatsNewVersion) {
+                android.graphics.drawable.GradientDrawable pill = new android.graphics.drawable.GradientDrawable();
+                pill.setCornerRadius(4 * getResources().getDisplayMetrics().density);
+                pill.setStroke((int) (1 * getResources().getDisplayMetrics().density), color);
+                tv.setBackground(pill);
+            }
+        } else if (view instanceof android.widget.ImageView) {
+            android.widget.ImageView iv = (android.widget.ImageView) view;
+            if ("dynamic_accent".equals(iv.getTag())) {
+                iv.setImageTintList(android.content.res.ColorStateList.valueOf(color));
             }
         }
         // Tint underlay/understood button if it's the target R.id.btnUnderstood
@@ -909,7 +1007,7 @@ public class MainActivity extends AppCompatActivity {
             // Show custom pulsing X letter
             android.widget.TextView titleMain = findViewById(R.id.titleMain);
             android.widget.TextView titleX = findViewById(R.id.titleX);
-            if (titleMain != null) titleMain.setText("RECORDER");
+            if (titleMain != null) titleMain.setText(R.string.title_recorder);
             if (titleX != null) {
                 titleX.setVisibility(android.view.View.VISIBLE);
                 startXPulseAnimation();
@@ -973,7 +1071,7 @@ public class MainActivity extends AppCompatActivity {
         layout.setBackground(bg);
 
         android.widget.TextView tvTitle = new android.widget.TextView(this);
-        tvTitle.setText("⚠  AV1 Software Encoding");
+        tvTitle.setText(R.string.dialog_av1_software_title);
         tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 16);
         tvTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
         tvTitle.setTextColor(getActiveAccentColor());
@@ -984,7 +1082,7 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(tvTitle, titleParams);
 
         android.widget.TextView tvMsg = new android.widget.TextView(this);
-        tvMsg.setText("Hardware AV1 encoding is not supported on this device.\n\nRecording will be performed using Software AV1 (CPU encoding). This may cause increased CPU usage, higher battery consumption, and potential frame drops on higher resolutions.");
+        tvMsg.setText(R.string.dialog_av1_software_message);
         tvMsg.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
         tvMsg.setTextColor(getResources().getColor(R.color.text_primary, getTheme()));
         android.widget.LinearLayout.LayoutParams msgParams = new android.widget.LinearLayout.LayoutParams(
@@ -994,7 +1092,7 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(tvMsg, msgParams);
 
         android.widget.Button btnOk = new android.widget.Button(this);
-        btnOk.setText("I UNDERSTAND");
+        btnOk.setText(R.string.dialog_av1_software_button);
         android.graphics.drawable.GradientDrawable btnBg = new android.graphics.drawable.GradientDrawable();
         btnBg.setColor(getActiveAccentColor());
         btnBg.setCornerRadius(4 * getResources().getDisplayMetrics().density);
@@ -1043,7 +1141,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Header Title
         android.widget.TextView tvTitle = new android.widget.TextView(this);
-        tvTitle.setText("SELECT LANGUAGE (80)");
+        tvTitle.setText(R.string.dialog_language_title);
         tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
         tvTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
         tvTitle.setTextColor(getActiveAccentColor());
@@ -1055,7 +1153,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Search Input
         android.widget.EditText searchEdit = new android.widget.EditText(this);
-        searchEdit.setHint("Search language...");
+        searchEdit.setHint(R.string.search_language_hint);
         searchEdit.setHintTextColor(getResources().getColor(R.color.text_secondary, getTheme()));
         searchEdit.setTextColor(getResources().getColor(R.color.text_primary, getTheme()));
         searchEdit.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
@@ -1089,7 +1187,11 @@ public class MainActivity extends AppCompatActivity {
                         continue;
                     }
                     android.widget.TextView tvLang = new android.widget.TextView(MainActivity.this);
-                    tvLang.setText(lang.getDisplayName());
+                    if ("sys".equals(lang.code)) {
+                        tvLang.setText(getString(R.string.lang_system_default));
+                    } else {
+                        tvLang.setText(lang.getDisplayName());
+                    }
                     tvLang.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
                     tvLang.setPadding((int)(12*getResources().getDisplayMetrics().density), (int)(12*getResources().getDisplayMetrics().density), (int)(12*getResources().getDisplayMetrics().density), (int)(12*getResources().getDisplayMetrics().density));
                     
@@ -1106,6 +1208,8 @@ public class MainActivity extends AppCompatActivity {
                                 .edit()
                                 .putString(LocaleManager.PREF_SELECTED_LANG, lang.code)
                                 .apply();
+                        ControlCenterWidgetProvider.updateAllWidgets(MainActivity.this);
+                        QuickRecordWidgetProvider.updateAllWidgets(MainActivity.this);
                         dialog.dismiss();
                         recreate();
                     });
@@ -1139,12 +1243,98 @@ public class MainActivity extends AppCompatActivity {
         dialog.setContentView(container);
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                android.view.WindowManager.LayoutParams attrs = dialog.getWindow().getAttributes();
+                attrs.setBlurBehindRadius((int) (16 * getResources().getDisplayMetrics().density));
+                dialog.getWindow().setAttributes(attrs);
+            }
             android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
             lp.copyFrom(dialog.getWindow().getAttributes());
             lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
             lp.height = android.view.WindowManager.LayoutParams.WRAP_CONTENT;
             dialog.getWindow().setAttributes(lp);
         }
+
+        // Apply blur to activity background
+        android.view.View rootView = findViewById(android.R.id.content);
+        if (rootView != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            rootView.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(15f, 15f, android.graphics.Shader.TileMode.CLAMP));
+        }
+
+        dialog.setOnDismissListener(d -> {
+            if (rootView != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                rootView.setRenderEffect(null);
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void checkAndShowWhatsNew() {
+        android.content.SharedPreferences prefs = getSharedPreferences("app_version_prefs", MODE_PRIVATE);
+        String lastSeen = prefs.getString("last_seen_whats_new", "");
+        if (!"3.1.1".equals(lastSeen)) {
+            prefs.edit().putString("last_seen_whats_new", "3.1.1").apply();
+            android.view.View root = findViewById(android.R.id.content);
+            if (root != null) {
+                root.post(this::showWhatsNewDialog);
+            } else {
+                showWhatsNewDialog();
+            }
+        }
+    }
+
+    private void showWhatsNewDialog() {
+        if (isFinishing() || isDestroyed()) return;
+
+        android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+
+        android.view.View contentView = getLayoutInflater().inflate(R.layout.dialog_whats_new, null);
+        if (contentView instanceof com.google.android.material.card.MaterialCardView) {
+            com.google.android.material.card.MaterialCardView card = (com.google.android.material.card.MaterialCardView) contentView;
+            float density = getResources().getDisplayMetrics().density;
+            card.setStrokeWidth((int) (2 * density));
+            card.setStrokeColor(android.content.res.ColorStateList.valueOf(getActiveAccentColor()));
+        }
+
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        int margin = (int) (24 * getResources().getDisplayMetrics().density);
+        container.setPadding(margin, margin, margin, margin);
+        container.addView(contentView);
+        dialog.setContentView(container);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                android.view.WindowManager.LayoutParams attrs = dialog.getWindow().getAttributes();
+                attrs.setBlurBehindRadius((int) (16 * getResources().getDisplayMetrics().density));
+                dialog.getWindow().setAttributes(attrs);
+            }
+            android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = android.view.WindowManager.LayoutParams.WRAP_CONTENT;
+            dialog.getWindow().setAttributes(lp);
+        }
+
+        applyDynamicColorsToView(dialog.getWindow().getDecorView(), getActiveAccentColor());
+
+        // Apply blur to activity background
+        android.view.View rootView = findViewById(android.R.id.content);
+        if (rootView != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            rootView.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(15f, 15f, android.graphics.Shader.TileMode.CLAMP));
+        }
+
+        dialog.setOnDismissListener(d -> {
+            if (rootView != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                rootView.setRenderEffect(null);
+            }
+        });
+
+        dialog.findViewById(R.id.btnUnderstood).setOnClickListener(view -> dialog.dismiss());
         dialog.show();
     }
 

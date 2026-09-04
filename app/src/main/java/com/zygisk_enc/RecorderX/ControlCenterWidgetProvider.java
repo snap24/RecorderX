@@ -24,26 +24,6 @@ public class ControlCenterWidgetProvider extends AppWidgetProvider {
     public static final String ACTION_TOGGLE_ORIENT = "com.zygisk_enc.RecorderX.ACTION_TOGGLE_ORIENT";
     public static final String ACTION_TOGGLE_AUDIO = "com.zygisk_enc.RecorderX.ACTION_TOGGLE_AUDIO";
 
-    private static final android.os.Handler sKillHandler = new android.os.Handler(android.os.Looper.getMainLooper());
-    private static final Runnable sKillRunnable = () -> {
-        if (!MainActivity.isActivityVisible()
-                && !RecorderService.isRecording()
-                && !CameraOverlayController.isOverlayShowing()
-                && !RequestCaptureActivity.isRequesting()) {
-            android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(0);
-        }
-    };
-
-    public static void scheduleTermination() {
-        sKillHandler.removeCallbacks(sKillRunnable);
-        sKillHandler.postDelayed(sKillRunnable, 1500);
-    }
-
-    public static void cancelPendingTermination() {
-        sKillHandler.removeCallbacks(sKillRunnable);
-    }
-
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Context localizedContext = LocaleManager.updateResources(context);
@@ -72,7 +52,6 @@ public class ControlCenterWidgetProvider extends AppWidgetProvider {
                 boolean nextState = !settingsManager.isFloatingControlEnabled();
                 settingsManager.setFloatingControlEnabled(nextState);
                 Toast.makeText(localizedContext, nextState ? R.string.toast_bubble_on : R.string.toast_bubble_off, Toast.LENGTH_SHORT).show();
-                scheduleTermination();
             }
             updateAllWidgets(localizedContext);
         } else if (ACTION_TOGGLE_CAM.equals(action)) {
@@ -107,7 +86,6 @@ public class ControlCenterWidgetProvider extends AppWidgetProvider {
                         CameraOverlayController.getInstance(localizedContext).dismiss();
                     }
                     Toast.makeText(localizedContext, nextState ? R.string.toast_camera_armed : R.string.toast_camera_off, Toast.LENGTH_SHORT).show();
-                    scheduleTermination();
                 }
             }
             updateAllWidgets(localizedContext);
@@ -117,7 +95,6 @@ public class ControlCenterWidgetProvider extends AppWidgetProvider {
             settingsManager.setOrientation(next);
             Toast.makeText(localizedContext, next == 1 ? R.string.toast_orientation_portrait : R.string.toast_orientation_landscape, Toast.LENGTH_SHORT).show();
             updateAllWidgets(localizedContext);
-            scheduleTermination();
         } else if (ACTION_TOGGLE_AUDIO.equals(action)) {
             int current = settingsManager.getAudioSource();
             int next;
@@ -147,15 +124,12 @@ public class ControlCenterWidgetProvider extends AppWidgetProvider {
                     boolean micMuted = (next == 2);
                     service.setMicMuted(micMuted);
                 }
-            } else {
-                scheduleTermination();
             }
 
             Toast.makeText(localizedContext, next == 3 ? R.string.toast_audio_sys_mic : R.string.toast_audio_sys, Toast.LENGTH_SHORT).show();
             updateAllWidgets(localizedContext);
         } else if (ACTION_WIDGET_UPDATE.equals(action) || AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(action)) {
             updateAllWidgets(localizedContext);
-            scheduleTermination();
         }
     }
 

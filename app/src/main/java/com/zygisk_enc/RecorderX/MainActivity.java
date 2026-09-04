@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         activeInstance = this;
         isActivityVisible = true;
-        ControlCenterWidgetProvider.cancelPendingTermination();
     }
 
     @Override

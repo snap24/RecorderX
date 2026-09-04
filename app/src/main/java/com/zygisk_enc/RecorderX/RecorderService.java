@@ -125,7 +125,6 @@ public class RecorderService extends Service {
     public void onCreate() {
         super.onCreate();
         activeInstance = this;
-        ControlCenterWidgetProvider.cancelPendingTermination();
     }
 
     @Override
@@ -182,13 +181,6 @@ public class RecorderService extends Service {
             if (!isRecording) {
                 stopForeground(true);
                 stopSelf();
-                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                    if (!MainActivity.isActivityVisible() && !isRecording && !CameraOverlayController.isOverlayShowing()) {
-                        Log.i(TAG, "Terminating process after notification delete action.");
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(0);
-                    }
-                }, 500);
             }
         }
 
@@ -310,14 +302,9 @@ public class RecorderService extends Service {
         stopForeground(true);
         stopSelf();
 
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            if (!isRecording) {
-                MainActivity.finishIfOpen();
-                Log.i(TAG, "Terminating process cleanly after recording stopped.");
-                android.os.Process.killProcess(android.os.Process.myPid());
-                System.exit(0);
-            }
-        }, 800);
+        if (isTaskRemovedFromRecents || !MainActivity.isActivityVisible()) {
+            MainActivity.finishIfOpen();
+        }
     }
 
     public boolean isPaused() {
@@ -695,13 +682,11 @@ public class RecorderService extends Service {
         Log.d(TAG, "onTaskRemoved: Task removed from Recents.");
         if (isRecording) {
             isTaskRemovedFromRecents = true;
-            Log.i(TAG, "onTaskRemoved: App swiped from Recents while recording. Marked for process kill on STOP.");
+            Log.i(TAG, "onTaskRemoved: App swiped from Recents while recording.");
         } else {
-            Log.i(TAG, "onTaskRemoved: Not recording, stopping service and clearing RAM.");
+            Log.i(TAG, "onTaskRemoved: Not recording, stopping service.");
             stopForeground(true);
             stopSelf();
-            android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(0);
         }
     }
 

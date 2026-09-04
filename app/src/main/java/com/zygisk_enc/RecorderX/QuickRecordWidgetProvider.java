@@ -29,7 +29,6 @@ public class QuickRecordWidgetProvider extends AppWidgetProvider {
         if (ACTION_WIDGET_UPDATE.equals(action) ||
             AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(action)) {
             updateAllWidgets(LocaleManager.updateResources(context));
-            ControlCenterWidgetProvider.scheduleTermination();
         }
     }
 

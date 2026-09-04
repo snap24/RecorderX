@@ -17,7 +17,6 @@ import java.io.File;
 public class WidgetActionActivity extends Activity {
 
     public static final String ACTION_OPEN_LAST_REC = "com.zygisk_enc.RecorderX.ACTION_OPEN_LAST_REC";
-    private boolean usedFileProvider = false;
 
     @Override
     protected void attachBaseContext(android.content.Context newBase) {
@@ -27,7 +26,6 @@ public class WidgetActionActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ControlCenterWidgetProvider.cancelPendingTermination();
 
         String action = getIntent() != null ? getIntent().getAction() : null;
         if (ACTION_OPEN_LAST_REC.equals(action)) {
@@ -39,15 +37,6 @@ public class WidgetActionActivity extends Activity {
             overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0);
         } else {
             overridePendingTransition(0, 0);
-        }
-
-        if (!usedFileProvider) {
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                if (!MainActivity.isActivityVisible() && !RecorderService.isRecording() && !CameraOverlayController.isOverlayShowing()) {
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                    System.exit(0);
-                }
-            }, 3000);
         }
     }
 
@@ -79,7 +68,6 @@ public class WidgetActionActivity extends Activity {
             Uri videoUri = resolveMediaUri(lastFile);
             if (videoUri == null) {
                 videoUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", lastFile);
-                usedFileProvider = true;
             }
 
             Intent viewIntent = new Intent(Intent.ACTION_VIEW);

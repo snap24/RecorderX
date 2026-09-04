@@ -30,7 +30,6 @@ public class RequestCaptureActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
-        ControlCenterWidgetProvider.cancelPendingTermination();
         
         if (isRequesting || RecorderService.isRecording()) {
             finish();
@@ -46,7 +45,6 @@ public class RequestCaptureActivity extends Activity {
         } else {
             isRequesting = false;
             finish();
-            exitProcessIfIdle();
         }
     }
 
@@ -66,7 +64,6 @@ public class RequestCaptureActivity extends Activity {
         } else {
             // Cancelled or denied
             finish();
-            exitProcessIfIdle();
         }
     }
 
@@ -74,23 +71,11 @@ public class RequestCaptureActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         isRequesting = false;
-        if (!RecorderService.isRecording()) {
-            exitProcessIfIdle();
-        }
     }
 
     @Override
     public void finish() {
         super.finish();
         overridePendingTransition(0, 0);
-    }
-
-    private void exitProcessIfIdle() {
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            if (!MainActivity.isActivityVisible() && !RecorderService.isRecording() && !CameraOverlayController.isOverlayShowing()) {
-                android.os.Process.killProcess(android.os.Process.myPid());
-                System.exit(0);
-            }
-        }, 300);
     }
 }

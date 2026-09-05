@@ -60,7 +60,7 @@
 
 ## Technical Configuration
 
-- Video Bitrate: Configurable up to 40 Mbps (CBR/VBR support).
+- Video Bitrate: Configurable up to 18 Mbps (CBR/VBR support).
 - Audio Fidelity: Adjustable sample rates from 64kbps to 320kbps.
 - Storage Path: All recordings are stored locally in `/Movies/RecorderX`.
 - Naming Conventions: Support for custom filename templates using date and timestamp variables.

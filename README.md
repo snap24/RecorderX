@@ -4,7 +4,7 @@
   <img src=".github/assets/iconz.png" width="256" height="256" />
   <br>
 
-  [![Latest Version](https://img.shields.io/badge/Version-v3.1.0-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/RecorderX/releases)
+  [![Latest Version](https://img.shields.io/badge/Version-v3.1.1-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/RecorderX/releases)
   ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)
   ![Android](https://img.shields.io/badge/API-29%2B-3DDC84?style=flat&logo=android&logoColor=white)
   [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat&logo=apache&logoColor=white)](LICENSE)
@@ -17,36 +17,14 @@
 
 ## Versions
 
-- v3.1.0 (Latest):
-  - 80 Global Languages System: Native multi-language support across 80 locales with a searchable language selection dialog.
-  - Background Process & Memory Optimization: Resolved background process lingering by implementing RAM cleanup when removed from Recents.
-  - Display Keep-Awake Engine: Ensured display remains active and awake during recording sessions to prevent screen timeout.
-  - Optimized Bitrate Thresholds: Capped maximum bitrate to a practical 18 Mbps threshold for improved high-frame-rate hardware encoding stability.
-  - General Bug Fixes & Stability: Resolved potential memory leaks and improved native MediaCodec surface release handling.
-- v3.0.1: 
-  - Performance & Core Fixes (Merged [#8](https://github.com/snap24/RecorderX/pull/8)):
-    - Fixed Android 14/15/16 and OnePlus recording failure by removing incompatible VirtualDisplay presentation flags.
-    - Fixed 1 FPS AV1 encoding lag by enforcing hardware-accelerated MediaCodec selection.
-    - Eliminated microphone audio stutter via PCM buffer allocation pooling.
-    - Fixed blurry 4K/1080p video outputs with dynamic BPP minimum bitrate calculation.
-    - Fixed video player start delay by zeroing CODEC_CONFIG buffer sizes.
-    - Fixed service memory leaks during lifecycle teardown (onDestroy).
-  - Floating Controls & Brush Tools:
-    - Added Independent Move Tool to select and drag individual drawn shapes around the screen.
-    - Reorganized Brush Toolbar into a compact 2-row/3-row grid with a dedicated frosted drag handle.
-    - Improved White 'X' (minimises toolbar, keeps drawings locked on screen) and Red 'X' (clears drawings & exits).
-    - Tapping floating bubble while minimised directly re-opens the Brush Toolbar.
-  - Notification Panel & System Integration:
-    - Added Hide / Show Floating Bubble action button directly in the active recording notification panel.
-    - Replaced generic open folder with "Open Last Recording", launching the system chooser for ZArchiver, VLC, Gallery, etc.
-  - UI & Quality-of-Life:
-    - Auto-dismissed "Swipe Here" tutorial hint on the 3rd app launch.
-    - Fixed Output Template Box border color to dynamically match the active accent theme across all states.
-- v3.0.0: Title Bar Swipe Gesture Theme Customizer (with custom onboarding and pulsing logo), Floating overlay controls, real-time screen brush tools, compact MediaStyle notification buttons, and compilation transition to Java 21.
-- v2.0.1: Android 14 background activity compliance fixes.
-- v2.0.0: Live-Reboot Watchdog, Encoder Fallback Mechanism, and System + Mic Audio Recording.
-- v1.1.0: 4K/120FPS Support, AMOLED Lavender UI, and Live Thumbnail Notifications.
-- v1.0.0: Initial stable release with H.264/HEVC support.
+- **v3.1.1 (Latest)**: Control Center & Quick Record home screen widgets, Facecam floating camera overlay, and natural Android lifecycle stability.
+- **v3.1.0**: 80 Global Languages System with searchable selector, display keep-awake engine, 18 Mbps bitrate cap, and native MediaCodec stability fixes.
+- **v3.0.1**: Android 14/15/16 & OnePlus recording fixes ([#8](https://github.com/snap24/RecorderX/pull/8)), AV1 hardware acceleration, audio stutter pooling, movable brush tools, and notification actions.
+- **v3.0.0**: Title Bar Swipe Gesture Theme Customizer (with custom onboarding and pulsing logo), Floating overlay controls, real-time screen brush tools, compact MediaStyle notification buttons, and compilation transition to Java 21.
+- **v2.0.1**: Android 14 background activity compliance fixes.
+- **v2.0.0**: Live-Reboot Watchdog, Encoder Fallback Mechanism, and System + Mic Audio Recording.
+- **v1.1.0**: 4K/120FPS Support, AMOLED Lavender UI, and Live Thumbnail Notifications.
+- **v1.0.0**: Initial stable release with H.264/HEVC support.
 
 ## Core Features
 

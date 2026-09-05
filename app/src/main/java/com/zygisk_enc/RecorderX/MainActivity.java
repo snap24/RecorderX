@@ -89,6 +89,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (RequestCaptureActivity.ACTION_REQUEST_CAMERA.equals(intent != null ? intent.getAction() : null)) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CODE_START);
+            }
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         isActivityVisible = false;
         if (activeInstance == this) {
@@ -128,16 +139,29 @@ public class MainActivity extends AppCompatActivity {
         RecorderService.registerStateListener(recordingStateListener);
         checkAndShowWhatsNew();
         
-        if (!checkPermissions()) {
+        boolean audioMissing = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED;
+        boolean notifMissing = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED;
+        boolean cameraMissing = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED;
+
+        android.content.SharedPreferences permPrefs = getSharedPreferences("perm_prefs", MODE_PRIVATE);
+        boolean cameraPrompted = permPrefs.getBoolean("camera_prompted_once", false);
+
+        if (audioMissing || notifMissing || (!cameraPrompted && cameraMissing)) {
             java.util.ArrayList<String> permissions = new java.util.ArrayList<>();
-            permissions.add(Manifest.permission.RECORD_AUDIO);
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.CAMERA);
+            if (audioMissing) {
+                permissions.add(Manifest.permission.RECORD_AUDIO);
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (cameraMissing && !cameraPrompted) {
+                permissions.add(Manifest.permission.CAMERA);
+                permPrefs.edit().putBoolean("camera_prompted_once", true).apply();
+            }
+            if (notifMissing) {
                 permissions.add(Manifest.permission.POST_NOTIFICATIONS);
             }
-            ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSION_REQUEST_CODE_START);
+            if (!permissions.isEmpty()) {
+                ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSION_REQUEST_CODE_START);
+            }
         }
 
         // Initialize swipe customizer onboarding hint next to the title
@@ -751,6 +775,8 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, R.string.toast_audio_permission_required, Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == PERMISSION_REQUEST_CODE_START) {
+            ControlCenterWidgetProvider.updateAllWidgets(this);
         }
     }
 

@@ -62,10 +62,10 @@ public class ControlCenterWidgetProvider extends AppWidgetProvider {
                 localizedContext.startActivity(permIntent);
                 Toast.makeText(localizedContext, R.string.dialog_overlay_permission_title, Toast.LENGTH_SHORT).show();
             } else if (ContextCompat.checkSelfPermission(localizedContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                Intent appIntent = new Intent(localizedContext, MainActivity.class);
-                appIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                localizedContext.startActivity(appIntent);
-                Toast.makeText(localizedContext, R.string.toast_camera_permission_required, Toast.LENGTH_SHORT).show();
+                Intent reqIntent = new Intent(localizedContext, RequestCaptureActivity.class);
+                reqIntent.setAction(RequestCaptureActivity.ACTION_REQUEST_CAMERA);
+                reqIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                localizedContext.startActivity(reqIntent);
             } else {
                 boolean nextState = !settingsManager.isCameraOverlayEnabled();
                 settingsManager.setCameraOverlayEnabled(nextState);

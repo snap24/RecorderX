@@ -285,11 +285,12 @@ public class FloatingController {
             btnCamera = createMenuButton(new CameraIconDrawable(initialCamActive, getAccentColor()), v -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     context.checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    android.widget.Toast.makeText(context, R.string.toast_camera_permission_required, android.widget.Toast.LENGTH_LONG).show();
                     try {
-                        Intent intent = new Intent(context, MainActivity.class);
+                        Intent intent = new Intent(context, RequestCaptureActivity.class);
+                        intent.setAction(RequestCaptureActivity.ACTION_REQUEST_CAMERA);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(intent);
+                        collapse();
                     } catch (Exception ignored) {}
                     return;
                 }
@@ -312,7 +313,13 @@ public class FloatingController {
             btnCamera.setOnLongClickListener(v -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     context.checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    android.widget.Toast.makeText(context, R.string.toast_camera_permission_required, android.widget.Toast.LENGTH_LONG).show();
+                    try {
+                        Intent intent = new Intent(context, RequestCaptureActivity.class);
+                        intent.setAction(RequestCaptureActivity.ACTION_REQUEST_CAMERA);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                        collapse();
+                    } catch (Exception ignored) {}
                     return true;
                 }
                 if (cameraController == null) {

@@ -1,34 +1,28 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-
-# Android Studio
-.idea/
-*.iml
-.gradle/
-build/
-captures/
-.externalNativeBuild/
-.cxx/
-local.properties
-
-# Android Built Files
+# Built & Output Files
 *.apk
 *.ap_
+*.aab
 *.dex
 *.dm
+/build/
+build/
+/captures/
+captures/
+release/
+app/release/
+**/output-metadata.json
+
+# Gradle & Local Config
+.gradle/
+local.properties
+/local.properties
+ijMapper_local.gradle
+
+# Android Studio & IntelliJ
+.idea/
+*.iml
+.externalNativeBuild/
+.cxx/
 
 # OS files
 .DS_Store
